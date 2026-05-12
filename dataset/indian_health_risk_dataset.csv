@@ -1,0 +1,151 @@
+patient_id,name,state,age,gender,bmi,systolic_bp,diastolic_bp,cholesterol_mg_dl,smoking,alcohol_consumption,physical_activity,family_history,heart_rate_bpm,sdnn_hrv,rmssd_hrv,spo2,risk_score,risk_level
+INDP1000,Nayantara Goswami,Maharashtra,56,Male,22.8,144,84,263,Yes,Yes,Low,No,66,33.8,16.2,96.4,91.0,High
+INDP1001,Indrajit Kapadia,Delhi,57,Female,22.7,134,77,207,Yes,Yes,Low,No,50,42.2,35.9,95.2,70.3,High
+INDP1002,Nirvi Dugal,Tamil Nadu,59,Female,24.0,140,72,273,Yes,No,Moderate,Yes,75,37.0,32.7,98.0,84.7,High
+INDP1003,Divit Bhattacharyya,Maharashtra,26,Female,22.6,120,71,239,No,Yes,High,Yes,75,32.3,41.5,95.5,29.4,Low
+INDP1004,Oorja Rajagopal,Gujarat,19,Female,19.5,112,71,176,Yes,No,Moderate,No,74,51.8,41.9,96.8,20.7,Low
+INDP1005,Kimaya Handa,Telangana,48,Male,21.0,116,84,201,No,No,Moderate,No,62,29.4,23.8,97.2,29.1,Low
+INDP1006,Urvi Shere,Maharashtra,32,Male,17.5,106,80,162,No,Yes,Low,Yes,80,50.0,36.1,97.7,36.8,Medium
+INDP1007,Nakul Ahluwalia,Tamil Nadu,45,Male,26.3,147,76,222,No,No,Moderate,No,64,27.4,38.0,98.6,50.3,Medium
+INDP1008,Tushar Dyal,Maharashtra,44,Female,16.8,136,73,216,No,No,Moderate,No,69,39.9,22.8,96.7,36.6,Medium
+INDP1009,Onkar Biswas,Delhi,49,Male,19.3,141,85,211,No,Yes,Moderate,Yes,70,24.2,26.1,97.9,64.8,Medium
+INDP1010,Kabir Dugar,Telangana,49,Female,31.5,154,81,269,No,No,Low,Yes,69,33.7,21.2,96.7,91.0,High
+INDP1011,Shaan Majumdar,Telangana,37,Female,25.4,142,73,206,Yes,Yes,High,No,72,26.9,35.8,97.3,53.0,Medium
+INDP1012,Bhamini Rattan,West Bengal,56,Male,25.5,129,92,233,No,No,High,No,66,28.3,26.9,96.3,44.0,Medium
+INDP1013,Seher Kalla,Kerala,41,Male,21.2,143,78,164,Yes,No,Low,No,65,29.9,33.7,96.5,54.6,Medium
+INDP1014,Dhanush Luthra,Karnataka,19,Female,23.2,120,81,150,Yes,No,Moderate,Yes,79,58.0,50.7,94.7,31.1,Low
+INDP1015,Ishaan Vyas,Kerala,72,Male,29.6,162,89,246,Yes,Yes,Moderate,No,90,20.4,31.5,99.6,100.0,High
+INDP1016,Divyansh Ganesan,Karnataka,65,Female,23.2,147,94,243,No,No,Low,No,71,39.9,33.7,95.9,68.2,Medium
+INDP1017,Vritika Chokshi,Maharashtra,80,Male,27.6,144,89,249,No,No,Low,No,82,28.7,23.3,95.9,86.9,High
+INDP1018,Advik Soman,West Bengal,42,Female,25.8,121,72,240,No,No,High,No,58,38.6,39.8,97.2,31.9,Low
+INDP1019,Anay Ratta,Delhi,72,Male,20.1,130,87,248,No,Yes,Moderate,No,78,34.4,22.7,97.3,63.0,Medium
+INDP1020,Piya Rajagopal,Karnataka,25,Male,27.6,140,63,236,No,Yes,High,No,66,32.2,15.7,96.0,45.5,Medium
+INDP1021,Tarini Baral,West Bengal,78,Female,27.9,146,81,243,No,Yes,Low,No,83,40.5,29.3,98.1,91.2,High
+INDP1022,Khushi Sha,Gujarat,50,Male,27.5,172,72,254,Yes,No,High,Yes,79,36.5,37.8,97.0,93.5,High
+INDP1023,Hrishita Verma,Tamil Nadu,44,Male,25.1,150,77,290,No,No,Low,No,82,30.3,25.0,97.6,65.9,Medium
+INDP1024,Ranbir Sankaran,Delhi,45,Female,17.9,125,80,214,No,No,High,No,74,39.7,47.1,98.9,26.5,Low
+INDP1025,Zoya Tella,Gujarat,77,Female,23.2,157,91,247,No,No,Low,No,66,26.5,31.5,97.1,82.2,High
+INDP1026,Zeeshan Sharma,Delhi,75,Male,27.5,143,77,247,Yes,Yes,Low,No,65,21.5,30.0,99.1,100.0,High
+INDP1027,Dhruv Majumdar,Telangana,59,Male,27.1,150,84,342,Yes,No,Low,No,81,43.3,36.5,97.8,100.0,High
+INDP1028,Hansh Chada,Gujarat,29,Male,18.8,140,68,215,No,Yes,Moderate,No,77,41.3,37.7,94.7,33.0,Low
+INDP1029,Akarsh Sinha,Kerala,54,Male,31.2,149,84,220,No,No,Low,Yes,99,49.9,40.2,98.0,84.1,High
+INDP1030,Jayan Srinivasan,Maharashtra,30,Female,24.6,123,85,192,No,No,Moderate,No,68,35.4,34.0,96.0,19.9,Low
+INDP1031,Emir Dasgupta,Delhi,29,Male,20.2,118,72,173,No,No,High,Yes,93,43.4,26.4,98.1,17.7,Low
+INDP1032,Lakshay Kanda,Maharashtra,33,Female,33.5,142,86,222,Yes,Yes,Moderate,No,76,34.7,29.7,96.7,73.8,High
+INDP1033,Ishita Ramaswamy,Karnataka,64,Female,24.1,163,82,219,No,No,Low,No,63,32.4,14.9,95.4,81.8,High
+INDP1034,Rhea Ganguly,Delhi,27,Male,25.0,134,87,211,No,No,Low,No,81,41.8,43.7,97.6,34.0,Low
+INDP1035,Advika Chawla,Gujarat,29,Female,31.3,123,88,173,No,Yes,Low,Yes,74,44.9,37.1,96.3,52.8,Medium
+INDP1036,Anya Devan,Gujarat,34,Female,20.4,140,70,228,No,No,High,No,75,25.5,27.0,98.6,28.4,Low
+INDP1037,Zain Bhandari,Karnataka,28,Male,26.4,135,71,228,Yes,Yes,Low,No,81,34.7,22.8,95.5,60.5,Medium
+INDP1038,Rhea Chaudhari,Tamil Nadu,56,Female,29.2,148,71,257,Yes,No,Moderate,No,87,41.7,25.9,95.4,84.5,High
+INDP1039,Prisha Dhar,Delhi,66,Male,30.2,153,87,256,No,Yes,Low,No,79,31.8,29.2,97.7,92.9,High
+INDP1040,Shlok Jha,Maharashtra,64,Female,29.5,172,80,265,Yes,No,Low,No,79,46.6,35.1,97.6,100.0,High
+INDP1041,Misha Bahl,Telangana,34,Female,23.3,130,80,226,No,No,Low,Yes,87,35.4,29.6,98.6,45.7,Medium
+INDP1042,Hunar Chandran,Maharashtra,48,Male,16.0,123,73,220,Yes,Yes,Moderate,No,68,21.4,27.7,95.2,61.5,Medium
+INDP1043,Shanaya Bora,Delhi,79,Male,26.3,146,88,306,No,No,High,Yes,74,33.4,31.0,96.5,91.2,High
+INDP1044,Faiyaz Chhabra,West Bengal,55,Female,30.4,144,81,260,Yes,No,Low,Yes,73,34.2,36.4,95.7,100.0,High
+INDP1045,Aarna Joshi,Karnataka,74,Male,34.1,165,82,331,No,No,Low,No,88,45.7,26.3,98.2,100.0,High
+INDP1046,Stuvan Bassi,Maharashtra,45,Female,21.1,126,71,251,No,Yes,High,Yes,68,30.0,23.0,96.1,47.5,Medium
+INDP1047,Misha Krishnamurthy,West Bengal,44,Male,26.4,156,84,211,Yes,No,Moderate,Yes,67,41.1,23.2,99.2,77.7,High
+INDP1048,Ivana Char,West Bengal,73,Female,25.6,161,82,229,Yes,No,Low,No,74,43.6,22.9,98.7,98.5,High
+INDP1049,Dishani Apte,Gujarat,76,Male,26.1,155,70,240,Yes,No,Moderate,Yes,74,30.4,28.5,97.4,100.0,High
+INDP1050,Mamooty Barad,Tamil Nadu,48,Female,26.3,141,89,245,No,Yes,High,No,69,47.2,26.6,96.2,52.9,Medium
+INDP1051,Ritvik Swaminathan,West Bengal,18,Male,25.5,128,77,163,No,No,Low,Yes,60,52.6,39.5,96.1,31.0,Low
+INDP1052,Zeeshan Bhalla,Delhi,51,Female,30.1,144,85,231,No,No,High,No,80,46.5,13.0,96.2,64.9,Medium
+INDP1053,Nirvi Kala,Tamil Nadu,54,Male,31.0,156,78,243,No,No,Moderate,No,58,46.8,36.9,96.8,73.7,High
+INDP1054,Indranil Chandran,Karnataka,69,Male,16.9,157,82,240,No,No,Moderate,No,95,34.0,26.6,98.7,68.2,Medium
+INDP1055,Kiara Setty,Delhi,34,Male,18.2,121,79,188,No,No,High,No,55,38.5,25.1,97.8,12.9,Low
+INDP1056,Rhea Kata,Gujarat,68,Female,16.3,157,73,261,Yes,No,Low,Yes,66,36.9,22.9,99.0,100.0,High
+INDP1057,Divij Mall,Delhi,49,Male,33.2,144,77,240,Yes,No,Low,No,67,31.7,21.5,96.8,90.1,High
+INDP1058,Tanya Bains,West Bengal,51,Male,23.5,129,76,218,Yes,Yes,Low,No,95,34.2,22.6,97.0,66.3,Medium
+INDP1059,Shlok Soni,Karnataka,65,Female,24.6,143,86,264,No,No,High,No,70,28.4,26.8,94.2,60.2,Medium
+INDP1060,Indrajit Koshy,Karnataka,43,Male,25.8,152,77,226,No,Yes,Moderate,No,84,41.2,30.2,98.1,56.0,Medium
+INDP1061,Azad Kothari,Maharashtra,68,Male,21.8,134,82,239,No,No,Moderate,No,65,27.2,22.7,96.6,55.9,Medium
+INDP1062,Biju Kar,Delhi,34,Female,23.6,107,84,172,No,Yes,Low,No,101,34.2,37.1,99.0,29.4,Low
+INDP1063,Dhanush Venkataraman,Maharashtra,57,Female,20.9,135,76,190,No,No,High,No,85,49.9,20.4,97.7,36.3,Medium
+INDP1064,Manikya Tara,Tamil Nadu,39,Female,22.5,117,84,207,No,No,Low,No,77,45.5,33.3,97.5,30.8,Low
+INDP1065,Mishti Dhillon,West Bengal,55,Male,27.1,145,93,281,No,No,Moderate,No,85,28.9,26.5,95.8,66.8,Medium
+INDP1066,Rania Ravi,Telangana,36,Female,27.6,126,88,226,No,Yes,Low,No,73,39.9,39.3,97.0,48.7,Medium
+INDP1067,Lagan Jain,Tamil Nadu,30,Female,22.4,125,70,187,No,No,Moderate,No,86,35.4,40.8,95.6,16.9,Low
+INDP1068,Shayak Atwal,Delhi,34,Male,24.7,120,84,220,No,No,Moderate,Yes,70,51.2,30.7,95.5,35.6,Medium
+INDP1069,Ryan Raman,Gujarat,18,Female,27.0,140,72,199,Yes,Yes,Low,Yes,70,47.1,34.9,96.6,62.9,Medium
+INDP1070,Manjari Chana,Kerala,22,Male,27.6,114,72,218,No,No,Moderate,No,93,48.2,48.8,96.5,22.7,Low
+INDP1071,Nehmat Dada,Maharashtra,49,Female,17.5,125,79,247,No,Yes,Moderate,No,79,34.4,37.4,94.3,44.2,Medium
+INDP1072,Mohanlal Gill,Delhi,57,Female,26.0,127,70,221,Yes,No,Moderate,No,85,43.3,42.1,97.0,62.9,Medium
+INDP1073,Kaira Lall,Telangana,44,Male,23.1,137,72,195,No,No,Moderate,No,91,40.4,30.0,98.0,34.2,Low
+INDP1074,Badal Brahmbhatt,Gujarat,55,Female,16.0,137,94,184,No,No,Moderate,No,107,36.5,12.5,96.5,48.0,Medium
+INDP1075,Riaan Cherian,West Bengal,62,Male,28.5,162,84,300,No,No,Low,Yes,68,23.6,16.8,98.8,100.0,High
+INDP1076,Yashvi Sanghvi,West Bengal,64,Female,28.3,134,81,244,No,Yes,Low,Yes,82,45.7,37.3,97.8,86.4,High
+INDP1077,Nayantara Soman,Tamil Nadu,48,Female,19.6,149,80,212,No,No,Low,Yes,75,42.6,49.5,97.6,62.3,Medium
+INDP1078,Elakshi Contractor,Delhi,38,Male,30.6,132,81,215,Yes,No,Moderate,Yes,66,40.4,40.9,96.7,70.5,High
+INDP1079,Tara Ramesh,Kerala,55,Female,19.8,121,78,261,No,No,High,Yes,73,23.0,28.8,96.7,56.5,Medium
+INDP1080,Drishya Chana,Kerala,24,Female,29.2,123,69,192,Yes,No,Moderate,No,76,29.3,35.8,97.5,39.9,Medium
+INDP1081,Ryan Chaudhry,Kerala,37,Male,21.8,126,77,207,No,Yes,Moderate,Yes,69,39.8,28.3,97.8,40.3,Medium
+INDP1082,Reyansh Trivedi,Kerala,36,Male,23.2,108,68,243,No,No,High,No,79,48.1,41.2,95.8,22.4,Low
+INDP1083,Trisha Chand,West Bengal,67,Male,16.0,147,90,170,Yes,No,High,Yes,72,29.6,18.5,96.1,80.8,High
+INDP1084,Tanya Dubey,West Bengal,63,Female,30.7,153,81,287,No,No,Low,No,59,36.1,29.2,95.3,91.4,High
+INDP1085,Ivana Yadav,Telangana,25,Female,25.4,125,78,173,Yes,Yes,Low,No,72,39.2,41.6,95.9,44.2,Medium
+INDP1086,Lakshay Guha,Delhi,73,Male,18.2,132,85,218,No,No,Moderate,No,82,35.1,36.8,98.1,55.2,Medium
+INDP1087,Kabir Shan,Maharashtra,18,Male,22.9,130,69,149,No,No,Low,No,60,47.2,28.2,99.1,17.0,Low
+INDP1088,Misha Goel,Maharashtra,47,Male,28.8,138,77,243,No,Yes,Low,No,78,36.9,22.6,96.9,67.3,Medium
+INDP1089,Vedika Bhatti,Kerala,67,Male,33.6,164,79,264,No,Yes,Low,Yes,63,33.4,16.9,97.7,100.0,High
+INDP1090,Taran Chawla,Delhi,34,Female,24.7,104,73,216,No,Yes,Moderate,No,71,34.0,40.7,95.9,30.0,Low
+INDP1091,Miraan Saraf,Karnataka,51,Male,31.7,157,69,218,No,Yes,Moderate,No,69,36.0,34.8,96.1,74.7,High
+INDP1092,Vihaan Ben,Karnataka,68,Female,25.6,146,88,249,No,No,Low,No,83,44.4,27.3,97.7,75.6,High
+INDP1093,Saanvi Kapadia,Gujarat,41,Female,25.4,136,81,181,No,Yes,High,No,75,32.5,21.2,98.2,34.0,Low
+INDP1094,Zain Mangat,Gujarat,43,Male,16.5,121,72,150,No,No,High,Yes,83,50.2,27.1,96.9,28.0,Low
+INDP1095,Tarini Sankar,Maharashtra,67,Female,27.5,159,87,217,No,No,Low,No,68,30.6,27.8,97.7,80.3,High
+INDP1096,Madhup Kibe,Kerala,64,Female,27.8,161,87,277,No,Yes,Moderate,No,76,33.3,30.7,97.9,86.8,High
+INDP1097,Ehsaan Dayal,West Bengal,76,Female,28.3,156,87,264,Yes,No,Low,Yes,87,30.2,23.5,98.1,100.0,High
+INDP1098,Jivika Khanna,Delhi,59,Female,30.4,162,87,205,Yes,No,High,No,86,33.8,12.1,98.6,91.2,High
+INDP1099,Taran Choudhry,Gujarat,40,Male,24.3,128,86,219,Yes,No,Moderate,Yes,86,26.1,35.1,98.1,57.9,Medium
+INDP1100,Dhanuk Dutta,Delhi,79,Female,20.6,124,83,220,No,Yes,Low,Yes,101,25.0,21.4,95.2,77.7,High
+INDP1101,Rohan Khare,Telangana,47,Female,18.3,111,74,225,No,No,Moderate,Yes,72,30.2,24.9,95.7,42.0,Medium
+INDP1102,Indrajit Khurana,Delhi,79,Female,18.6,151,84,222,No,Yes,Low,Yes,69,36.6,28.1,97.1,91.5,High
+INDP1103,Kaira Kala,Delhi,80,Female,24.8,160,79,273,Yes,No,Moderate,Yes,77,33.9,28.0,99.9,100.0,High
+INDP1104,Prisha Handa,Maharashtra,27,Female,24.5,121,78,212,Yes,No,Moderate,No,63,45.2,53.1,97.6,34.6,Low
+INDP1105,Tarini Sane,Tamil Nadu,66,Male,23.5,133,87,269,No,No,Low,No,79,29.8,23.6,96.2,66.4,Medium
+INDP1106,Taran Johal,Gujarat,64,Female,24.5,156,73,226,Yes,Yes,Low,No,69,33.0,32.4,96.8,92.1,High
+INDP1107,Ivana Setty,Tamil Nadu,28,Male,24.3,118,67,182,No,No,Moderate,No,75,54.8,31.7,97.3,14.9,Low
+INDP1108,Gokul Wali,Gujarat,34,Male,28.6,135,87,241,Yes,No,Low,Yes,87,40.3,35.4,99.1,76.1,High
+INDP1109,Lakshay Contractor,West Bengal,33,Male,28.7,138,79,237,No,No,Low,No,81,46.3,41.5,98.8,51.4,Medium
+INDP1110,Mehul Bal,Delhi,55,Male,25.8,140,80,251,No,Yes,Moderate,No,70,40.1,41.5,97.4,62.1,Medium
+INDP1111,Rhea Bal,West Bengal,29,Female,25.8,129,67,224,No,No,High,No,82,57.5,33.0,97.3,24.4,Low
+INDP1112,Kashvi Venkataraman,Delhi,47,Male,24.8,133,77,252,No,No,High,Yes,81,31.0,28.1,97.6,51.2,Medium
+INDP1113,Tanya Sunder,Karnataka,53,Female,24.3,135,78,234,No,Yes,Low,Yes,57,43.1,27.5,97.2,69.7,Medium
+INDP1114,Vanya Sharaf,West Bengal,67,Female,33.1,149,73,308,No,No,Low,Yes,87,28.9,27.5,95.5,100.0,High
+INDP1115,Jhanvi Cheema,Delhi,21,Female,19.2,95,76,164,Yes,Yes,Low,No,65,47.5,38.3,96.3,34.1,Low
+INDP1116,Samaira Malhotra,Tamil Nadu,39,Female,26.7,137,75,259,Yes,Yes,Low,Yes,64,28.8,40.0,98.0,84.4,High
+INDP1117,Purab Krishnan,West Bengal,52,Male,25.3,137,86,223,Yes,No,Moderate,No,81,35.4,32.9,96.7,63.4,Medium
+INDP1118,Hansh Sabharwal,Gujarat,70,Female,24.4,136,81,251,Yes,No,Moderate,No,69,39.5,26.7,95.4,77.8,High
+INDP1119,Eshani Bhagat,West Bengal,47,Female,22.3,151,79,181,Yes,Yes,Moderate,Yes,77,31.2,37.8,96.2,70.9,High
+INDP1120,Misha Madan,Karnataka,28,Male,32.9,133,77,224,Yes,No,Moderate,No,85,50.6,37.2,97.6,59.9,Medium
+INDP1121,Aniruddh Chacko,Gujarat,68,Female,23.9,142,98,246,No,No,Low,No,81,46.7,22.0,97.0,69.7,Medium
+INDP1122,Advik Majumdar,Maharashtra,30,Female,19.5,110,81,202,Yes,No,Moderate,No,77,37.8,36.5,98.1,31.7,Low
+INDP1123,Zara Grover,Telangana,26,Female,25.2,120,79,210,No,No,Moderate,No,84,45.9,43.1,96.4,19.5,Low
+INDP1124,Vidur Korpal,Karnataka,24,Female,27.6,148,82,217,No,Yes,High,No,70,41.0,34.5,95.5,38.0,Medium
+INDP1125,Armaan Chatterjee,Karnataka,35,Female,20.9,120,80,226,Yes,Yes,Low,No,105,38.2,27.6,97.9,50.8,Medium
+INDP1126,Zara Sheth,Gujarat,49,Female,23.0,166,78,202,No,Yes,Low,No,71,24.9,35.0,96.5,73.0,High
+INDP1127,Divij Khalsa,Gujarat,66,Male,26.6,154,80,292,Yes,No,High,No,63,21.1,30.1,98.3,97.6,High
+INDP1128,Nishith Bhatt,West Bengal,53,Male,24.7,136,89,272,Yes,No,Moderate,No,81,44.5,21.9,95.1,69.7,Medium
+INDP1129,Ranbir Vyas,Gujarat,35,Male,30.5,145,79,210,No,Yes,High,No,79,36.7,22.5,96.9,48.9,Medium
+INDP1130,Divij Borah,West Bengal,77,Male,31.4,143,96,302,No,Yes,High,Yes,78,24.9,20.4,95.0,100.0,High
+INDP1131,Uthkarsh Gala,Kerala,52,Female,19.8,144,77,224,No,No,Low,No,75,39.4,31.6,95.5,54.4,Medium
+INDP1132,Keya Ramanathan,West Bengal,27,Male,21.5,127,88,159,No,No,High,No,63,28.5,24.1,98.4,9.8,Low
+INDP1133,Lakshay Bawa,West Bengal,29,Female,29.9,133,77,250,No,No,Low,Yes,72,43.2,32.9,96.3,60.5,Medium
+INDP1134,Khushi Bhakta,Kerala,19,Female,23.7,117,74,175,No,No,Moderate,Yes,69,37.9,49.0,97.9,17.1,Low
+INDP1135,Aarna Bandi,Kerala,37,Female,28.7,140,83,152,No,No,High,Yes,96,37.5,41.5,95.8,44.7,Medium
+INDP1136,Ira Swaminathan,Kerala,59,Male,22.1,144,85,210,No,No,Low,No,71,29.4,29.1,97.0,57.2,Medium
+INDP1137,Ivan Buch,Karnataka,35,Female,28.9,138,74,224,No,No,Moderate,Yes,77,42.6,26.6,97.8,54.3,Medium
+INDP1138,Shalv Hayer,Gujarat,33,Male,27.0,142,65,238,No,No,High,No,79,30.5,40.1,96.5,38.2,Medium
+INDP1139,Neysa Jha,Tamil Nadu,42,Male,26.3,140,88,234,No,No,Moderate,Yes,73,45.3,41.2,95.5,56.5,Medium
+INDP1140,Ritvik Kata,Maharashtra,23,Male,28.2,125,65,183,No,No,Low,No,62,50.7,45.6,98.9,28.8,Low
+INDP1141,Gokul Apte,Gujarat,32,Female,21.5,140,67,189,No,No,Low,Yes,63,34.8,35.8,96.2,43.1,Medium
+INDP1142,Alia Saha,Delhi,63,Male,30.1,158,101,260,No,Yes,Moderate,Yes,59,34.8,12.1,96.4,100.0,High
+INDP1143,Ryan Babu,Gujarat,40,Male,27.4,145,82,231,No,Yes,Moderate,No,77,37.5,27.9,96.7,54.3,Medium
+INDP1144,Manikya Kanda,West Bengal,78,Male,26.8,178,88,273,No,No,Low,No,100,38.2,28.1,96.4,100.0,High
+INDP1145,Mannat Raja,Tamil Nadu,19,Female,22.6,104,72,180,No,Yes,Moderate,No,66,46.6,49.9,97.3,10.7,Low
+INDP1146,Vidur Jaggi,Gujarat,73,Male,22.7,152,83,269,Yes,No,Low,No,80,13.2,29.0,99.7,100.0,High
+INDP1147,Lakshit Talwar,Gujarat,45,Male,22.2,126,70,258,Yes,No,Moderate,No,63,31.5,27.3,98.1,53.6,Medium
+INDP1148,Ayesha Brar,West Bengal,36,Female,26.7,142,80,234,No,Yes,Moderate,Yes,73,29.8,30.8,96.3,59.1,Medium
+INDP1149,Neelofar Swamy,Gujarat,61,Female,23.6,146,89,278,No,No,Low,No,60,35.9,39.6,95.0,71.0,High
