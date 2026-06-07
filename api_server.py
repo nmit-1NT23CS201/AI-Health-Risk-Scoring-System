@@ -5,7 +5,7 @@ import io
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Tuple
-
+from src.database import create_tables, save_assessment
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -52,6 +52,8 @@ class PredictionResponse(BaseModel):
     bar_plot: str
     waterfall_plot: str
 
+
+create_tables()
 
 app = FastAPI(title="AI Health Risk API", version="1.0")
 app.add_middleware(
@@ -172,7 +174,11 @@ def predict(payload: PredictionInput) -> PredictionResponse:
 
         prediction = float(pipeline.predict(input_df)[0])
         risk_level = classify_risk(prediction)
-
+        assessment_id = save_assessment(
+            payload,
+            prediction,
+            risk_level
+        )
         X_processed, feature_names = prepare_shap_inputs(pipeline, input_df)
         shap_values, base_value = compute_shap_values(pipeline, X_processed)
         shap_row = shap_values[0]
