@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
@@ -36,6 +36,29 @@ type PredictionResponse = {
   summary_plot: string;
   bar_plot: string;
   waterfall_plot: string;
+};
+type HistoryRecord = {
+  id: number;
+  age: number;
+  risk_score: number;
+  risk_level: string;
+  created_at: string;
+};
+
+type ModelMetrics = {
+  regression_metrics: {
+    MAE: number;
+    MSE: number;
+    RMSE: number;
+    R2: number;
+  };
+  classification_metrics: {
+    accuracy: number;
+    precision: number;
+    recall: number;
+    f1: number;
+  };
+  confusion_matrix: string;
 };
 
 const defaultValues: PredictionInput = {
@@ -102,16 +125,53 @@ function riskPillClass(riskLevel: string) {
 export default function Home() {
   const [formValues, setFormValues] = useState<PredictionInput>(defaultValues);
   const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
+  const [history, setHistory] = useState<HistoryRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [metrics, setMetrics] = useState<ModelMetrics | null>(null);
+  const [metricsLoading, setMetricsLoading] = useState(false);
+  const [metricsError, setMetricsError] = useState<string | null>(null);
 
+  useEffect(() => {
+    loadHistory();
+    loadMetrics();
+  }, []);
+
+  async function loadMetrics() {
+    setMetricsLoading(true);
+    setMetricsError(null);
+    try {
+      const response = await fetch(`${API_BASE}/model-metrics`);
+      if (!response.ok) {
+        throw new Error("Failed to load model performance metrics.");
+      }
+      const data = await response.json();
+      setMetrics(data);
+    } catch (err) {
+      setMetricsError(err instanceof Error ? err.message : "Failed to load metrics");
+    } finally {
+      setMetricsLoading(false);
+    }
+  }
   const riskPercent = useMemo(() => {
     if (!prediction) return 0;
     return Math.max(0, Math.min(100, prediction.risk_score));
   }, [prediction]);
 
   const predictionState = prediction ? "Prediction Complete" : "Awaiting Input";
+  async function loadHistory() {
+    try {
+      const response = await fetch(`${API_BASE}/history`);
 
+      if (!response.ok) return;
+
+      const data = await response.json();
+
+      setHistory(data);
+    } catch {
+      console.log("Failed to load history");
+    }
+  }
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setLoading(true);
@@ -130,6 +190,7 @@ export default function Home() {
 
       const payload = (await response.json()) as PredictionResponse;
       setPrediction(payload);
+      await loadHistory();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Prediction failed.");
     } finally {
@@ -490,7 +551,9 @@ export default function Home() {
                   </div>
                 ))}
                 {!prediction && (
-                  <div className="empty-state">Recommendations appear after prediction.</div>
+                  <div className="empty-state">
+                    Recommendations appear after prediction.
+                  </div>
                 )}
               </div>
             </div>
@@ -499,9 +562,12 @@ export default function Home() {
               <div className="card-header">
                 <div>
                   <div className="card-title">AI Explanation</div>
-                  <div className="card-subtitle">Key factors driving the score</div>
+                  <div className="card-subtitle">
+                    Key factors driving the score
+                  </div>
                 </div>
               </div>
+
               <div className="ai-explanation-grid">
                 <div>
                   <div className="section-label">Top Contributors</div>
@@ -512,15 +578,22 @@ export default function Home() {
                         {item.feature}
                       </div>
                     ))}
+
                     {prediction?.negative_contributors.map((item) => (
                       <div key={item.feature} className="chip negative">
                         <span>-</span>
                         {item.feature}
                       </div>
                     ))}
-                    {!prediction && <div className="empty-state">Awaiting prediction.</div>}
+
+                    {!prediction && (
+                      <div className="empty-state">
+                        Awaiting prediction.
+                      </div>
+                    )}
                   </div>
                 </div>
+
                 <div>
                   <div className="section-label">Insights</div>
                   <div className="insight-grid">
@@ -529,7 +602,12 @@ export default function Home() {
                         {insight}
                       </div>
                     ))}
-                    {!prediction && <div className="empty-state">No insights yet.</div>}
+
+                    {!prediction && (
+                      <div className="empty-state">
+                        No insights yet.
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -539,37 +617,192 @@ export default function Home() {
               <div className="card-header">
                 <div>
                   <div className="card-title">SHAP Visualizations</div>
-                  <div className="card-subtitle">Explainability charts</div>
+                  <div className="card-subtitle">
+                    Explainability charts
+                  </div>
                 </div>
               </div>
-              {error && <p style={{ color: "var(--danger)" }}>{error}</p>}
-              {!prediction && (
-                <p style={{ color: "var(--muted)" }}>Run a prediction to load charts.</p>
+
+              {error && (
+                <p style={{ color: "var(--danger)" }}>
+                  {error}
+                </p>
               )}
+
+              {!prediction && (
+                <p style={{ color: "var(--muted)" }}>
+                  Run a prediction to load charts.
+                </p>
+              )}
+
               {prediction && (
                 <div className="chart-grid">
                   <div className="chart-card">
-                    <div className="section-label">Summary Plot</div>
+                    <div className="section-label">
+                      Summary Plot
+                    </div>
+
                     <img
                       src={`data:image/png;base64,${prediction.summary_plot}`}
                       alt="SHAP Summary"
                     />
                   </div>
+
                   <div className="chart-card">
-                    <div className="section-label">Bar Plot</div>
+                    <div className="section-label">
+                      Bar Plot
+                    </div>
+
                     <img
                       src={`data:image/png;base64,${prediction.bar_plot}`}
                       alt="SHAP Bar"
                     />
                   </div>
+
                   <div className="chart-card">
-                    <div className="section-label">Waterfall Plot</div>
+                    <div className="section-label">
+                      Waterfall Plot
+                    </div>
+
                     <img
                       src={`data:image/png;base64,${prediction.waterfall_plot}`}
                       alt="SHAP Waterfall"
                     />
                   </div>
                 </div>
+              )}
+            </div>
+
+            {/* Model Performance Card */}
+            <div className="glass-card results-card results-span-2">
+              <div className="card-header">
+                <div>
+                  <div className="card-title">Model Performance Evaluation</div>
+                  <div className="card-subtitle">
+                    RandomForestRegressor & Risk Classification metrics
+                  </div>
+                </div>
+              </div>
+
+              {metricsLoading && (
+                <div className="empty-state">Loading model performance metrics...</div>
+              )}
+
+              {metricsError && (
+                <div style={{ color: "var(--danger)", padding: "12px 14px" }}>
+                  {metricsError}
+                </div>
+              )}
+
+              {metrics && (
+                <div className="metrics-dashboard-grid">
+                  <div className="metrics-group">
+                    <div className="section-label">Regression Metrics</div>
+                    <div className="metrics-stats-grid">
+                      <div className="stat-box">
+                        <small>MAE</small>
+                        <span>{metrics.regression_metrics.MAE.toFixed(4)}</span>
+                      </div>
+                      <div className="stat-box">
+                        <small>MSE</small>
+                        <span>{metrics.regression_metrics.MSE.toFixed(4)}</span>
+                      </div>
+                      <div className="stat-box">
+                        <small>RMSE</small>
+                        <span>{metrics.regression_metrics.RMSE.toFixed(4)}</span>
+                      </div>
+                      <div className="stat-box">
+                        <small>R² Score</small>
+                        <span>{metrics.regression_metrics.R2.toFixed(4)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="metrics-group">
+                    <div className="section-label">Classification Metrics</div>
+                    <div className="metrics-stats-grid">
+                      <div className="stat-box">
+                        <small>Accuracy</small>
+                        <span>{(metrics.classification_metrics.accuracy * 100).toFixed(2)}%</span>
+                      </div>
+                      <div className="stat-box">
+                        <small>Precision</small>
+                        <span>{(metrics.classification_metrics.precision * 100).toFixed(2)}%</span>
+                      </div>
+                      <div className="stat-box">
+                        <small>Recall</small>
+                        <span>{(metrics.classification_metrics.recall * 100).toFixed(2)}%</span>
+                      </div>
+                      <div className="stat-box">
+                        <small>F1 Score</small>
+                        <span>{(metrics.classification_metrics.f1 * 100).toFixed(2)}%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="metrics-chart-container">
+                    <div className="section-label">Confusion Matrix Plot</div>
+                    <div className="confusion-matrix-wrapper">
+                      <img
+                        src={`data:image/png;base64,${metrics.confusion_matrix}`}
+                        alt="Confusion Matrix"
+                        className="confusion-matrix-img"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Assessment History */}
+            <div className="glass-card results-card results-span-2">
+              <div className="card-header">
+                <div>
+                  <div className="card-title">
+                    Assessment History
+                  </div>
+
+                  <div className="card-subtitle">
+                    Previously stored health assessments
+                  </div>
+                </div>
+              </div>
+
+              {history.length === 0 ? (
+                <div className="empty-state">
+                  No assessment history available.
+                </div>
+              ) : (
+                <table className="history-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Age</th>
+                      <th>Risk Score</th>
+                      <th>Risk Level</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {history.map((record) => (
+                      <tr key={record.id}>
+                        <td>
+                          {new Date(
+                            record.created_at
+                          ).toLocaleString()}
+                        </td>
+
+                        <td>{record.age}</td>
+
+                        <td>
+                          {record.risk_score.toFixed(2)}
+                        </td>
+
+                        <td>{record.risk_level}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               )}
             </div>
           </div>

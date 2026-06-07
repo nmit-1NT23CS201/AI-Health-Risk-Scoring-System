@@ -3,7 +3,7 @@ from pathlib import Path
 
 # Database location
 DB_PATH = Path("database/healthrisk.db")
-
+print("DATABASE PATH:", DB_PATH.resolve())
 
 def get_connection():
     """
@@ -16,7 +16,7 @@ def create_tables():
     """
     Creates the database and required tables if they do not exist.
     """
-
+    print("CREATING TABLES...")
     # Ensure database folder exists
     DB_PATH.parent.mkdir(exist_ok=True)
 
@@ -116,3 +116,24 @@ def save_assessment(payload, risk_score, risk_level):
     conn.close()
 
     return assessment_id
+def get_assessment_history(limit=20):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    SELECT
+        id,
+        age,
+        risk_score,
+        risk_level,
+        created_at
+    FROM assessments
+    ORDER BY created_at DESC
+    LIMIT ?
+    """, (limit,))
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return rows

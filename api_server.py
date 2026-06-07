@@ -5,7 +5,11 @@ import io
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Tuple
-from src.database import create_tables, save_assessment
+from src.database import (
+    create_tables,
+    save_assessment,
+    get_assessment_history
+)
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -164,7 +168,50 @@ def root() -> Dict[str, str]:
 @app.get("/health")
 def health_check() -> Dict[str, str]:
     return {"status": "ok"}
+@app.get("/history")
+def history():
 
+    rows = get_assessment_history()
+
+    return [
+        {
+            "id": row[0],
+            "age": row[1],
+            "risk_score": row[2],
+            "risk_level": row[3],
+            "created_at": row[4]
+        }
+        for row in rows
+    ]
+
+
+@app.get("/model-metrics")
+def get_model_metrics() -> Dict[str, object]:
+    project_root = Path(__file__).resolve().parent
+    metrics_path = project_root / "outputs" / "metrics.json"
+    cm_path = project_root / "outputs" / "confusion_matrix.png"
+
+    if not metrics_path.exists() or not cm_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail="Model metrics or confusion matrix image not found. Please run the evaluation pipeline script manually first."
+        )
+
+    try:
+        import json
+        with open(metrics_path, "r") as f:
+            metrics_data = json.load(f)
+
+        with open(cm_path, "rb") as f:
+            cm_base64 = base64.b64encode(f.read()).decode("utf-8")
+
+        return {
+            "regression_metrics": metrics_data["regression_metrics"],
+            "classification_metrics": metrics_data["classification_metrics"],
+            "confusion_matrix": cm_base64
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load model metrics: {str(e)}")
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(payload: PredictionInput) -> PredictionResponse:
