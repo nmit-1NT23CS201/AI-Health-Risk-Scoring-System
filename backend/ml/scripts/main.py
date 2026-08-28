@@ -1,26 +1,26 @@
 import argparse
 from pathlib import Path
 
-from src.data_loader import load_dataset
-from src.feature_engineering import select_features
-from src.predict import generate_predictions
-from src.risk_interpreter import (
+from backend.ml.data_loader import load_dataset
+from backend.ml.feature_engineering import select_features
+from backend.ml.predict import generate_predictions
+from backend.ml.risk_interpreter import (
     build_report,
     classify_risk,
     generate_insights,
     top_contributors,
 )
-from src.shap_explainer import compute_shap_values, load_model, prepare_shap_inputs
-from src.train_model import split_data
-from src.utils import ensure_dir, save_dataframe, save_text
-from src.visualization import save_bar_plot, save_summary_plot, save_waterfall_plot
+from backend.ml.shap_explainer import compute_shap_values, load_model, prepare_shap_inputs
+from backend.ml.train_model import split_data
+from backend.ml.utils import ensure_dir, save_dataframe, save_text
+from backend.ml.visualization import save_bar_plot, save_summary_plot, save_waterfall_plot
 
 
 def run_pipeline(test_size: float, random_state: int, sample_index: int) -> None:
-    project_root = Path(__file__).resolve().parent
+    project_root = Path(__file__).resolve().parents[3]
     dataset_path = project_root / "dataset" / "indian_health_risk_dataset.csv"
-    model_path = project_root / "models" / "random_forest_model.pkl"
-    outputs_dir = project_root / "outputs"
+    model_path = project_root / "backend" / "models" / "random_forest_model.pkl"
+    outputs_dir = project_root / "backend" / "outputs"
 
     ensure_dir(str(outputs_dir))
 

@@ -1,8 +1,8 @@
 import sqlite3
 from pathlib import Path
 
-# Database location
-DB_PATH = Path("database/healthrisk.db")
+# Database location is anchored to this module so it works from any cwd.
+DB_PATH = Path(__file__).resolve().parent / "healthrisk.db"
 print("DATABASE PATH:", DB_PATH.resolve())
 
 def get_connection():
@@ -137,3 +137,37 @@ def get_assessment_history(limit=20):
     conn.close()
 
     return rows
+
+
+def delete_assessment(assessment_id: int) -> bool:
+    """
+    Deletes a single assessment by ID.
+    Returns True if a row was deleted, False if the ID did not exist.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id FROM assessments WHERE id = ?", (assessment_id,))
+    if cursor.fetchone() is None:
+        conn.close()
+        return False
+
+    cursor.execute("DELETE FROM assessments WHERE id = ?", (assessment_id,))
+    conn.commit()
+    conn.close()
+    return True
+
+
+def delete_all_assessments() -> int:
+    """
+    Deletes every row in the assessments table.
+    Returns the number of rows deleted.
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM assessments")
+    deleted = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return deleted

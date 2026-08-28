@@ -172,6 +172,28 @@ export default function Home() {
       console.log("Failed to load history");
     }
   }
+
+  async function deleteAssessment(id: number) {
+    if (!window.confirm("Are you sure you want to delete this assessment?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/history/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      await loadHistory();
+    } catch {
+      console.error("Failed to delete assessment");
+    }
+  }
+
+  async function clearAllHistory() {
+    if (!window.confirm("Are you sure you want to permanently delete all assessment history?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/history`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Clear failed");
+      await loadHistory();
+    } catch {
+      console.error("Failed to clear history");
+    }
+  }
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setLoading(true);
@@ -766,6 +788,17 @@ export default function Home() {
                     Previously stored health assessments
                   </div>
                 </div>
+
+                {history.length > 0 && (
+                  <button
+                    id="clear-all-history-btn"
+                    className="clear-all-btn"
+                    onClick={clearAllHistory}
+                    type="button"
+                  >
+                    🗑 Clear All History
+                  </button>
+                )}
               </div>
 
               {history.length === 0 ? (
@@ -780,6 +813,7 @@ export default function Home() {
                       <th>Age</th>
                       <th>Risk Score</th>
                       <th>Risk Level</th>
+                      <th>Action</th>
                     </tr>
                   </thead>
 
@@ -789,7 +823,7 @@ export default function Home() {
                         <td>
                           {new Date(
                             record.created_at
-                          ).toLocaleString()}
+                          ).toLocaleString("en-IN")}
                         </td>
 
                         <td>{record.age}</td>
@@ -799,6 +833,18 @@ export default function Home() {
                         </td>
 
                         <td>{record.risk_level}</td>
+
+                        <td>
+                          <button
+                            id={`delete-assessment-${record.id}`}
+                            className="delete-row-btn"
+                            onClick={() => deleteAssessment(record.id)}
+                            type="button"
+                            title="Delete this assessment"
+                          >
+                            🗑
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

@@ -68,11 +68,11 @@ def run_evaluation_pipeline(
     test_size: float = 0.2,
     random_state: int = 42
 ) -> Dict[str, Any]:
-    from src.data_loader import load_dataset
-    from src.feature_engineering import select_features
-    from src.preprocessing import get_feature_groups, build_preprocessor
-    from src.train_model import split_data, train_model
-    from src.utils import ensure_dir
+    from backend.ml.data_loader import load_dataset
+    from backend.ml.feature_engineering import select_features
+    from backend.ml.preprocessing import get_feature_groups, build_preprocessor
+    from backend.ml.train_model import split_data, train_model
+    from backend.ml.utils import ensure_dir
 
     # 1. Load dataset
     df = load_dataset(dataset_path)
@@ -149,9 +149,9 @@ def run_evaluation_pipeline(
 
 
 if __name__ == "__main__":
-    project_root = Path(__file__).resolve().parent.parent
+    project_root = Path(__file__).resolve().parents[2]
     dataset_csv = project_root / "dataset" / "indian_health_risk_dataset.csv"
-    outputs_path = project_root / "outputs"
+    outputs_path = project_root / "backend" / "outputs"
     run_evaluation_pipeline(
         dataset_path=str(dataset_csv),
         outputs_dir=str(outputs_path)

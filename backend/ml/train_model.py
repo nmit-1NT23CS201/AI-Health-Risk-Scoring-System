@@ -7,7 +7,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
-from src.model_evaluation import evaluate_classification
+from backend.ml.model_evaluation import evaluate_classification
 
 
 def split_data(X, y, test_size: float, random_state: int):

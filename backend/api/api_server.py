@@ -5,10 +5,12 @@ import io
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Tuple
-from src.database import (
+from backend.database.database import (
     create_tables,
     save_assessment,
-    get_assessment_history
+    get_assessment_history,
+    delete_assessment,
+    delete_all_assessments,
 )
 import matplotlib
 matplotlib.use("Agg")
@@ -16,18 +18,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import shap
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from src.feature_engineering import FEATURE_COLUMNS
-from src.risk_interpreter import (
+from backend.ml.feature_engineering import FEATURE_COLUMNS
+from backend.ml.risk_interpreter import (
     classify_risk,
     generate_insights,
     top_contributors,
     _pretty_feature_name,
 )
-from src.shap_explainer import compute_shap_values, load_model, prepare_shap_inputs
+from backend.ml.shap_explainer import compute_shap_values, load_model, prepare_shap_inputs
 
 
 class PredictionInput(BaseModel):
@@ -78,9 +82,9 @@ app.add_middleware(
 
 @lru_cache
 def _get_paths() -> Tuple[Path, Path]:
-    project_root = Path(__file__).resolve().parent
+    project_root = Path(__file__).resolve().parents[2]
     dataset_path = project_root / "dataset" / "indian_health_risk_dataset.csv"
-    model_path = project_root / "models" / "random_forest_model.pkl"
+    model_path = project_root / "backend" / "models" / "random_forest_model.pkl"
     return dataset_path, model_path
 
 
@@ -180,23 +184,58 @@ def history():
 
     rows = get_assessment_history()
 
-    return [
-        {
-            "id": row[0],
-            "age": row[1],
-            "risk_score": row[2],
-            "risk_level": row[3],
-            "created_at": row[4]
-        }
-        for row in rows
-    ]
+    result = []
+
+    for row in rows:
+
+        created_at = datetime.strptime(
+            row[4],
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+        created_at = created_at.replace(
+            tzinfo=timezone.utc
+        ).astimezone(
+            ZoneInfo("Asia/Kolkata")
+        )
+
+        result.append(
+            {
+                "id": row[0],
+                "age": row[1],
+                "risk_score": row[2],
+                "risk_level": row[3],
+                "created_at": created_at.isoformat()
+            }
+        )
+
+    return result
+
+
+@app.delete("/history/{assessment_id}")
+def delete_single_assessment(assessment_id: int) -> Dict[str, object]:
+    """Delete a single assessment by ID. Returns 404 if not found."""
+    deleted = delete_assessment(assessment_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Assessment with id {assessment_id} not found."
+        )
+    return {"success": True, "message": "Assessment deleted"}
+
+
+@app.delete("/history")
+def delete_all_history() -> Dict[str, object]:
+    """Delete every assessment record from the database."""
+    delete_all_assessments()
+    return {"success": True, "message": "All assessments deleted"}
 
 
 @app.get("/model-metrics")
 def get_model_metrics() -> Dict[str, object]:
-    project_root = Path(__file__).resolve().parent
-    metrics_path = project_root / "outputs" / "metrics.json"
-    cm_path = project_root / "outputs" / "confusion_matrix.png"
+    project_root = Path(__file__).resolve().parents[2]
+    metrics_path = project_root / "backend" / "outputs" / "metrics.json"
+    cm_path = project_root / "backend" / "outputs" / "confusion_matrix.png"
 
     if not metrics_path.exists() or not cm_path.exists():
         raise HTTPException(

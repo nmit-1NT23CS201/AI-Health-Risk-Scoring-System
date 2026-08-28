@@ -75,24 +75,16 @@ The AI Health Risk Scoring System is an intelligent healthcare analytics platfor
 ## Project Structure
 
 ```text
-app/                    Frontend dashboard
-database/               Database files
-dataset/                Dataset files
+backend/
+├── api/                FastAPI and Streamlit entry points
+├── database/           SQLite database and access module
+├── ml/                 ML and explainability modules
+├── models/             Trained ML model artifacts
+├── outputs/            Evaluation and generated outputs
+└── requirements.txt    Python dependencies
+frontend/               Next.js dashboard and frontend configuration
+dataset/                Dataset files (kept at project root)
 docs/                   Project documentation
-models/                 Trained ML models
-src/
-├── data_loader.py
-├── preprocessing.py
-├── feature_engineering.py
-├── train_model.py
-├── predict.py
-├── shap_explainer.py
-├── visualization.py
-└── model_evaluation.py
-
-api_server.py           FastAPI backend
-main.py                 Main execution script
-requirements.txt        Python dependencies
 ```
 
 ---
@@ -109,12 +101,13 @@ cd AI-Health-Risk-Scoring-System
 ### Install Python Dependencies
 
 ```bash
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 ### Install Frontend Dependencies
 
 ```bash
+cd frontend
 npm install
 ```
 
@@ -125,18 +118,19 @@ npm install
 ### Start Backend
 
 ```bash
-python api_server.py
+python -m uvicorn backend.api.api_server:app --reload
 ```
 
 or
 
 ```bash
-uvicorn api_server:app --reload
+python -m streamlit run backend/api/app.py
 ```
 
 ### Start Frontend
 
 ```bash
+cd frontend
 npm run dev
 ```
 

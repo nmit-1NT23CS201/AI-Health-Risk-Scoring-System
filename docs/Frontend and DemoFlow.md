@@ -79,7 +79,7 @@ The user launches the Streamlit application locally.
 Example:
 
 ```bash id="zud2f4"
-streamlit run app.py
+streamlit run backend/api/app.py
 ```
 
 ---
@@ -268,7 +268,7 @@ Open the Streamlit dashboard.
 Example:
 
 ```bash id="n0g08m"
-streamlit run app.py
+streamlit run backend/api/app.py
 ```
 
 ---

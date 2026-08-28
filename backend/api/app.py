@@ -7,15 +7,15 @@ import pandas as pd
 import shap
 import streamlit as st
 
-from api_server import app as api_app
-from src.feature_engineering import FEATURE_COLUMNS
-from src.risk_interpreter import (
+from backend.api.api_server import app as api_app
+from backend.ml.feature_engineering import FEATURE_COLUMNS
+from backend.ml.risk_interpreter import (
     classify_risk,
     format_contributors,
     generate_insights,
     top_contributors,
 )
-from src.shap_explainer import compute_shap_values, load_model, prepare_shap_inputs
+from backend.ml.shap_explainer import compute_shap_values, load_model, prepare_shap_inputs
 
 
 def apply_theme() -> None:
@@ -459,9 +459,9 @@ def render_waterfall_plot(
 def run_streamlit() -> None:
     apply_theme()
 
-    project_root = Path(__file__).resolve().parent
+    project_root = Path(__file__).resolve().parents[2]
     dataset_path = project_root / "dataset" / "indian_health_risk_dataset.csv"
-    model_path = project_root / "models" / "random_forest_model.pkl"
+    model_path = project_root / "backend" / "models" / "random_forest_model.pkl"
 
     prediction_state = st.session_state.get("prediction_state", "Awaiting Input")
     render_navbar(prediction_state)
