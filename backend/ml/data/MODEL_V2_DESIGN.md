@@ -1,380 +1,537 @@
-# AI Health Risk Scoring System — Model V2 Target & Feature Architecture Design
+# AI Health Risk Scoring System — Model V2 Architecture Design (Final, Revision 2)
 
-> **Document Type:** Technical Architecture Specification  
-> **Stage:** Stage 1B — Target & Feature Design (Read-Only Specification)  
-> **Project:** Final-Year B.Tech CSE Project — *AI Health Risk Scoring System*  
-> **Primary Dataset:** CDC NHANES August 2021–August 2023 (N = 11,933 total; N = 7,809 adults)  
-> **Validation Dataset:** ICMR-INDIAB Adult Cohort Sample (N = 500)  
-> **Legacy Baseline:** Synthetic 151-row dataset (`dataset/indian_health_risk_dataset.csv`)  
-> **Date:** September 2026  
-> **Status:** Completed Design Specification — Pending User Approval  
-
----
-
-## 1. Executive Summary & Project Context
-
-This specification defines the mathematical, clinical, and architectural design for **Model V2** of the AI Health Risk Scoring System. Model V1 relied on a 151-row synthetic dataset that included fabricated wearable metrics (`sdnn_hrv`, `rmssd_hrv`, `spo2`) and a synthetic target score. Model V2 transitions the system to authentic, population-representative epidemiological datasets: **CDC NHANES 2021–2023** (16 XPT files) and the **ICMR-INDIAB cohort**.
-
-### Core Design Principles
-1. **Clinical Authenticity:** Targets and features are strictly grounded in CDC NHANES diagnostic protocols and WHO / ICMR epidemiological definitions.
-2. **Zero Target Leakage:** Direct target-defining variables, post-outcome treatments, and circular proxies are strictly excluded from predictor sets.
-3. **Dual-Mode Inference:** 
-   - **Mode A (Baseline / Non-Invasive):** Uses questionnaire demographics, anthropometrics, vitals, and lifestyle data to provide an immediate non-invasive health risk score.
-   - **Mode B (Laboratory-Enhanced):** Incorporates routine clinical blood test biomarkers to provide a comprehensive, multi-organ risk assessment.
-4. **Hierarchical Multi-Model Architecture:** A decoupled multi-model architecture outputs a **Cardiovascular Risk Score**, a **Metabolic Risk Score**, and an **Overall Calibrated Health Risk Score (0–100)** without cross-target leakage.
-5. **South Asian Population Recalibration:** Incorporates ICMR-INDIAB Asian Indian anthropometric cutoffs (BMI ≥ 25 kg/m², Waist ≥ 90 cm Men / ≥ 80 cm Women) to ensure accurate risk stratification for Indian users.
+> **Document Type:** Technical Architecture & Feature Specification
+> **Stage:** Stage 1B Final — Target & Feature Architecture Design
+> **Project:** Final-Year B.Tech CSE Project — *AI Health Risk Scoring System*
+> **Primary Development Dataset:** CDC NHANES August 2021–August 2023 (N = 11,933 total; N = 7,809 adults aged 20+)
+> **External Validation Dataset:** ICMR-INDIAB Cohort Sample (N = 500 adults)
+> **Legacy Baseline:** Synthetic 151-row dataset (`dataset/indian_health_risk_dataset.csv`)
+> **Date:** September 2026
+> **Status:** Design Finalised — Pending Stage 1C Implementation
 
 ---
 
-## 2. Task 1 — Comprehensive Evaluation of Target Options
+## 1. Final 3-Model Architecture
 
-We evaluated six candidate target definitions constructed on the adult cohort (**N = 7,809 adults aged 20+** in NHANES 2021–2023).
+### 1.1 Rejection of Circular Composite Supervised Target
 
-```
-==================================================================================================
-TARGET FEASIBILITY METRICS (NHANES ADULTS N = 7,809)
-==================================================================================================
-Target Option                          Positive Cases    Prevalence    Evaluable Adults    Missing %
---------------------------------------------------------------------------------------------------
-A. Hard Cardiovascular Disease (CVD)      982           12.58%             7,764            0.58%
-B. Diabetes Mellitus (ADA Criteria)     1,385           17.74%             7,809            0.00%
-C. Hypertension (JNC7 / ICMR Criteria)  3,331           42.66%             7,800            0.12%
-D. Composite Cardiometabolic Risk       3,047           39.02%             7,809            0.00%
-E. Metabolic Syndrome (ATP III Criteria) 3,046           39.01%             5,171           33.78%
-F. Atherosclerotic Risk (ASCVD Proxy)   1,624           20.80%             7,764            0.58%
-==================================================================================================
-```
+Earlier draft iterations proposed a single supervised model trained against a manually constructed composite label:
 
-### Detailed Evaluation of Each Candidate Target
+> Target_Composite = Hard CVD **OR** Diabetes **OR** (SBP ≥ 140) **OR** (DBP ≥ 90) **OR** (Total Cholesterol ≥ 240)
 
-#### Target A: Hard Cardiovascular Disease (CVD)
-- **NHANES Target Formula:**
-  $$\text{Target}_{\text{CVD}} = 1 \iff (\text{MCQ160B} = 1) \lor (\text{MCQ160C} = 1) \lor (\text{MCQ160D} = 1) \lor (\text{MCQ160E} = 1) \lor (\text{MCQ160F} = 1)$$
-- **NHANES Variables Required:** `MCQ160B` (Heart Failure), `MCQ160C` (Coronary Heart Disease), `MCQ160D` (Angina Pectoris), `MCQ160E` (Heart Attack / MI), `MCQ160F` (Stroke).
-- **Positive / Negative Cases:** **982 positive** vs **6,782 negative** (45 missing/refused).
-- **Prevalence & Class Ratio:** **12.58%** (~1:7 imbalanced ratio).
-- **Cross-Sectional vs Prospective:** Adjudicated medical history endpoint (cross-sectional lifetime prevalence in survey).
-- **Clinical Interpretation:** Hard macrovascular event or clinical heart failure diagnosis.
-- **0–100 Score Mapping:** Excellent. Calibrated probability $P(\text{CVD} \mid X) \times 100$ produces a smooth 0–100 cardiovascular risk score directly analogous to Framingham / ASCVD risk calculators.
-- **Suitability for Project:** **High.** Highly specific, clinical, and clean separation from physiological predictors.
+This design was **rejected and removed** for the following reasons:
 
-#### Target B: Diabetes Mellitus (ADA Diagnostic Criteria)
-- **NHANES Target Formula:**
-  $$\text{Target}_{\text{DM}} = 1 \iff (\text{LBXGH} \ge 6.5) \lor (\text{LBXGLU} \ge 126) \lor (\text{DIQ010} = 1) \lor (\text{DIQ050} = 1) \lor (\text{DIQ070} = 1)$$
-- **NHANES Variables Required:** `LBXGH` (HbA1c %), `LBXGLU` (Fasting Glucose mg/dL), `DIQ010` (Diagnosed DM), `DIQ050` (Insulin use), `DIQ070` (Oral diabetic pills).
-- **Positive / Negative Cases:** **1,385 positive** vs **6,424 negative** (0 missing; 100% evaluable).
-- **Prevalence & Class Ratio:** **17.74%** (~1:4.6 ratio).
-- **Clinical Interpretation:** Presence of overt type 2 or type 1 diabetes mellitus.
-- **0–100 Score Mapping:** High. Probability $P(\text{Diabetes} \mid X) \times 100$ provides a continuous 0–100 diabetes risk score.
-- **Suitability for Project:** **High** as a specialized metabolic sub-score; moderate as a single overall health risk score.
+- **Circular target leakage:** SBP, DBP, HbA1c, fasting glucose, and total cholesterol appear in both the target construction rule and the intended predictor set. A decision tree trained on this label would trivially split on the defining threshold values, producing artificially inflated training metrics that do not generalise.
+- **No clinical validity:** The composite is a manually assembled rule, not a clinically validated outcome. Training a supervised model to learn it is equivalent to learning a clinical rule that the developers themselves invented — it produces an appearance of prediction without genuine epidemiological basis.
+- **This target has been completely removed from the architecture.** No fourth model, no "Master Composite Estimator", and no supervised model with this composite label exists in Model V2.
 
-#### Target C: Hypertension (JNC7 / ICMR Criteria)
-- **NHANES Target Formula:**
-  $$\text{Target}_{\text{HTN}} = 1 \iff (\text{mean\_sbp} \ge 140) \lor (\text{mean\_dbp} \ge 90) \lor (\text{BPQ020} = 1)$$
-- **NHANES Variables Required:** `BPXOSY1..3` (Systolic BP), `BPXODI1..3` (Diastolic BP), `BPQ020` (Ever told had HTN).
-- **Positive / Negative Cases:** **3,331 positive** vs **4,469 negative** (9 missing).
-- **Prevalence & Class Ratio:** **42.66%** (JNC7 criteria) / **52.31%** (ACC/AHA 2017 stage-1 criteria SBP ≥ 130).
-- **Clinical Interpretation:** Stage-2 clinical hypertension or diagnosed blood pressure disorder.
-- **0–100 Score Mapping:** Moderate. High baseline prevalence narrows discrimination bandwidth.
-- **Suitability for Project:** Moderate as a sub-condition; poor as a single target due to severe leakage if SBP/DBP are included as predictors.
+### 1.2 Rejection of Undefined Biomarker / Cardiorenal Engine
 
-#### Target D: Composite Cardiometabolic Multi-Morbidity Risk (Primary Target Recommendation)
-- **NHANES Target Formula:**
-  $$\text{Target}_{\text{Composite}} = 1 \iff (\text{Target}_{\text{CVD}} = 1) \lor (\text{Target}_{\text{DM}} = 1) \lor (\text{mean\_sbp} \ge 140) \lor (\text{mean\_dbp} \ge 90) \lor (\text{LBXTC} \ge 240)$$
-- **NHANES Variables Required:** `MCQ160B-F`, `DIQ010`, `LBXGH`, `LBXGLU`, `BPXOSY/DI`, `LBXTC`.
-- **Positive / Negative Cases:** **3,047 positive** vs **4,762 negative** (0 missing).
-- **Prevalence & Class Ratio:** **39.02%** (~1:1.5 ratio, balanced binary distribution).
-- **Clinical Interpretation:** Holistic multi-organ cardiometabolic impairment (presence of major CVD, overt diabetes, uncontrolled stage-2 HTN, or severe hypercholesterolemia).
-- **0–100 Score Mapping:** **Superior.** Calibrated probability $P(\text{Composite Risk} \mid X) \times 100$ yields a continuous, highly sensitive **0–100 Overall Health Risk Score** with natural clinical risk categories:
-  - **Low Risk:** Score < 30 (Healthy / Low cardiometabolic burden)
-  - **Medium Risk:** Score 30 – 60 (Moderate risk / Single controlled risk factor)
-  - **High Risk:** Score ≥ 60 (High risk / Multi-morbidity or established CVD/DM)
-- **Suitability for Project:** **Highest.** Perfectly matches the title and scope of "AI Health Risk Scoring System".
+Earlier drafts proposed a supplementary "Cardiorenal / Biomarker Engine" with a target variously described as "renal or inflammatory stress." This target was **rejected and removed** because:
 
-#### Target E: Metabolic Syndrome (ATP III / AHA Criteria)
-- **NHANES Target Formula:** $\ge 3$ of 5 criteria: (1) Abdominal obesity, (2) High Triglycerides $\ge 150$, (3) Low HDL $< 40\text{M}/< 50\text{F}$, (4) High BP $\ge 130/85$, (5) High Glucose $\ge 100$.
-- **Positive / Negative Cases:** **3,046 positive** vs **2,125 negative** (**2,638 missing** / unmeasured fasting labs).
-- **Prevalence & Missingness:** **39.01%** prevalence, but **33.78% missingness** due to fasting subsample randomization.
-- **Suitability for Project:** **Poor.** High missingness weakens model training and creates extreme circular feature leakage.
+- No clean, clinically defensible NHANES outcome variable was identified that maps unambiguously to this concept.
+- Possession of renal or inflammatory biomarkers (creatinine, BUN, uric acid, WBC, RDW, hemoglobin) is not a sufficient reason to create a supervised model — a defensible outcome label must exist.
+- These biomarkers are retained as **predictor candidates** for the three approved sub-models where they are not target-defining.
 
----
+### 1.3 Approved Final Architecture: Three Decoupled Zero-Leakage Sub-Models
 
-## 3. Task 2 — Rigorous Data Leakage Audit
+Model V2 is built around **three independent supervised sub-models**, each with a clinically defensible NHANES outcome variable as its target, and each with a strictly controlled predictor set that excludes every variable involved in its own target definition.
 
-Data leakage occurs when target-defining variables, downstream medical interventions, or circular proxies are erroneously included as predictors. We enforce strict separation across all candidate targets.
-
-```mermaid
-flowchart LR
-    subgraph SAFE_PREDICTORS["SAFE PREDICTORS (Allowed Inputs)"]
-        direction TB
-        P1["Demographics: Age, Gender, Education, SES"]
-        P2["Anthropometrics: BMI, Waist Circumference"]
-        P3["Vitals: Resting Pulse (BPXOPLS)"]
-        P4["Lifestyle: Smoking, Alcohol, Physical Activity"]
-        P5["Non-Defining Blood Biomarkers: CBC, BioProfile"]
-    end
-
-    subgraph FORBIDDEN["FORBIDDEN LEAKAGE VARIABLES (Excluded)"]
-        direction TB
-        F1["Target-Defining Diagnoses: MCQ160B-F, DIQ010, BPQ020"]
-        F2["Target-Defining Threshold Labs: SBP/DBP (for HTN target), HbA1c/Glucose (for DM target)"]
-        F3["Post-Outcome Treatments: Insulin (DIQ050), Diabetes Pills (DIQ070), Cholesterol Meds (BPQ101D)"]
-    end
-
-    SAFE_PREDICTORS -->|Supervised Learning| MODEL["Model V2 Classifier"]
-    FORBIDDEN -.-x|STRICTLY PROHIBITED| MODEL
-```
-
-### Categorization Matrix of Key Variables Across Targets
-
-| Feature Variable | Target: Hard CVD | Target: Diabetes (DM) | Target: Hypertension (HTN) | Target: Composite Risk | Leakage Status & Justification |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| `RIDAGEYR` (Age) | **Safe** | **Safe** | **Safe** | **Safe** | Universal baseline demographic factor. |
-| `RIAGENDR` (Gender) | **Safe** | **Safe** | **Safe** | **Safe** | Universal baseline demographic factor. |
-| `BMXBMI` (BMI) | **Safe** | **Safe** | **Safe** | **Safe** | Anthropometric body composition predictor. |
-| `BMXWAIST` (Waist) | **Safe** | **Safe** | **Safe** | **Safe** | Visceral adiposity predictor. |
-| `BPXOSY` / `BPXODI` (BP) | **Safe** | **Safe** | **DIRECT LEAKAGE** | **Safe** | Defines HTN target ($\ge 140/90$). Cannot be used to predict HTN. |
-| `BPXOPLS` (Pulse) | **Safe** | **Safe** | **Safe** | **Safe** | Resting heart rate; non-defining hemodynamic metric. |
-| `SMQ020` / `SMQ040` (Smoking) | **Safe** | **Safe** | **Safe** | **Safe** | Lifestyle exposure risk factor. |
-| `ALQ121` (Alcohol) | **Safe** | **Safe** | **Safe** | **Safe** | Lifestyle exposure risk factor. |
-| `PAD790` / `PAD810` (Activity)| **Safe** | **Safe** | **Safe** | **Safe** | Lifestyle physical activity factor. |
-| `LBXGH` (HbA1c %) | **Safe** | **DIRECT LEAKAGE** | **Safe** | **Safe** | Defines DM target ($\ge 6.5\%$). Cannot be used to predict DM. |
-| `LBXGLU` (Fasting Glucose) | **Safe** | **DIRECT LEAKAGE** | **Safe** | **Safe** | Defines DM target ($\ge 126$). Cannot be used to predict DM. |
-| `LBXTC` (Total Cholesterol)| **Safe** | **Safe** | **Safe** | **Safe** | Continuous lipid biomarker. |
-| `LBDHDD` (HDL-C) | **Safe** | **Safe** | **Safe** | **Safe** | Continuous protective lipid fraction. |
-| `LBXSCR` (Creatinine) | **Safe** | **Safe** | **Safe** | **Safe** | Renal clearance biomarker. |
-| `LBXHGB` (Hemoglobin) | **Safe** | **Safe** | **Safe** | **Safe** | Oxygen-carrying hematology marker. |
-| `LBXWBCSI` (WBC Count) | **Safe** | **Safe** | **Safe** | **Safe** | Systemic inflammation marker. |
-| `MCQ160B-F` (CVD Diagnoses)| **DIRECT LEAKAGE**| **Safe** | **Safe** | **DIRECT LEAKAGE** | Defines CVD target. Forbidden as predictor for CVD/Composite. |
-| `DIQ010` (DM Diagnosis) | **Safe** | **DIRECT LEAKAGE** | **Safe** | **DIRECT LEAKAGE** | Defines DM target. Forbidden as predictor for DM/Composite. |
-| `BPQ020` (HTN Diagnosis) | **Safe** | **Safe** | **DIRECT LEAKAGE** | **DIRECT LEAKAGE** | Defines HTN target. Forbidden as predictor for HTN/Composite. |
-| `DIQ050` / `070` (DM Meds)| **Proxy Leakage** | **DIRECT LEAKAGE** | **Proxy Leakage** | **DIRECT LEAKAGE** | Post-outcome treatment intervention. Excluded. |
-| `BPQ101D` (Chol Meds) | **Proxy Leakage** | **Proxy Leakage** | **Proxy Leakage** | **DIRECT LEAKAGE** | Post-outcome treatment intervention. Excluded. |
-
-### Concrete Leakage Mathematical Proofs
-
-1. **Proof 1 — HbA1c Leakage on Diabetes Target:**  
-   If the target $Y_{\text{DM}} = 1 \iff \text{HbA1c} \ge 6.5$, including $\text{HbA1c}$ as predictor $X_j$ causes the decision tree split at $X_j \ge 6.5$ to achieve **Gini Impurity = 0.0**. The model achieves artificial 100% accuracy while learning zero generalizable physiological patterns.
-2. **Proof 2 — SBP Leakage on Hypertension Target:**  
-   If the target $Y_{\text{HTN}} = 1 \iff \text{SBP} \ge 140$, including $\text{SBP}$ as a feature results in trivial thresholding.
-3. **Proof 3 — Prescribed Medication Proxy Leakage:**  
-   Prescription drug flags (e.g. `DIQ050` Insulin) occur *after* clinical diagnosis. Including treatment flags predicts doctor prescribing behavior rather than patient physiological health risk.
-
----
-
-## 4. Task 3 — Model Architecture Design & Evaluation
-
-We evaluated four candidate system architectures for Model V2.
-
-```
-====================================================================================================
-MODEL ARCHITECTURE COMPARISON MATRIX
-====================================================================================================
-Architecture Option             Leakage Prevention    Multi-Domain Risk Scores    SHAP Interpretability
-----------------------------------------------------------------------------------------------------
-Option A: Single Unified Model     Moderate               Low (1 overall score)        High (Global)
-Option B: Decoupled Dual Models    High                   High (2 sub-scores)          High (Sub-domain)
-Option C: CVD + Condition Models   High                   Moderate                     Moderate
-Option D: Hierarchical Ensemble    EXCELLENT              EXCELLENT (3 Sub-scores +    EXCELLENT (Multi-tier)
-          (Recommended)                                  1 Overall Score)
-====================================================================================================
-```
-
-### Proposed Architecture — Option D: Hierarchical Multi-Model Ensemble Architecture (Recommended)
-
-Option D decouples risk prediction into specialized, zero-leakage sub-models that feed into a master calibrated health risk engine.
+The final 0–100 overall health risk score is produced by a **deterministic post-model aggregation layer** — not by a fourth supervised model.
 
 ```mermaid
 flowchart TD
     subgraph INPUTS["USER INPUT DATA (Dual-Mode Interface)"]
-        MA["Mode A Features:<br>Age, Sex, BMI, Waist, SBP, DBP, Pulse, Smoking, Alcohol, Activity"]
-        MB["Mode B Extra Features:<br>HbA1c, Total Chol, HDL, Creatinine, BUN, Hemoglobin, WBC, RDW"]
+        MA["MODE A (Non-Invasive)
+        Age, Sex, Education, PIR
+        BMI, Waist
+        SBP, DBP, Resting Pulse
+        Smoking, Alcohol
+        Physical Activity, Sedentary Time"]
+        MB["MODE B (Lab-Enhanced — Mode A + Blood Report)
+        HbA1c, Fasting Glucose
+        Total Chol, HDL, Triglycerides, LDL
+        Creatinine, BUN, Uric Acid
+        ALT, AST
+        Hb, WBC, Platelets, RDW, Albumin"]
     end
 
-    subgraph SUB_MODELS["INDEPENDENT SUB-MODELS (Zero-Leakage Domain Calculators)"]
-        M1["Sub-Model 1: Cardiovascular Risk Engine<br>Target: Hard CVD (MCQ160B-F)<br>Predictors: Demographics, Anthropometrics, Vitals, Lifestyle, Lipids, CBC"]
-        M2["Sub-Model 2: Metabolic Risk Engine<br>Target: Diabetes (ADA Criteria)<br>Predictors: Demographics, Anthropometrics, Vitals, Lifestyle, Lipids (No HbA1c/Glucose)"]
-        M3["Sub-Model 3: Cardiorenal / Biomarker Engine<br>Target: Renal / Inflammatory Stress<br>Predictors: Creatinine, BUN, Uric Acid, Hemoglobin, WBC, RDW"]
+    subgraph MODELS["THREE DECOUPLED SUPERVISED SUB-MODELS"]
+        M1["Model 1: Hard CVD Classifier
+        Target: MCQ160B-F (documented CVD history)
+        SBP & DBP: ALLOWED  |  MCQ160B-F: PROHIBITED"]
+        M2["Model 2: Diabetes Classifier
+        Target: ADA criteria (HbA1c / Glucose / Diagnosis)
+        HbA1c, Glucose, DIQ010/050/070: PROHIBITED"]
+        M3["Model 3: Hypertension Classifier
+        Target: JNC7 (SBP≥140 or DBP≥90 or BPQ020)
+        SBP, DBP, BPQ020: PROHIBITED"]
     end
 
-    subgraph MASTER["MASTER CALIBRATION & ENSEMBLE ENGINE"]
-        MASTER_ENG["Master Composite Health Risk Estimator<br>Target: Composite Cardiometabolic Risk<br>Calibration: Isotonic Regression / Platt Scaling"]
+    subgraph AGGREGATION["DETERMINISTIC POST-MODEL AGGREGATION (No Supervised Training)"]
+        AGG["R_overall = 100 × [1 − (1 − P_CVD)(1 − P_DM)(1 − P_HTN)]
+        Clipped to [0, 100]
+        Documented as a composite application-level risk index
+        NOT a validated clinical risk calculator
+        NOT a prospective 10-year risk probability"]
     end
 
-    subgraph OUTPUTS["USER DASHBOARD OUTPUTS"]
-        O1["Overall Health Risk Score (0–100)<br>Low / Medium / High Risk Tiers"]
-        O2["Cardiovascular Risk Sub-Score (0–100)"]
-        O3["Metabolic Risk Sub-Score (0–100)"]
-        O4["SHAP Explanation Waterfall & Feature Attributions"]
+    subgraph OUTPUT["DASHBOARD OUTPUTS"]
+        O1["Overall Health Risk Index: 0–100 | Low / Medium / High"]
+        O2["Cardiovascular Risk Sub-Score: P_CVD × 100"]
+        O3["Diabetes Risk Sub-Score: P_DM × 100"]
+        O4["Hypertension Risk Sub-Score: P_HTN × 100"]
+        O5["Per-Model SHAP Feature Attributions"]
     end
 
-    MA --> M1 & M2 & M3 & MASTER_ENG
-    MB --> M1 & M2 & M3 & MASTER_ENG
-
-    M1 -->|P_CVD| MASTER_ENG
-    M2 -->|P_Metabolic| MASTER_ENG
-    M3 -->|P_Renal| MASTER_ENG
-
-    MASTER_ENG --> O1
+    MA --> M1 & M2 & M3
+    MB --> M1 & M2 & M3
+    M1 -->|P_CVD| AGG
+    M2 -->|P_DM| AGG
+    M3 -->|P_HTN| AGG
+    AGG --> O1
     M1 --> O2
     M2 --> O3
-    MASTER_ENG --> O4
+    M3 --> O4
+    M1 & M2 & M3 --> O5
 ```
 
-### Why Option D is Superior:
-1. **Zero Cross-Target Leakage:** Sub-Model 2 (Metabolic) excludes `HbA1c` and `Glucose` from its predictors, allowing it to predict undiagnosed metabolic risk from anthropometrics, vitals, and lipids without circular reasoning.
-2. **Rich Multi-Domain Output:** The dashboard can present:
-   - **Overall Health Risk Score (0–100)** (Master Composite)
-   - **Cardiovascular Sub-Score (0–100)** (Sub-Model 1)
-   - **Metabolic Sub-Score (0–100)** (Sub-Model 2)
-3. **Exact SHAP Interpretability:** SHAP values can be calculated independently for the Master Score and for each domain sub-score, explaining precisely *why* a user's cardiovascular or metabolic risk is elevated.
+---
+
+## 2. Exact Target Definitions & Cohort Prevalence
+
+All targets are evaluated on the adult population (**N = 7,809 adults aged 20+**) in NHANES 2021–2023.
+
+### 2.1 Model 1 Target: Hard Cardiovascular Disease (Documented History)
+
+**Target construction:**
+
+$$\text{Target}_{\text{CVD}} = 1 \iff (\text{MCQ160B} = 1) \lor (\text{MCQ160C} = 1) \lor (\text{MCQ160D} = 1) \lor (\text{MCQ160E} = 1) \lor (\text{MCQ160F} = 1)$$
+
+**NHANES variables used to construct this target:**
+
+| Variable | Question (NHANES L) | Condition |
+|---|---|---|
+| `MCQ160B` | Ever told you had congestive heart failure? | = 1 (Yes) |
+| `MCQ160C` | Ever told you had coronary heart disease? | = 1 (Yes) |
+| `MCQ160D` | Ever told you had angina pectoris? | = 1 (Yes) |
+| `MCQ160E` | Ever told you had heart attack/MI? | = 1 (Yes) |
+| `MCQ160F` | Ever told you had a stroke? | = 1 (Yes) |
+
+**Cohort prevalence (adults 20+, N = 7,809):**
+
+| Class | N | % |
+|---|---|---|
+| Positive (Hard CVD history) | 982 | 12.58% |
+| Negative | 6,782 | 86.85% |
+| Missing / Unknown | 45 | 0.58% |
+
+**Scientific framing:**
+
+The calibrated model probability provides an interpretable estimate of the likelihood of the observed CVD-history outcome within the NHANES 2021–2023 study population, given the participant's demographic, lifestyle, and physiological profile. This is a cross-sectional prevalence estimate and **must not** be described as a prospective 10-year CVD incidence probability, nor as equivalent to Framingham Risk Score, ASCVD, or any other longitudinal clinical risk calculator.
 
 ---
 
-## 5. Task 4 & 5 — Two-Tier Feature Design & Blood-Test Compatibility
+### 2.2 Model 2 Target: Diabetes Mellitus (ADA Multi-Criteria Definition)
 
-Model V2 supports two inference modes based on user data availability.
+**Target construction:**
 
-### 5.1 Inference Modes Overview
-- **Mode A (Baseline Non-Invasive):** Demographics, Anthropometrics, Oscillometric Vitals, Lifestyle Questionnaire (13 features). Enables instant assessment without blood tests.
-- **Mode B (Laboratory-Enhanced):** Mode A + 16 Routine Blood Test Biomarkers (29 total features). Enables deep cardiorenal and metabolic risk scoring when users upload a blood report.
+$$\text{Target}_{\text{DM}} = 1 \iff (\text{LBXGH} \ge 6.5) \lor (\text{LBXGLU} \ge 126) \lor (\text{DIQ010} = 1) \lor (\text{DIQ050} = 1) \lor (\text{DIQ070} = 1)$$
 
-### 5.2 Laboratory Biomarker Clinical Tier Classification
+**NHANES variables used to construct this target:**
 
-| Laboratory Biomarker | NHANES File | NHANES Variable | Standard Clinical Blood Report Equivalent | Clinical Tier | Clinical Relevance & Utility |
-| :--- | :--- | :--- | :--- | :---: | :--- |
-| **Glycohemoglobin** | `GHB_L.xpt` | `LBXGH` | HbA1c (%) | **Tier 1 (Routine)** | Long-term 3-month glycemic control; non-fasting gold standard. |
-| **Total Cholesterol** | `TCHOL_L.xpt`| `LBXTC` | Total Cholesterol (mg/dL) | **Tier 1 (Routine)** | Lipid profile component; circulating atherogenic burden. |
-| **HDL-Cholesterol** | `HDL_L.xpt` | `LBDHDD` | HDL-Cholesterol (mg/dL) | **Tier 1 (Routine)** | Lipid profile component; cardioprotective lipoprotein. |
-| **Serum Creatinine** | `BIOPRO_L.xpt`| `LBXSCR` | Serum Creatinine (mg/dL) | **Tier 1 (Routine)** | Renal panel component; estimated GFR calculation. |
-| **Blood Urea Nitrogen**| `BIOPRO_L.xpt`| `LBXSBU` | BUN (mg/dL) | **Tier 1 (Routine)** | Renal panel component; cardiorenal clearance. |
-| **Hemoglobin** | `CBC_L.xpt` | `LBXHGB` | Hemoglobin / Hb (g/dL) | **Tier 1 (Routine)** | Complete Blood Count (CBC); anemia & cardiac workload. |
-| **White Blood Cell** | `CBC_L.xpt` | `LBXWBCSI`| WBC Count (10³/µL) | **Tier 1 (Routine)** | Complete Blood Count (CBC); systemic low-grade arterial inflammation. |
-| **Fasting Glucose** | `GLU_L.xpt` | `LBXGLU` | Fasting Blood Sugar (mg/dL) | **Tier 1 (Routine)** | Diabetic profile; fasting plasma glucose (subsample). |
-| **Serum Triglycerides**| `TRIGLY_L.xpt`| `LBXTLG` | Triglycerides (mg/dL) | **Tier 2 (Common)** | Lipid profile component; atherogenic remnant lipids. |
-| **LDL-Cholesterol** | `TRIGLY_L.xpt`| `LBDLDL` | LDL-Cholesterol (mg/dL) | **Tier 2 (Common)** | Lipid profile component; Friedewald / Martin-Hopkins LDL. |
-| **Platelet Count** | `CBC_L.xpt` | `LBXPLTSI`| Platelets (10³/µL) | **Tier 2 (Common)** | Complete Blood Count (CBC); thrombotic profile. |
-| **Red Cell Dist. Width**| `CBC_L.xpt` | `LBXRDW` | RDW (%) | **Tier 2 (Common)** | Complete Blood Count (CBC); independent cardiovascular mortality. |
-| **ALT Enzyme** | `BIOPRO_L.xpt`| `LBXSATSI`| SGPT / ALT (U/L) | **Tier 2 (Common)** | Liver function panel; hepatic steatosis / MASLD indicator. |
-| **AST Enzyme** | `BIOPRO_L.xpt`| `LBXSASSI`| SGOT / AST (U/L) | **Tier 2 (Common)** | Liver function panel; cellular integrity marker. |
-| **Serum Uric Acid** | `BIOPRO_L.xpt`| `LBXSUA` | Serum Uric Acid (mg/dL) | **Tier 2 (Common)** | Metabolic panel; gout & endothelial dysfunction. |
-| **Serum Albumin** | `BIOPRO_L.xpt`| `LBXSAL` | Serum Albumin (g/dL) | **Tier 2 (Common)** | Comprehensive Metabolic Panel; nutritional/inflammatory status. |
+| Variable | Question / Lab | Threshold | Source File |
+|---|---|---|---|
+| `LBXGH` | HbA1c % | ≥ 6.5% | `GHB_L.xpt` |
+| `LBXGLU` | Fasting plasma glucose (mg/dL) | ≥ 126 mg/dL | `GLU_L.xpt` |
+| `DIQ010` | Ever told you have diabetes? | = 1 (Yes) | `DIQ_L.xpt` |
+| `DIQ050` | Currently taking insulin? | = 1 (Yes) | `DIQ_L.xpt` |
+| `DIQ070` | Currently taking diabetes pills? | = 1 (Yes) | `DIQ_L.xpt` |
+
+**Explicit predictor exclusions for Model 2:**
+
+All five target-defining variables (`LBXGH`, `LBXGLU`, `DIQ010`, `DIQ050`, `DIQ070`) are **strictly prohibited** as predictors in the Diabetes model. They may not appear in any feature set passed to the Diabetes model, regardless of Mode A or Mode B input tier.
+
+**Cohort prevalence (adults 20+, N = 7,809):**
+
+| Class | N | % |
+|---|---|---|
+| Positive (Diabetes by ADA criteria) | 1,385 | 17.74% |
+| Negative | 6,424 | 82.26% |
+| Missing / Unknown | 0 | 0.00% (100% evaluable) |
+
+**Scientific framing:**
+
+The calibrated model probability provides an interpretable estimate of the likelihood that a participant meets ADA criteria for diabetes, based on their non-glycemic clinical profile. This is a cross-sectional classification and must not be described as a prospective diabetes incidence probability.
 
 ---
 
-## 6. Task 6 — ICMR-INDIAB Compatibility & Indian Population Recalibration
+### 2.3 Model 3 Target: Hypertension (JNC7-Defined)
 
-To ensure Model V2 transfers accurately to Indian clinical settings, we mapped the feature schema to the **ICMR-INDIAB sample (`sample.dta`)**.
+**Target definition:** This model uses the **JNC 7 (Seventh Report of the Joint National Committee)** definition of hypertension, which classifies hypertension as SBP ≥ 140 mmHg **or** DBP ≥ 90 mmHg **or** a prior physician diagnosis of hypertension.
+
+This is **not** the stricter ACC/AHA 2017 guideline (which lowers the threshold to SBP ≥ 130 or DBP ≥ 80), nor is it restricted to "Stage-2 hypertension" specifically. The JNC7 definition captures the full clinically diagnosed and measured hypertension population.
+
+**Target construction:**
+
+$$\text{Target}_{\text{HTN}} = 1 \iff (\bar{\text{SBP}} \ge 140) \lor (\bar{\text{DBP}} \ge 90) \lor (\text{BPQ020} = 1)$$
+
+where $\bar{\text{SBP}}$ and $\bar{\text{DBP}}$ are the **means of up to three valid oscillometric readings** from `BPXOSY1`/`BPXOSY2`/`BPXOSY3` and `BPXODI1`/`BPXODI2`/`BPXODI3` respectively.
+
+**NHANES variables used to construct this target:**
+
+| Variable | Description | Threshold | Source File |
+|---|---|---|---|
+| `BPXOSY1..3` (mean) | Mean systolic BP (mmHg) | ≥ 140 | `BPXO_L.xpt` |
+| `BPXODI1..3` (mean) | Mean diastolic BP (mmHg) | ≥ 90 | `BPXO_L.xpt` |
+| `BPQ020` | Told by doctor you have high blood pressure? | = 1 (Yes) | `BPQ_L.xpt` |
+
+**Explicit predictor exclusions for Model 3:**
+
+`BPXOSY` (systolic), `BPXODI` (diastolic), and `BPQ020` (diagnosis) are **strictly prohibited** as predictors in the Hypertension model. SBP and DBP values from the user's input are not forwarded to this model's feature pipeline, even in Mode A or Mode B.
+
+**Cohort prevalence (adults 20+, N = 7,809):**
+
+| Class | N | % |
+|---|---|---|
+| Positive (JNC7 hypertension) | 3,331 | 42.66% |
+| Negative | 4,469 | 57.22% |
+| Missing / Unknown | 9 | 0.12% |
+
+**Scientific framing:**
+
+The calibrated model probability provides an interpretable estimate of the likelihood that a participant meets JNC7 hypertension criteria, based on their non-blood-pressure clinical profile. This is a cross-sectional classification and must not be described as a prospective hypertension incidence probability.
+
+---
+
+## 3. Predictor Sets & Per-Model Leakage Matrix
+
+To guarantee zero circular leakage, predictor availability is strictly enforced per sub-model. The table below documents every feature's status in each model context.
 
 ```
-====================================================================================================
-ICMR-INDIAB FEASIBILITY & RECALIBRATION MAPPING MATRIX
-====================================================================================================
-Model V2 Feature      NHANES Variable    ICMR Variable    Comparable?    Recalibration / Cutoff Shift
-----------------------------------------------------------------------------------------------------
-Age                   RIDAGEYR           v4               Direct Match   Direct numeric alignment (20–89 yrs).
-Sex                   RIAGENDR           v5               Exact Match    Identical coding: 1=Male, 2=Female.
-Education             DMDEDUC2           v6               Harmonizable   Harmonize to 3 tiers (Low/Mid/High).
-BMI                   BMXBMI             v8 / v40         Cutoff Shift   IMPORTANT: Apply Asian Indian cutoff
-                                                                         (BMI >= 25 kg/m2 for obesity).
-Waist Circumference   BMXWAIST           v9 / v39         Cutoff Shift   IMPORTANT: Apply South Asian cutoffs
-                                                                         (Waist >= 90cm Men / >= 80cm Women).
-Systolic BP           BPXOSY mean        v10              Direct Match   Resting SBP in mmHg.
-Diastolic BP          BPXODI mean        v11              Direct Match   Resting DBP in mmHg.
-Smoking Status        SMQ020/040         v25 / v27        Harmonizable   Recode to 0=Never, 1=Former, 2=Current.
-Alcohol Frequency     ALQ121             v28              Harmonizable   Recode to 0=Never, 1=Former, 2=Current.
-Physical Activity     PAD790/810         v32              Harmonizable   WHO GPAQ 3 tiers (1=High, 2=Mod, 3=Low).
-Diabetes Target       LBXGH/GLU/DIQ      v36              Direct Match   ADA / ICMR diagnostic criteria.
-Hypertension Target   BPXOSY/DI/BPQ020   v38              Direct Match   JNC7 / ICMR criteria (SBP>=140/DBP>=90).
-Dyslipidemia Target   LBXTC/HDD/TLG      v41              Direct Match   ATP III lipid abnormality criteria.
-====================================================================================================
+======================================================================================================================
+FEATURE LEAKAGE MATRIX — MODEL V2 (FINAL)
+======================================================================================================================
+Feature Name                    | NHANES Variable       | Mode  | CVD Model   | DM Model    | HTN Model
+-------------------------------|----------------------|-------|-------------|-------------|------------------
+Age                             | RIDAGEYR             | A & B | ALLOWED     | ALLOWED     | ALLOWED
+Sex                             | RIAGENDR             | A & B | ALLOWED     | ALLOWED     | ALLOWED
+Education Level                 | DMDEDUC2             | A & B | ALLOWED     | ALLOWED     | ALLOWED
+Poverty-Income Ratio (PIR)      | INDFMPIR             | A & B | ALLOWED     | ALLOWED     | ALLOWED
+BMI                             | BMXBMI               | A & B | ALLOWED     | ALLOWED     | ALLOWED
+Waist Circumference             | BMXWAIST             | A & B | ALLOWED     | ALLOWED     | ALLOWED
+Systolic BP (mean)              | BPXOSY1..3           | A & B | ALLOWED     | ALLOWED     | PROHIBITED (*)
+Diastolic BP (mean)             | BPXODI1..3           | A & B | ALLOWED     | ALLOWED     | PROHIBITED (*)
+Resting Pulse (mean)            | BPXOPLS1..3          | A & B | ALLOWED     | ALLOWED     | ALLOWED
+Smoking Status                  | SMQ020 / SMQ040      | A & B | ALLOWED     | ALLOWED     | ALLOWED
+Alcohol Consumption             | ALQ121 / ALQ111      | A & B | ALLOWED     | ALLOWED     | ALLOWED
+Physical Activity Level         | PAD790Q / PAD810Q    | A & B | ALLOWED     | ALLOWED     | ALLOWED
+Sedentary Minutes               | PAD680               | A & B | ALLOWED     | ALLOWED     | ALLOWED
+-------------------------------|----------------------|-------|-------------|-------------|------------------
+HbA1c %                         | LBXGH                | B     | ALLOWED     | PROHIBITED (*) | ALLOWED
+Fasting Glucose                 | LBXGLU               | B     | ALLOWED     | PROHIBITED (*) | ALLOWED
+Total Cholesterol               | LBXTC                | B     | ALLOWED     | ALLOWED     | ALLOWED
+HDL-Cholesterol                 | LBDHDD               | B     | ALLOWED     | ALLOWED     | ALLOWED
+Triglycerides                   | LBXTLG               | B     | ALLOWED     | ALLOWED     | ALLOWED
+LDL-Cholesterol (calc.)         | LBDLDL               | B     | ALLOWED     | ALLOWED     | ALLOWED
+Serum Creatinine                | LBXSCR               | B     | ALLOWED     | ALLOWED     | ALLOWED
+Blood Urea Nitrogen             | LBXSBU               | B     | ALLOWED     | ALLOWED     | ALLOWED
+Serum Uric Acid                 | LBXSUA               | B     | ALLOWED     | ALLOWED     | ALLOWED
+ALT Enzyme                      | LBXSATSI             | B     | ALLOWED     | ALLOWED     | ALLOWED
+AST Enzyme                      | LBXSASSI             | B     | ALLOWED     | ALLOWED     | ALLOWED
+Hemoglobin                      | LBXHGB               | B     | ALLOWED     | ALLOWED     | ALLOWED
+WBC Count                       | LBXWBCSI             | B     | ALLOWED     | ALLOWED     | ALLOWED
+Platelet Count                  | LBXPLTSI             | B     | ALLOWED     | ALLOWED     | ALLOWED
+RDW %                           | LBXRDW               | B     | ALLOWED     | ALLOWED     | ALLOWED
+Serum Albumin                   | LBXSAL               | B     | ALLOWED     | ALLOWED     | ALLOWED
+-------------------------------|----------------------|-------|-------------|-------------|------------------
+CHF Diagnosis (MCQ160B)         | MCQ160B              | TARGET| PROHIBITED (*) | not used | not used
+CHD Diagnosis (MCQ160C)         | MCQ160C              | TARGET| PROHIBITED (*) | not used | not used
+Angina Diagnosis (MCQ160D)      | MCQ160D              | TARGET| PROHIBITED (*) | not used | not used
+MI / Heart Attack (MCQ160E)     | MCQ160E              | TARGET| PROHIBITED (*) | not used | not used
+Stroke Diagnosis (MCQ160F)      | MCQ160F              | TARGET| PROHIBITED (*) | not used | not used
+Diabetes Diagnosis (DIQ010)     | DIQ010               | TARGET| not used    | PROHIBITED (*) | not used
+Insulin Use (DIQ050)            | DIQ050               | TARGET| not used    | PROHIBITED (*) | not used
+Diabetes Pills (DIQ070)         | DIQ070               | TARGET| not used    | PROHIBITED (*) | not used
+HTN Diagnosis (BPQ020)          | BPQ020               | TARGET| not used    | not used    | PROHIBITED (*)
+Cholesterol Meds (BPQ101D)      | BPQ101D              | EXCL. | PROHIBITED  | PROHIBITED  | PROHIBITED
+======================================================================================================================
+(*) = Defines or directly proxies for target. Hard prohibition in all pipeline stages.
+Note: "not used" means the variable is neither a target nor a predictor for that model; it is unused.
+======================================================================================================================
 ```
 
-### Critical Indian Population Recalibration Rules:
-1. **BMI Obesity Cutoff Shift:**  
-   Standard WHO/US guidelines define obesity at $\text{BMI} \ge 30\text{ kg/m}^2$. ICMR-INDIAB guidelines mandate the Asian Indian cutoff of **$\text{BMI} \ge 25\text{ kg/m}^2$**.
-2. **Abdominal Obesity Cutoff Shift:**  
-   US NCEP ATP III defines abdominal obesity at $\text{Waist} \ge 102\text{ cm}$ (Men) / $\ge 88\text{ cm}$ (Women). ICMR-INDIAB mandates South Asian cutoffs of **$\text{Waist} \ge 90\text{ cm}$ (Men) / $\ge 80\text{ cm}$ (Women)**.
-3. **Premature Cardiometabolic Onset:** South Asian populations experience onset of Type 2 Diabetes and Coronary Artery Disease **10–15 years earlier** than Western populations. Incorporating Asian cutoffs prevents severe underestimation of health risk for Indian users.
+---
+
+## 4. Mode A Feature Set (13 Non-Invasive Features)
+
+Mode A is the default, non-invasive input pathway. It requires no blood test report and is collected through the application's health questionnaire.
+
+| # | Feature Name | NHANES Variable | Source File | Type | Coverage | HTN Model |
+|---|---|---|---|---|---|---|
+| 1 | Age (years) | `RIDAGEYR` | `DEMO_L.xpt` | Numeric | 100.0% | ALLOWED |
+| 2 | Sex | `RIAGENDR` | `DEMO_L.xpt` | Categorical | 100.0% | ALLOWED |
+| 3 | Education Level | `DMDEDUC2` | `DEMO_L.xpt` | Categorical | 99.9% | ALLOWED |
+| 4 | Poverty-Income Ratio | `INDFMPIR` | `DEMO_L.xpt` | Numeric | 85.9% | ALLOWED |
+| 5 | BMI (kg/m²) | `BMXBMI` | `BMX_L.xpt` | Numeric | 76.5% | ALLOWED |
+| 6 | Waist Circumference (cm) | `BMXWAIST` | `BMX_L.xpt` | Numeric | 73.8% | ALLOWED |
+| 7 | Mean Systolic BP (mmHg) | `BPXOSY1..3` | `BPXO_L.xpt` | Numeric | 72.4% | **PROHIBITED** |
+| 8 | Mean Diastolic BP (mmHg) | `BPXODI1..3` | `BPXO_L.xpt` | Numeric | 72.4% | **PROHIBITED** |
+| 9 | Resting Pulse (bpm) | `BPXOPLS1..3` | `BPXO_L.xpt` | Numeric | 72.4% | ALLOWED |
+| 10 | Smoking Status | `SMQ020`/`040` | `SMQ_L.xpt` | Categorical | 88.7% | ALLOWED |
+| 11 | Alcohol Consumption | `ALQ121`/`111` | `ALQ_L.xpt` | Categorical | 81.9% | ALLOWED |
+| 12 | Physical Activity Level | `PAD790Q`/`810Q` | `PAQ_L.xpt` | Categorical | 89.1% | ALLOWED |
+| 13 | Sedentary Minutes/Day | `PAD680` | `PAQ_L.xpt` | Numeric | 88.9% | ALLOWED |
+
+> [!IMPORTANT]
+> SBP and DBP (features 7–8) are collected in the UI for Mode A but are **routed away from the HTN model pipeline**. They are forwarded only to the CVD and Diabetes model pipelines. The HTN model receives features 1–6, 9–13 in Mode A.
 
 ---
 
-## 7. Task 7 — Survey Design, Sampling Weights & Methodology
+## 5. Mode B Feature Set (Mode A + 16 Laboratory Biomarkers = 29 Features)
 
-NHANES uses a complex multistage probability sampling design. We specify how sampling design variables must be handled in ML model development.
+Mode B is the lab-enhanced input pathway, activated when the user manually enters laboratory values or uploads a clinical blood test report.
 
-### Survey Design Variables in `DEMO_L.xpt`:
-- **`WTINT2YR`:** Interview weight (N = 11,933; Mean = 27,698.8). Applies to home interview variables (`DEMO_L`, `DIQ_L`, `MCQ_L`, `SMQ_L`).
-- **`WTMEC2YR`:** Examination weight (N = 11,933; Mean = 27,698.8). Applies to MEC physical exam & non-fasting bloods (`BMX_L`, `BPXO_L`, `GHB_L`, `TCHOL_L`, `HDL_L`, `BIOPRO_L`, `CBC_L`).
-- **`WTSAF2YR`:** Fasting subsample weight. Applies to fasting bloods (`GLU_L`, `TRIGLY_L`).
-- **`SDMVSTRA` / `SDMVPSU`:** Pseudo-strata (169–186) and pseudo-PSUs (1–3) for Taylor-series variance estimation.
+| # | Feature Name | NHANES Variable | Source File | Panel | Coverage | DM Model |
+|---|---|---|---|---|---|---|
+| 14 | HbA1c % | `LBXGH` | `GHB_L.xpt` | Glycemic | 70.4% | **PROHIBITED** |
+| 15 | Fasting Glucose (mg/dL) | `LBXGLU` | `GLU_L.xpt` | Glycemic | 41.1% (subsample) | **PROHIBITED** |
+| 16 | Total Cholesterol (mg/dL) | `LBXTC` | `TCHOL_L.xpt` | Lipid | 70.4% | ALLOWED |
+| 17 | HDL-Cholesterol (mg/dL) | `LBDHDD` | `HDL_L.xpt` | Lipid | 70.4% | ALLOWED |
+| 18 | Triglycerides (mg/dL) | `LBXTLG` | `TRIGLY_L.xpt` | Lipid | 41.1% (subsample) | ALLOWED |
+| 19 | LDL-Cholesterol (mg/dL) | `LBDLDL` | `TRIGLY_L.xpt` | Lipid | 40.6% (subsample) | ALLOWED |
+| 20 | Serum Creatinine (mg/dL) | `LBXSCR` | `BIOPRO_L.xpt` | Renal | 70.4% | ALLOWED |
+| 21 | BUN (mg/dL) | `LBXSBU` | `BIOPRO_L.xpt` | Renal | 70.4% | ALLOWED |
+| 22 | Serum Uric Acid (mg/dL) | `LBXSUA` | `BIOPRO_L.xpt` | Metabolic | 70.4% | ALLOWED |
+| 23 | ALT (U/L) | `LBXSATSI` | `BIOPRO_L.xpt` | Hepatic | 70.4% | ALLOWED |
+| 24 | AST (U/L) | `LBXSASSI` | `BIOPRO_L.xpt` | Hepatic | 70.4% | ALLOWED |
+| 25 | Hemoglobin (g/dL) | `LBXHGB` | `CBC_L.xpt` | CBC | 73.1% | ALLOWED |
+| 26 | WBC Count (10³/µL) | `LBXWBCSI` | `CBC_L.xpt` | CBC | 73.1% | ALLOWED |
+| 27 | Platelet Count (10³/µL) | `LBXPLTSI` | `CBC_L.xpt` | CBC | 73.1% | ALLOWED |
+| 28 | RDW % | `LBXRDW` | `CBC_L.xpt` | CBC | 73.1% | ALLOWED |
+| 29 | Serum Albumin (g/dL) | `LBXSAL` | `BIOPRO_L.xpt` | Metabolic | 70.4% | ALLOWED |
 
-### Methodological Strategy for Model V2:
-1. **Model Training (Supervised ML):** ML algorithms (Random Forest, XGBoost, LightGBM) learn physiological mappings $f(X) \to Y$ at the individual patient level. Training is performed **unweighted** with stratified $K$-fold cross-validation to prevent extreme weight instability from distorting decision boundary optimization.
-2. **Prevalence Calibration & Evaluation:** `WTMEC2YR` weights are applied during **probability calibration** (Isotonic Regression / Platt Scaling) and population test-set evaluation to ensure that predicted risk probabilities align with true national population disease prevalence.
+> [!IMPORTANT]
+> HbA1c (feature 14) and Fasting Glucose (feature 15) are available in Mode B but are **prohibited predictors in the Diabetes model only** — they define the Diabetes target. They are valid predictors for the CVD and HTN models. A feature being in Mode B does not override the per-model leakage prohibition.
 
 ---
 
-## 8. Task 8 — Data Split & Validation Strategy
+## 6. Overall Health Risk Score — Deterministic Aggregation
 
-We establish a strict, leak-free evaluation protocol.
+> [!IMPORTANT]
+> The Overall Health Risk Score is **not produced by a supervised ML model**. It is produced by a deterministic mathematical formula applied to the calibrated outputs of the three sub-models. No training is performed on the composite score itself.
+
+### 6.1 Aggregation Formula
+
+$$P_{\text{CVD}}, \quad P_{\text{DM}}, \quad P_{\text{HTN}} \in [0, 1]$$
+
+where each probability is the Platt / Isotonic-calibrated output from its respective zero-leakage sub-model.
+
+$$R_{\text{overall}} = 1 - \left(1 - P_{\text{CVD}}\right) \times \left(1 - P_{\text{DM}}\right) \times \left(1 - P_{\text{HTN}}\right)$$
+
+$$\text{Overall Health Risk Index} = \min\!\left(100,\; \max\!\left(0,\; R_{\text{overall}} \times 100\right)\right)$$
+
+This formula treats the three conditions as probabilistically independent (a simplifying assumption that will be documented on the dashboard) and computes the probability that the user falls into at least one of the three risk groups.
+
+### 6.2 Risk Tier Thresholds
+
+| Tier | Score Range | Interpretation |
+|---|---|---|
+| **Low** | 0 – 29 | Low estimated composite cardiometabolic risk |
+| **Medium** | 30 – 59 | Moderate estimated composite cardiometabolic risk |
+| **High** | 60 – 100 | High estimated composite cardiometabolic risk |
+
+### 6.3 Dashboard Display Outputs
+
+The user dashboard will display:
+
+| Output | Value | Source |
+|---|---|---|
+| Overall Health Risk Index | 0 – 100 (Low / Medium / High) | Deterministic aggregation |
+| Cardiovascular Risk Sub-Score | $P_{\text{CVD}} \times 100$ | CVD model output |
+| Diabetes Risk Sub-Score | $P_{\text{DM}} \times 100$ | Diabetes model output |
+| Hypertension Risk Sub-Score | $P_{\text{HTN}} \times 100$ | HTN model output |
+| SHAP Feature Attributions | Per-model explanations | SHAP TreeExplainer |
+
+### 6.4 Mandatory Disclaimer Language
+
+The dashboard and any exported reports **must** include the following (or equivalent) disclaimer:
+
+> *The Overall Health Risk Index is a composite application-level risk index derived from three independent machine-learning sub-models trained on cross-sectional survey data (CDC NHANES 2021–2023). It is not a clinically validated risk calculator, not a prospective 10-year disease incidence probability, and not equivalent to Framingham Risk Score, ASCVD, or any other validated clinical risk tool. It is intended for informational and educational purposes only and must not be used to make or defer medical decisions.*
+
+---
+
+## 7. Calibration Strategy
+
+Each sub-model's raw predicted probability is calibrated before use in the aggregation formula.
+
+| Step | Method | When Applied |
+|---|---|---|
+| **Primary calibration** | Isotonic Regression (non-parametric, monotone) | On the held-out validation set (15% split) |
+| **Fallback calibration** | Platt Scaling (logistic calibration) | If Isotonic overfits on small positive classes |
+| **Evaluation** | Reliability diagram (calibration curve) + Expected Calibration Error (ECE) | Reported for each sub-model |
+| **Survey weight application** | `WTMEC2YR` weights applied during calibration | Post-hoc; not applied during tree model training |
+
+> [!NOTE]
+> Survey weights are applied during the calibration step (not during tree model training) to anchor the model's population-level probability estimates toward CDC-representative NHANES prevalence rates.
+
+---
+
+## 8. ICMR-INDIAB External Validation Strategy
+
+### 8.1 Scope of External Validation
+
+The ICMR-INDIAB sample (`backend/ml/data/raw/icmr_indiab/sample.dta`, N = 500 adults) is used **strictly as an external benchmark** — it plays no role in model training, hyperparameter search, calibration, or internal test evaluation.
+
+**Compatible validation targets (ICMR sample contains):**
+
+| NHANES Model | ICMR Equivalent Variable | Definition Match |
+|---|---|---|
+| Diabetes (Model 2) | `v36` (Diabetes flag) | Self-reported diagnosis; comparable to `DIQ010`. HbA1c/glucose-based sub-criteria not available. |
+| Hypertension (Model 3) | `v38` (Hypertension flag) | Self-reported diagnosis; BP measurement cut-offs not separately available. Partial match. |
+| — | `v40` (Generalised Obesity) | Not a model target, but useful for BMI/waist distribution comparison. |
+| — | `v41` (Dyslipidemia) | Not a model target, but relevant for lipid predictor distribution comparison. |
+
+**CVD Model external validation:** The ICMR sample **does not** contain an individual hard CVD history equivalent (`v35` records family history of heart disease, not personal diagnosis). **No external validation of the CVD model will be claimed on the ICMR sample.** The CVD model's performance is reported only on the internal NHANES test set.
+
+### 8.2 Indian-Specific Clinical Cut-offs (Applied at Evaluation Time)
+
+| Feature | Standard NHANES Threshold | Indian / South Asian Threshold | Application |
+|---|---|---|---|
+| BMI | ≥ 30 kg/m² (WHO General Obesity) | ≥ 25 kg/m² (Asian Obesity) | `asian_obesity_flag` derived feature at ICMR evaluation |
+| Waist (Men) | ≥ 102 cm | ≥ 90 cm | `south_asian_waist_flag` derived feature |
+| Waist (Women) | ≥ 88 cm | ≥ 80 cm | `south_asian_waist_flag` derived feature |
+
+These derived flags supplement the continuous BMI and waist predictors. They are applied during ICMR evaluation only; the NHANES training pipeline uses continuous values.
+
+### 8.3 Definition Difference Documentation
+
+Any metric comparison between NHANES-trained model predictions and ICMR outcome flags will document the following definition differences:
+
+- NHANES diabetes target uses ADA lab criteria (HbA1c, fasting glucose) + self-report; ICMR `v36` is self-report only.
+- NHANES hypertension target uses measured BP thresholds (SBP ≥ 140 or DBP ≥ 90) + self-report; ICMR `v38` is self-report only.
+- Any AUC or calibration metrics computed on ICMR are labelled as "approximate external benchmarks" due to definition mismatch.
+
+---
+
+## 9. Survey-Weight Strategy
+
+> [!NOTE]
+> Survey weights are **not implemented** in Stage 1B or Stage 1C data preparation. This section documents the intended methodological approach for Stage 2 (model training).
+
+| Task | Weight Variable | Strategy |
+|---|---|---|
+| Model training (tree models) | None | Unweighted; stratified cross-validation prevents high-weight outlier distortion |
+| Probability calibration | `WTMEC2YR` (2-year MEC examination weight) | Applied during Isotonic Regression calibration to anchor predicted probabilities to CDC-representative national prevalence |
+| Fasting sub-cohort analysis | `WTSAF2YR` or `WTPH2YR` (to be confirmed) | Applicable only to Fasting Glucose and Triglycerides analysis |
+| Prevalence reporting | `WTMEC2YR` | Weighted prevalence figures for the final report and dashboard |
+
+**Items to verify in Stage 1C / Stage 2:**
+
+- Confirm the exact CDC variable name for NHANES 2021–2023 fasting examination weights (`WTSAF2YR` vs `WTPH2YR`) against official documentation.
+- Verify whether combining 2021–2023 2-year weights with any cross-cycle pooling requires rescaling.
+
+---
+
+## 10. Cross-Sectional Data Limitation
+
+> [!IMPORTANT]
+> **This is a methodological constraint that must be disclosed in all output interfaces.**
+
+NHANES 2021–2023 is a **cross-sectional survey**. Each participant was measured at a single point in time. The dataset records the presence or absence of disease history at that moment — it does not follow participants forward in time.
+
+Consequences for Model V2:
+
+| What the model estimates | What it does NOT estimate |
+|---|---|
+| Probability of observed CVD history in a cross-sectional NHANES-like population | Probability of developing CVD over the next 10 years |
+| Probability of meeting ADA diabetes criteria at time of assessment | Probability of incident diabetes diagnosis over any future time horizon |
+| Probability of meeting JNC7 hypertension criteria at time of assessment | Probability of developing hypertension over any future time horizon |
+
+**Language rule:** All model output descriptions use the phrase "estimated likelihood of the observed condition" or "estimated risk profile" — never "10-year risk", "incidence probability", or "prospective risk prediction".
+
+---
+
+## 11. Blood-Test Integration Implications
+
+### 11.1 Why Mode B Exists
+
+Mode B supports users who already possess routine blood test results (CBC, lipid panel, metabolic panel, HbA1c). Including lab biomarkers substantially improves predictive accuracy for all three sub-models, particularly:
+
+- **CVD model:** HbA1c, total cholesterol, HDL, triglycerides, and creatinine are clinically established CVD risk factors.
+- **Diabetes model:** Lipids (especially triglycerides), renal markers (creatinine, BUN), liver enzymes (ALT, AST), and CBC markers (hemoglobin, WBC) are associated with insulin resistance and metabolic syndrome without directly defining the diabetes target.
+- **HTN model:** Uric acid, creatinine, albumin, and cholesterol are associated with hypertension-related end-organ damage and metabolic risk.
+
+### 11.2 Biomarker Routing Rules
+
+A Mode B biomarker that **defines** a particular model's target must be **excluded** from that model's feature pipeline, even though it appears in the user's blood test report. The routing logic is:
+
+```
+Blood test report → Feature router:
+  HbA1c, Fasting Glucose → CVD model ✓ | Diabetes model ✗ | HTN model ✓
+  SBP, DBP              → CVD model ✓ | Diabetes model ✓  | HTN model ✗
+  All other biomarkers   → All three models ✓
+```
+
+### 11.3 Missingness Handling for Lab Features
+
+Fasting biomarkers (Fasting Glucose, Triglycerides, LDL) are present in only ~41% of the NHANES adult sample due to CDC randomised fasting sub-sampling. In Stage 1C, missing lab values will be handled via:
+
+- **IterativeImputer (MICE)** for laboratory continuous variables (Tier 1: total cholesterol, HDL, creatinine, BUN, hemoglobin, WBC).
+- **Median imputation** for fasting-subsample variables (Tier 2: Fasting Glucose, Triglycerides, LDL) as a fallback where MICE produces unstable estimates on small sub-cohorts.
+- **Missing-indicator flags** added alongside imputed values for Tier 2 variables to allow models to learn from the absence pattern.
+
+The imputation strategy will be validated programmatically in Stage 1C before use in training.
+
+---
+
+## 12. Data Split Strategy
 
 ```mermaid
-flowchart TD
-    subgraph NHANES_DATASET["PRIMARY DATASET: NHANES 2021–2023 ADULTS (N = 7,809)"]
-        direction TB
-        TR["Training Set (70% — N = 5,466 adults)<br>Used for feature preprocessing & hyperparameter tuning"]
-        VAL["Validation Set (15% — N = 1,171 adults)<br>Used for model selection & probability calibration"]
-        TS["Internal Test Set (15% — N = 1,172 adults)<br>Used for final ROC-AUC, PR-AUC, and SHAP evaluation"]
+flowchart LR
+    subgraph PRIMARY["PRIMARY DEVELOPMENT (NHANES 2021–2023 Adults, N = 7,809)"]
+        TR["Training Set
+        70% — N ≈ 5,466
+        Model fitting & hyperparameter search"] --> VAL["Validation Set
+        15% — N ≈ 1,171
+        Isotonic calibration & early stopping"]
+        VAL --> TS["Internal Test Set
+        15% — N ≈ 1,172
+        ROC-AUC, PR-AUC, SHAP, ECE"]
     end
 
-    subgraph ICMR_DATASET["EXTERNAL VALIDATION DATASET: ICMR-INDIAB SAMPLE (N = 500)"]
-        EXT["Strict External Validation Benchmark<br>Evaluates South Asian population transferability & Asian cutoff calibration"]
+    subgraph EXTERNAL["EXTERNAL BENCHMARK (ICMR-INDIAB, N = 500)"]
+        EXT["Diabetes Model (v36)
+        HTN Model (v38)
+        (CVD model: not applicable)"]
     end
 
-    TR -->|Stratified 5-Fold CV| VAL
-    VAL -->|Calibrated Model| TS
-    TS -->|Final Model Freeze| EXT
+    TS -..->|Frozen model| EXT
 ```
 
-### Data Split Rules:
-1. **NHANES Internal Split (70 / 15 / 15):** Stratified by Age group, Gender, and Target outcome (`Target_Composite`).
-2. **Patient Independence:** NHANES sequence numbers (`SEQN`) represent unique individual respondents; no duplicate records exist.
-3. **Strict External Validation (ICMR-INDIAB):** The 500-record ICMR dataset is reserved **exclusively** for external validation. It is **NEVER** mixed into NHANES training data.
+- **Stratification:** Stratified simultaneously by age group (20–39 / 40–59 / 60+), sex, and each target outcome variable.
+- **Patient independence:** Each NHANES respondent has a unique `SEQN`; zero overlap across splits.
+- **ICMR isolation:** The ICMR sample has no contact with any training or calibration step; it is a read-once final benchmark.
 
 ---
 
-## 9. Task 9 — Final Formal Specification & Summary
+## 13. Remaining Methodological Questions for Stage 1C
 
-### 9.1 Master Specification Summary
-1. **Recommended Primary Target:** **Composite Cardiometabolic Risk** (Prevalence: 39.02% / 3,047 positive cases).
-2. **Recommended Secondary Targets:** **Hard CVD** (12.58% prevalence) & **Diabetes Mellitus** (17.74% prevalence).
-3. **Recommended Architecture:** **Option D — Hierarchical Multi-Model Ensemble Architecture**.
-4. **Mode A Features (13 Non-Invasive Features):** `age`, `gender`, `education_level`, `poverty_income_ratio`, `bmi`, `waist_circumference`, `systolic_bp`, `diastolic_bp`, `resting_pulse`, `smoking_status`, `alcohol_frequency`, `physical_activity_level`, `sedentary_minutes`.
-5. **Mode B Extra Features (16 Laboratory Biomarkers):** `hba1c`, `total_cholesterol`, `hdl_cholesterol`, `triglycerides`, `ldl_cholesterol`, `fasting_glucose`, `serum_creatinine`, `blood_urea_nitrogen`, `serum_uric_acid`, `alt_enzyme`, `ast_enzyme`, `hemoglobin`, `wbc_count`, `platelet_count`, `rdw`, `serum_albumin`.
-6. **Prohibited Leakage Variables:** `MCQ160B-F` (CVD diagnoses), `DIQ010` (DM diagnosis), `BPQ020` (HTN diagnosis), `DIQ050/070` (DM meds), `BPQ101D` (Cholesterol meds).
-7. **Primary Target Formula:**  
-   $$\text{Target}_{\text{Composite}} = 1 \iff (\text{Hard CVD} = 1) \lor (\text{Diabetes} = 1) \lor (\text{Mean SBP} \ge 140) \lor (\text{Mean DBP} \ge 90) \lor (\text{Total Chol} \ge 240)$$
-8. **Train / Validation / Test Strategy:** Stratified 70 / 15 / 15 split on adult NHANES records (N = 7,809).
-9. **ICMR Validation Strategy:** Strict external benchmark on Indian adult cohort (N = 500) applying Asian Indian cutoffs.
-10. **Survey Weight Strategy:** Unweighted supervised ML training + `WTMEC2YR` weighted probability calibration.
-11. **Blood Test Strategy:** Two-tier dual-mode interface supporting manual or PDF extraction of routine CBC, Lipid, Metabolic, and Diabetic panels.
+The following items must be resolved programmatically during Stage 1C before data preparation and training begin. No assumption should be committed to code until verified.
+
+- [ ] **Fasting weight variable name:** Confirm whether `WTSAF2YR` or `WTPH2YR` is the correct CDC variable name for NHANES August 2021–August 2023 fasting examination weights. Verify against the official `DEMO_L` codebook.
+- [ ] **SAS floating-point epsilon handling:** Confirm exact recoding of SAS floating-point underflow epsilons ($\approx 5.3976 \times 10^{-79}$) to `0.0` in all NHANES XPT numeric fields.
+- [ ] **Imputation strategy validation:** Run comparative missingness imputation trials (IterativeImputer vs. Median) on Mode B laboratory features using the NHANES training split; select strategy based on reconstruction error.
+- [ ] **Hyperparameter search grids:** Finalise candidate search grids for Random Forest, XGBoost, and LightGBM for each sub-model; confirm whether nested cross-validation or a simple train/validation/test split is used.
+- [ ] **Resting pulse availability:** Verify that `BPXOPLS` (pulse rate) is reliably present in `BPXO_L.xpt` for the August 2021–August 2023 cycle; confirm column name (some NHANES cycles use `BPXPLS`).
+- [ ] **Alcohol variable mapping:** Confirm which of `ALQ121` (past-12-month drinking days) vs `ALQ111` (ever drank alcohol) best represents a 3-tier current/former/never categorical.
+- [ ] **Asian obesity flag:** Confirm that derived feature `asian_obesity_flag` (BMI ≥ 25) is computed at feature-engineering time (not training time) to prevent data leakage in imputation pipelines.
+- [ ] **ICMR definition mismatch documentation:** Formally document all NHANES-to-ICMR variable definition mismatches in a mapping table before reporting any external validation metrics.
 
 ---
 
-### 9.2 Comparative Analysis: Model V2 vs Legacy Model V1
+*Machine-readable feature specification:*
+[`model_v2_feature_matrix.csv`](file:///c:/Users/sunny/Desktop/AI-Health-Risk-Scoring-System/backend/ml/data/interim/audit/model_v2_feature_matrix.csv)
 
-| Design Parameter | Legacy Model V1 | Proposed Model V2 | Advantage & Clinical Justification |
-| :--- | :--- | :--- | :--- |
-| **Dataset Scale & Type** | 151 synthetic rows (`indian_health_risk_dataset.csv`) | **7,809 authentic NHANES adults + 500 ICMR adults** | Real population variance, non-linear feature interactions, and epidemiological ground truth. |
-| **Synthetic Features** | Included `sdnn_hrv`, `rmssd_hrv`, `spo2` | **RETIRED** (Replaced by `resting_pulse`, `waist_circumference`, CBC & BioProfile) | Eliminates non-clinical fabricated metrics; uses standard clinical vitals & laboratory panels. |
-| **Target Variable** | Synthetic rule-derived `risk_score` | **Composite Cardiometabolic Risk & Hard CVD** | Scientifically defensible clinical endpoints grounded in ADA, ACC/AHA, and NCEP guidelines. |
-| **Target Leakage** | Unaudited | **Strict Zero-Leakage Boundaries** | Excludes target-defining diagnoses and medication flags to prevent trivial memorization. |
-| **Inference Flexibility** | Single fixed input form | **Two-Tier Dual Mode (Mode A Vitals & Mode B Labs)** | Allows instant non-invasive screening OR laboratory-enhanced report upload. |
-| **Indian Recalibration** | None | **ICMR Asian Indian Cutoffs Applied** | Prevents underestimation of cardiometabolic risk in South Asian populations. |
-| **Probability Score** | Uncalibrated regression | **Isotonic Probability Calibration (0–100 Scale)** | Outputs true, clinically interpretable risk probabilities $P(\text{Risk} \mid X) \times 100$. |
-
----
-
-*Machine-readable feature specification generated at:*  
-[`backend/ml/data/interim/audit/model_v2_feature_matrix.csv`](file:///c:/Users/sunny/Desktop/AI-Health-Risk-Scoring-System/backend/ml/data/interim/audit/model_v2_feature_matrix.csv)
+*Data audit foundation:*
+[`DATA_AUDIT_REPORT.md`](file:///c:/Users/sunny/Desktop/AI-Health-Risk-Scoring-System/backend/ml/data/DATA_AUDIT_REPORT.md)

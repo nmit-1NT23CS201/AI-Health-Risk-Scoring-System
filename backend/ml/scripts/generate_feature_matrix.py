@@ -1,5 +1,7 @@
 """
-Generate Model V2 Feature Matrix CSV
+Generate Model V2 Feature Matrix CSV - Revision 1B
+Reflects decoupled multi-model architecture (Hard CVD Primary, Diabetes Secondary, Hypertension Secondary)
+with strict per-model leakage boundaries, Mode A/B classification, and ICMR compatibility.
 """
 
 import os
@@ -12,7 +14,7 @@ AUDIT_OUTPUT_DIR = WORKSPACE_ROOT / "backend" / "ml" / "data" / "interim" / "aud
 os.makedirs(AUDIT_OUTPUT_DIR, exist_ok=True)
 
 matrix_data = [
-    # MODE A: Baseline Non-Invasive (Demographics, Anthropometrics, Vitals, Lifestyle)
+    # MODE A: Baseline Non-Invasive Predictors (Demographics, Anthropometrics, Vitals, Lifestyle)
     {
         "feature_name": "age",
         "human_name": "Age (years)",
@@ -22,9 +24,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "100.0% (N=7,809 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "v4 (Age)",
-        "notes": "Direct numeric match. Top-coded at 80 years in NHANES."
+        "notes": "Direct numeric match. Top-coded at 80 years in NHANES. Allowed in CVD, Diabetes, and HTN models."
     },
     {
         "feature_name": "gender",
@@ -35,9 +37,9 @@ matrix_data = [
         "type": "Categorical",
         "coverage": "100.0% (N=7,809 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "v5 (Sex)",
-        "notes": "Exact coding match: 1=Male, 2=Female."
+        "notes": "Exact coding match: 1=Male, 2=Female. Allowed in all models."
     },
     {
         "feature_name": "education_level",
@@ -48,9 +50,9 @@ matrix_data = [
         "type": "Categorical",
         "coverage": "99.9% (N=7,802 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "v6 (Education)",
-        "notes": "Harmonizable into 3 tiers: 1=Low/No schooling, 2=High school, 3=Higher/Technical."
+        "notes": "Harmonizable into 3 tiers (Low/Mid/High). Allowed in all models."
     },
     {
         "feature_name": "poverty_income_ratio",
@@ -61,9 +63,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "85.9% (N=6,707 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "v24 (SLI Index)",
-        "notes": "Socioeconomic proxy; median imputable."
+        "notes": "Socioeconomic status proxy; median imputable. Allowed in all models."
     },
     {
         "feature_name": "bmi",
@@ -74,9 +76,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "76.5% (N=5,970 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "v8 (BMI) / v40 (Obesity)",
-        "notes": "Continuous float. Apply Asian Indian cutoff (BMI >= 25 kg/m²) for Indian population risk."
+        "notes": "Continuous float. Standard CDC cutoff for NHANES; Asian Indian cutoff (BMI>=25) used for ICMR evaluation."
     },
     {
         "feature_name": "waist_circumference",
@@ -87,9 +89,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "73.8% (N=5,765 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "v9 (Waist) / v39 (Abdominal Obesity)",
-        "notes": "Continuous float. Apply South Asian cutoffs (>=90cm Men, >=80cm Women)."
+        "notes": "Continuous float. Standard tape measurement. South Asian cutoffs (>=90M, >=80F) used for ICMR evaluation."
     },
     {
         "feature_name": "systolic_bp",
@@ -100,9 +102,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "72.4% (N=5,654 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe for CVD/Composite; Target-Defining for HTN Target",
+        "leakage_status": "Safe for CVD & Diabetes Models; PROHIBITED in Hypertension Model",
         "icmr_equivalent": "v10 (Systolic BP)",
-        "notes": "Take mean of valid oscillometric readings. Cannot be used if target is HTN."
+        "notes": "Mean of 3 oscillometric readings. Allowed as predictor for CVD and Diabetes models; PROHIBITED in HTN Model."
     },
     {
         "feature_name": "diastolic_bp",
@@ -113,9 +115,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "72.4% (N=5,654 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe for CVD/Composite; Target-Defining for HTN Target",
+        "leakage_status": "Safe for CVD & Diabetes Models; PROHIBITED in Hypertension Model",
         "icmr_equivalent": "v11 (Diastolic BP)",
-        "notes": "Take mean of valid oscillometric readings. Cannot be used if target is HTN."
+        "notes": "Mean of 3 oscillometric readings. Allowed as predictor for CVD and Diabetes models; PROHIBITED in HTN Model."
     },
     {
         "feature_name": "resting_pulse",
@@ -126,9 +128,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "72.4% (N=5,654 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Mean resting pulse; clean replacement for legacy synthetic HRV features."
+        "notes": "Mean resting pulse; clean replacement for legacy synthetic HRV features. Allowed in all models."
     },
     {
         "feature_name": "smoking_status",
@@ -139,9 +141,9 @@ matrix_data = [
         "type": "Categorical",
         "coverage": "88.7% (N=6,926 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "v25 (Smoking) / v27 (Any Tobacco)",
-        "notes": "Recode to 0=Never, 1=Former, 2=Current."
+        "notes": "Recode to 0=Never, 1=Former, 2=Current. Allowed in all models."
     },
     {
         "feature_name": "alcohol_frequency",
@@ -152,9 +154,9 @@ matrix_data = [
         "type": "Categorical",
         "coverage": "81.9% (N=6,397 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "v28 (Alcohol)",
-        "notes": "Recode to 0=Never, 1=Former, 2=Current."
+        "notes": "Recode to 0=Never, 1=Former, 2=Current. Allowed in all models."
     },
     {
         "feature_name": "physical_activity_level",
@@ -165,9 +167,9 @@ matrix_data = [
         "type": "Categorical",
         "coverage": "89.1% (N=6,957 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "v32 (Overall Activity)",
-        "notes": "Recode to WHO GPAQ 3 tiers: 1=High, 2=Moderate, 3=Low."
+        "notes": "Recode to WHO GPAQ 3 tiers: 1=High, 2=Moderate, 3=Low. Allowed in all models."
     },
     {
         "feature_name": "sedentary_minutes",
@@ -178,12 +180,12 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "88.9% (N=6,944 adults)",
         "mode": "Mode A & B",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "v29 (Work Activity Sedentary proxy)",
-        "notes": "Continuous daily sitting minutes."
+        "notes": "Continuous daily sitting minutes. Allowed in all models."
     },
 
-    # MODE B: Laboratory-Enhanced Features
+    # MODE B: Laboratory-Enhanced Predictors
     {
         "feature_name": "hba1c",
         "human_name": "Glycohemoglobin (HbA1c %)",
@@ -193,61 +195,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "70.4% (N=5,498 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe for CVD/Composite; Target-Defining for DM Target",
+        "leakage_status": "Safe for CVD & HTN Models; PROHIBITED in Diabetes Model",
         "icmr_equivalent": "v36 (Diabetes flag)",
-        "notes": "Tier 1 routine blood test. Gold standard diabetes biomarker."
-    },
-    {
-        "feature_name": "total_cholesterol",
-        "human_name": "Total Cholesterol (mg/dL)",
-        "source_dataset": "NHANES 2021-2023",
-        "source_file": "TCHOL_L.xpt",
-        "variable": "LBXTC",
-        "type": "Numeric",
-        "coverage": "70.4% (N=5,498 adults)",
-        "mode": "Mode B Only",
-        "leakage_status": "Safe for CVD/Composite; Target-Defining for Dyslip Target",
-        "icmr_equivalent": "v41 (Dyslipidemia flag)",
-        "notes": "Tier 1 routine lipid panel test."
-    },
-    {
-        "feature_name": "hdl_cholesterol",
-        "human_name": "Direct HDL-Cholesterol (mg/dL)",
-        "source_dataset": "NHANES 2021-2023",
-        "source_file": "HDL_L.xpt",
-        "variable": "LBDHDD",
-        "type": "Numeric",
-        "coverage": "70.4% (N=5,498 adults)",
-        "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
-        "icmr_equivalent": "v41 (Dyslipidemia flag)",
-        "notes": "Tier 1 routine lipid panel test."
-    },
-    {
-        "feature_name": "triglycerides",
-        "human_name": "Serum Triglycerides (mg/dL)",
-        "source_dataset": "NHANES 2021-2023",
-        "source_file": "TRIGLY_L.xpt",
-        "variable": "LBXTLG",
-        "type": "Numeric",
-        "coverage": "41.1% (N=3,210 adults)",
-        "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
-        "icmr_equivalent": "v41 (Dyslipidemia flag)",
-        "notes": "Tier 2 lipid test (Fasting subsample)."
-    },
-    {
-        "feature_name": "ldl_cholesterol",
-        "human_name": "Calculated LDL-Cholesterol (mg/dL)",
-        "source_dataset": "NHANES 2021-2023",
-        "source_file": "TRIGLY_L.xpt",
-        "variable": "LBDLDL",
-        "type": "Numeric",
-        "coverage": "40.6% (N=3,172 adults)",
-        "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
-        "icmr_equivalent": "v41 (Dyslipidemia flag)",
-        "notes": "Tier 2 lipid test (Fasting subsample; Friedewald/Martin-Hopkins equation)."
+        "notes": "Tier 1 routine blood test. Gold standard glycemic biomarker. Allowed in CVD & HTN models; PROHIBITED in Diabetes Model."
     },
     {
         "feature_name": "fasting_glucose",
@@ -258,9 +208,61 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "41.1% (N=3,210 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe for CVD/Composite; Target-Defining for DM Target",
+        "leakage_status": "Safe for CVD & HTN Models; PROHIBITED in Diabetes Model",
         "icmr_equivalent": "v36 (Diabetes flag)",
-        "notes": "Tier 1 routine glucose test (Fasting subsample)."
+        "notes": "Tier 1 routine glucose test (Fasting subsample). Allowed in CVD & HTN models; PROHIBITED in Diabetes Model."
+    },
+    {
+        "feature_name": "total_cholesterol",
+        "human_name": "Total Cholesterol (mg/dL)",
+        "source_dataset": "NHANES 2021-2023",
+        "source_file": "TCHOL_L.xpt",
+        "variable": "LBXTC",
+        "type": "Numeric",
+        "coverage": "70.4% (N=5,498 adults)",
+        "mode": "Mode B Only",
+        "leakage_status": "Safe Predictor (All Models)",
+        "icmr_equivalent": "v41 (Dyslipidemia flag)",
+        "notes": "Tier 1 routine lipid panel test. Allowed in CVD, Diabetes, and HTN models."
+    },
+    {
+        "feature_name": "hdl_cholesterol",
+        "human_name": "Direct HDL-Cholesterol (mg/dL)",
+        "source_dataset": "NHANES 2021-2023",
+        "source_file": "HDL_L.xpt",
+        "variable": "LBDHDD",
+        "type": "Numeric",
+        "coverage": "70.4% (N=5,498 adults)",
+        "mode": "Mode B Only",
+        "leakage_status": "Safe Predictor (All Models)",
+        "icmr_equivalent": "v41 (Dyslipidemia flag)",
+        "notes": "Tier 1 routine lipid panel test. Allowed in CVD, Diabetes, and HTN models."
+    },
+    {
+        "feature_name": "triglycerides",
+        "human_name": "Serum Triglycerides (mg/dL)",
+        "source_dataset": "NHANES 2021-2023",
+        "source_file": "TRIGLY_L.xpt",
+        "variable": "LBXTLG",
+        "type": "Numeric",
+        "coverage": "41.1% (N=3,210 adults)",
+        "mode": "Mode B Only",
+        "leakage_status": "Safe Predictor (All Models)",
+        "icmr_equivalent": "v41 (Dyslipidemia flag)",
+        "notes": "Tier 2 lipid test (Fasting subsample). Allowed in all models."
+    },
+    {
+        "feature_name": "ldl_cholesterol",
+        "human_name": "Calculated LDL-Cholesterol (mg/dL)",
+        "source_dataset": "NHANES 2021-2023",
+        "source_file": "TRIGLY_L.xpt",
+        "variable": "LBDLDL",
+        "type": "Numeric",
+        "coverage": "40.6% (N=3,172 adults)",
+        "mode": "Mode B Only",
+        "leakage_status": "Safe Predictor (All Models)",
+        "icmr_equivalent": "v41 (Dyslipidemia flag)",
+        "notes": "Tier 2 lipid test (Fasting subsample; Friedewald/Martin-Hopkins equation). Allowed in all models."
     },
     {
         "feature_name": "serum_creatinine",
@@ -271,9 +273,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "70.4% (N=5,498 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Tier 1 routine renal panel test. Used for eGFR (CKD-EPI equation)."
+        "notes": "Tier 1 routine renal panel test. Used for eGFR (CKD-EPI equation). Allowed in all models."
     },
     {
         "feature_name": "blood_urea_nitrogen",
@@ -284,9 +286,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "70.4% (N=5,498 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Tier 1 routine renal clearance & cardiorenal strain marker."
+        "notes": "Tier 1 routine renal clearance & cardiorenal strain marker. Allowed in all models."
     },
     {
         "feature_name": "serum_uric_acid",
@@ -297,9 +299,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "70.4% (N=5,498 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Tier 2 metabolic syndrome & endothelial dysfunction marker."
+        "notes": "Tier 2 metabolic syndrome & endothelial dysfunction marker. Allowed in all models."
     },
     {
         "feature_name": "alt_enzyme",
@@ -310,9 +312,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "70.4% (N=5,498 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Tier 2 liver function & steatotic liver disease indicator."
+        "notes": "Tier 2 liver function & steatotic liver disease indicator. Allowed in all models."
     },
     {
         "feature_name": "ast_enzyme",
@@ -323,9 +325,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "70.4% (N=5,498 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Tier 2 liver function & cellular injury marker."
+        "notes": "Tier 2 liver function & cellular injury marker. Allowed in all models."
     },
     {
         "feature_name": "hemoglobin",
@@ -336,9 +338,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "73.1% (N=5,708 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Tier 1 routine CBC test. Anemia detection & cardiac stressor."
+        "notes": "Tier 1 routine CBC test. Anemia detection & cardiac stressor. Allowed in all models."
     },
     {
         "feature_name": "wbc_count",
@@ -349,9 +351,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "73.1% (N=5,708 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Tier 1 routine CBC test. Low-grade systemic inflammation marker."
+        "notes": "Tier 1 routine CBC test. Low-grade systemic inflammation marker. Allowed in all models."
     },
     {
         "feature_name": "platelet_count",
@@ -362,9 +364,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "73.1% (N=5,708 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Tier 2 routine CBC test. Thrombotic profile indicator."
+        "notes": "Tier 2 routine CBC test. Thrombotic profile indicator. Allowed in all models."
     },
     {
         "feature_name": "rdw",
@@ -375,9 +377,9 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "73.1% (N=5,708 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Tier 2 routine CBC test. Independent cardiovascular mortality predictor."
+        "notes": "Tier 2 routine CBC test. Independent cardiovascular mortality predictor. Allowed in all models."
     },
     {
         "feature_name": "serum_albumin",
@@ -388,12 +390,12 @@ matrix_data = [
         "type": "Numeric",
         "coverage": "70.4% (N=5,498 adults)",
         "mode": "Mode B Only",
-        "leakage_status": "Safe Predictor",
+        "leakage_status": "Safe Predictor (All Models)",
         "icmr_equivalent": "Not present in ICMR sample",
-        "notes": "Tier 2 routine metabolic panel marker. Nutritional & inflammatory status."
+        "notes": "Tier 2 routine metabolic panel marker. Nutritional & inflammatory status. Allowed in all models."
     },
 
-    # TARGET & FORBIDDEN LEAKAGE VARIABLES (Prohibited from Model Predictors)
+    # TARGET & PROHIBITED LEAKAGE VARIABLES (Strictly Excluded per Model)
     {
         "feature_name": "mcq160b_chf",
         "human_name": "Congestive Heart Failure Diagnosis",
@@ -403,9 +405,9 @@ matrix_data = [
         "type": "Binary",
         "coverage": "99.4% (N=7,764 adults)",
         "mode": "Excluded (Target Component)",
-        "leakage_status": "Direct Target Leakage",
+        "leakage_status": "PROHIBITED (Defines Hard CVD Target)",
         "icmr_equivalent": "v35 (Family Heart Disease)",
-        "notes": "Target-defining variable for Hard CVD & Composite Risk. FORBIDDEN as predictor."
+        "notes": "Target-defining variable for Hard CVD Classifier. FORBIDDEN as predictor in all models."
     },
     {
         "feature_name": "mcq160c_chd",
@@ -416,9 +418,9 @@ matrix_data = [
         "type": "Binary",
         "coverage": "99.4% (N=7,764 adults)",
         "mode": "Excluded (Target Component)",
-        "leakage_status": "Direct Target Leakage",
+        "leakage_status": "PROHIBITED (Defines Hard CVD Target)",
         "icmr_equivalent": "v35 (Family Heart Disease)",
-        "notes": "Target-defining variable for Hard CVD & Composite Risk. FORBIDDEN as predictor."
+        "notes": "Target-defining variable for Hard CVD Classifier. FORBIDDEN as predictor in all models."
     },
     {
         "feature_name": "mcq160d_angina",
@@ -429,9 +431,9 @@ matrix_data = [
         "type": "Binary",
         "coverage": "99.4% (N=7,764 adults)",
         "mode": "Excluded (Target Component)",
-        "leakage_status": "Direct Target Leakage",
+        "leakage_status": "PROHIBITED (Defines Hard CVD Target)",
         "icmr_equivalent": "v35 (Family Heart Disease)",
-        "notes": "Target-defining variable for Hard CVD & Composite Risk. FORBIDDEN as predictor."
+        "notes": "Target-defining variable for Hard CVD Classifier. FORBIDDEN as predictor in all models."
     },
     {
         "feature_name": "mcq160e_mi",
@@ -442,9 +444,9 @@ matrix_data = [
         "type": "Binary",
         "coverage": "99.4% (N=7,764 adults)",
         "mode": "Excluded (Target Component)",
-        "leakage_status": "Direct Target Leakage",
+        "leakage_status": "PROHIBITED (Defines Hard CVD Target)",
         "icmr_equivalent": "v35 (Family Heart Disease)",
-        "notes": "Target-defining variable for Hard CVD & Composite Risk. FORBIDDEN as predictor."
+        "notes": "Target-defining variable for Hard CVD Classifier. FORBIDDEN as predictor in all models."
     },
     {
         "feature_name": "mcq160f_stroke",
@@ -455,9 +457,9 @@ matrix_data = [
         "type": "Binary",
         "coverage": "99.4% (N=7,764 adults)",
         "mode": "Excluded (Target Component)",
-        "leakage_status": "Direct Target Leakage",
+        "leakage_status": "PROHIBITED (Defines Hard CVD Target)",
         "icmr_equivalent": "v35 (Family Heart Disease)",
-        "notes": "Target-defining variable for Hard CVD & Composite Risk. FORBIDDEN as predictor."
+        "notes": "Target-defining variable for Hard CVD Classifier. FORBIDDEN as predictor in all models."
     },
     {
         "feature_name": "diq010_dm_diag",
@@ -468,9 +470,9 @@ matrix_data = [
         "type": "Categorical",
         "coverage": "100.0% (N=7,809 adults)",
         "mode": "Excluded (Target Component)",
-        "leakage_status": "Direct Target Leakage",
+        "leakage_status": "PROHIBITED in Diabetes Model",
         "icmr_equivalent": "v36 (Diabetes flag)",
-        "notes": "Target-defining variable for Diabetes & Composite Risk. FORBIDDEN as predictor."
+        "notes": "Target-defining variable for Diabetes Classifier. FORBIDDEN in Diabetes Model."
     },
     {
         "feature_name": "bpq020_htn_diag",
@@ -481,9 +483,35 @@ matrix_data = [
         "type": "Categorical",
         "coverage": "99.9% (N=7,800 adults)",
         "mode": "Excluded (Target Component)",
-        "leakage_status": "Direct Target Leakage",
+        "leakage_status": "PROHIBITED in Hypertension Model",
         "icmr_equivalent": "v38 (Hypertension flag)",
-        "notes": "Target-defining variable for HTN & Composite Risk. FORBIDDEN as predictor."
+        "notes": "Target-defining variable for Hypertension Classifier. FORBIDDEN in HTN Model."
+    },
+    {
+        "feature_name": "diq050_insulin",
+        "human_name": "Taking Insulin",
+        "source_dataset": "NHANES 2021-2023",
+        "source_file": "DIQ_L.xpt",
+        "variable": "DIQ050",
+        "type": "Binary",
+        "coverage": "100.0% (N=7,809 adults)",
+        "mode": "Excluded (Post-Outcome Treatment)",
+        "leakage_status": "PROHIBITED in Diabetes Model",
+        "icmr_equivalent": "v36 (Diabetes flag)",
+        "notes": "Post-outcome drug treatment flag. FORBIDDEN in Diabetes Model."
+    },
+    {
+        "feature_name": "diq070_dm_pills",
+        "human_name": "Taking Diabetes Pills",
+        "source_dataset": "NHANES 2021-2023",
+        "source_file": "DIQ_L.xpt",
+        "variable": "DIQ070",
+        "type": "Binary",
+        "coverage": "100.0% (N=7,809 adults)",
+        "mode": "Excluded (Post-Outcome Treatment)",
+        "leakage_status": "PROHIBITED in Diabetes Model",
+        "icmr_equivalent": "v36 (Diabetes flag)",
+        "notes": "Post-outcome drug treatment flag. FORBIDDEN in Diabetes Model."
     },
     {
         "feature_name": "bpq101d_chol_meds",
@@ -493,13 +521,13 @@ matrix_data = [
         "variable": "BPQ101D",
         "type": "Categorical",
         "coverage": "99.9% (N=7,800 adults)",
-        "mode": "Excluded (Post-Outcome)",
-        "leakage_status": "Post-Outcome Leakage",
+        "mode": "Excluded (Post-Outcome Treatment)",
+        "leakage_status": "PROHIBITED (Post-Outcome Treatment)",
         "icmr_equivalent": "v41 (Dyslipidemia flag)",
-        "notes": "Prescription drug treatment flag. Excluded to prevent treatment proxy leakage."
+        "notes": "Prescription drug treatment flag. Excluded from all models to prevent treatment proxy leakage."
     }
 ]
 
 df_matrix = pd.DataFrame(matrix_data)
 df_matrix.to_csv(AUDIT_OUTPUT_DIR / "model_v2_feature_matrix.csv", index=False)
-print(f"Successfully generated model_v2_feature_matrix.csv with {len(df_matrix)} features.")
+print(f"Successfully generated revised model_v2_feature_matrix.csv with {len(df_matrix)} features.")
