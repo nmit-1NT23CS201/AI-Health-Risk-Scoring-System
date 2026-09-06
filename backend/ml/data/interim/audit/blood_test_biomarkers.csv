@@ -1,0 +1,21 @@
+category,variable,file,name,missing_pct,tier,clinical_utility
+Glycemic Control,LBXGH,GHB_L.xpt,Glycohemoglobin (HbA1c %),26.15,Highly Useful (Tier 1),Gold standard diagnostic & monitoring marker for diabetes; robust to non-fasting status.
+Glycemic Control,LBXGLU,GLU_L.xpt,Fasting Serum Glucose (mg/dL),58.89,Potentially Useful (Subsample),"Diagnostic for impaired fasting glucose / diabetes, but restricted to morning fasting subsample (~54% missing in adults)."
+Lipid Profile,LBXTC,TCHOL_L.xpt,Total Cholesterol (mg/dL),29.59,Highly Useful (Tier 1),Key cardiovascular risk predictor; available across full examined cohort (only ~18% missing).
+Lipid Profile,LBDHDD,HDL_L.xpt,Direct HDL-Cholesterol (mg/dL),29.59,Highly Useful (Tier 1),"Cardioprotective lipid fraction; essential for Framingham, SCORE, and metabolic syndrome calculation."
+Lipid Profile,LBXTLG,TRIGLY_L.xpt,Serum Triglycerides (mg/dL),60.57,Potentially Useful (Subsample),Atherogenic marker and metabolic syndrome criterion; measured in fasting subsample (~52% missing).
+Lipid Profile,LBDLDL,TRIGLY_L.xpt,Friedewald LDL-Cholesterol (mg/dL),61.04,Potentially Useful (Subsample),Primary target of lipid-lowering therapy; calculated in fasting subsample.
+Renal Function,LBXSCR,BIOPRO_L.xpt,Serum Creatinine (mg/dL),30.3,Highly Useful (Tier 1),Essential for estimating GFR (eGFR) and staging chronic kidney disease / cardiorenal syndrome.
+Renal Function,LBXSBU,BIOPRO_L.xpt,Blood Urea Nitrogen (mg/dL),30.29,Highly Useful (Tier 1),"Marker of renal clearance, hydration status, and heart failure severity."
+Renal Function,LBXSUA,BIOPRO_L.xpt,Serum Uric Acid (mg/dL),30.26,Potentially Useful (Tier 2),"Biomarker for gout, metabolic syndrome, and endothelial dysfunction."
+Hepatic Function,LBXSATSI,BIOPRO_L.xpt,Alanine Aminotransferase ALT (U/L),30.36,Potentially Useful (Tier 2),Indicator of hepatocellular injury and metabolic dysfunction-associated steatotic liver disease (MASLD).
+Hepatic Function,LBXSASSI,BIOPRO_L.xpt,Aspartate Aminotransferase AST (U/L),30.52,Potentially Useful (Tier 2),Indicator of hepatic and myocardial cellular integrity; AST/ALT ratio.
+Hepatic Function,LBXSAPSI,BIOPRO_L.xpt,Alkaline Phosphatase (U/L),30.29,Unnecessary for V2 Core,Biliary/bone marker; low specificity for primary cardiometabolic risk.
+Hepatic Function,LBXSTB,BIOPRO_L.xpt,Total Bilirubin (mg/dL),30.3,Unnecessary for V2 Core,Liver excretion marker; rarely abnormal in early cardiometabolic disease.
+Proteins & Electrolytes,LBXSAL,BIOPRO_L.xpt,Serum Albumin (g/dL),29.85,Potentially Useful (Tier 2),"Marker of nutritional status, hepatic synthesis, and systemic inflammatory response."
+Proteins & Electrolytes,LBXSNASI,BIOPRO_L.xpt,Serum Sodium (mmol/L),29.85,Unnecessary for V2 Core,"Electrolyte balance; tightly regulated, high noise for general risk."
+Proteins & Electrolytes,LBXSKSI,BIOPRO_L.xpt,Serum Potassium (mmol/L),30.76,Unnecessary for V2 Core,"Electrolyte; critical in acute settings, less predictive in chronic risk classification."
+Hematology (CBC),LBXHGB,CBC_L.xpt,Hemoglobin (g/dL),26.14,Highly Useful (Tier 1),Anemia detection; anemia strongly exacerbates cardiovascular strain and mortality.
+Hematology (CBC),LBXWBCSI,CBC_L.xpt,White Blood Cell Count (1000 cells/uL),26.14,Highly Useful (Tier 1),Non-specific systemic inflammation marker strongly correlated with atherogenesis and CAD.
+Hematology (CBC),LBXPLTSI,CBC_L.xpt,Platelet Count (1000 cells/uL),26.14,Potentially Useful (Tier 2),Thrombotic potential and bone marrow/liver dysfunction indicator.
+Hematology (CBC),LBXRDW,CBC_L.xpt,Red Cell Distribution Width (%),26.14,Potentially Useful (Tier 2),High RDW is an established independent predictor of all-cause and cardiovascular mortality.

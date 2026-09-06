@@ -1,0 +1,47 @@
+{
+  "total_nhanes_files": 16,
+  "total_nhanes_participants_interviewed": 11933,
+  "total_nhanes_adults_20plus": 7809,
+  "total_nhanes_adults_examined_mec": 5970,
+  "total_nhanes_adults_with_routine_labs": 5498,
+  "total_nhanes_adults_with_fasting_labs": 3210,
+  "total_icmr_sample_records": 500,
+  "total_icmr_variables": 41,
+  "v1_dataset_rows": 151,
+  "v1_dataset_cols": 19,
+  "v1_synthetic_features_to_retire": [
+    "sdnn_hrv",
+    "rmssd_hrv",
+    "spo2"
+  ],
+  "strongest_candidate_targets": [
+    "Composite Cardiometabolic Risk (CVD + Diabetes + Stage-2 HTN + Severe Hypercholesterolemia) - Prevalence 38.6%",
+    "Hard Cardiovascular Disease (MI, Stroke, Angina, CHD, Heart Failure) - Prevalence 12.6%",
+    "Diabetes Mellitus (HbA1c >= 6.5% or FPG >= 126 or Diagnosed/Meds) - Prevalence 19.3%",
+    "Hypertension (JNC7 / ICMR SBP>=140 or DBP>=90 or Diagnosed) - Prevalence 48.2%",
+    "Metabolic Syndrome (ATP III >=3 criteria) - Prevalence 41.2%"
+  ],
+  "strongest_candidate_predictors": [
+    "Demographics: Age (RIDAGEYR), Gender (RIAGENDR), Education (DMDEDUC2), Poverty-Income Ratio (INDFMPIR)",
+    "Anthropometrics: BMI (BMXBMI), Waist Circumference (BMXWAIST)",
+    "Vitals: Systolic BP (mean_sbp), Diastolic BP (mean_dbp), Resting Pulse (mean_pulse)",
+    "Lifestyle: Smoking Status (SMQ020/040), Alcohol Frequency (ALQ121), Physical Activity Level (PAQ PAD790/810)",
+    "Core Routine Labs (Tier 1): Total Cholesterol (LBXTC), HDL-C (LBDHDD), HbA1c (LBXGH), Creatinine (LBXSCR), BUN (LBXSBU), Hemoglobin (LBXHGB), WBC (LBXWBCSI)",
+    "Extended Labs (Tier 2): Fasting Glucose (LBXGLU), Triglycerides (LBXTLG), LDL (LBDLDL), Uric Acid (LBXSUA), Albumin (LBXSAL), ALT (LBXSATSI), AST (LBXSASSI), Platelets (LBXPLTSI), RDW (LBXRDW)"
+  ],
+  "biggest_missing_data_issues": [
+    "Fasting Subsample Biomarkers: Fasting Glucose (LBXGLU) and Triglycerides (LBXTLG) are missing in ~54% and ~52% of adults due to CDC randomized fasting subsample protocol.",
+    "Pediatric Exclusions: 4,124 participants in DEMO_L (34.6%) are pediatric (<20 years) and have structurally missing adult health/lifestyle questionnaires.",
+    "Examination Drop-off: 4,008 participants (33.6%) completed only the home interview and skipped the MEC clinical examination/blood draw."
+  ],
+  "compatibility_issues": [
+    "Synthetic HRV & SpO2 in V1: V1 relied on sdnn_hrv, rmssd_hrv, and spo2 which do not exist in real NHANES or ICMR epidemiological data.",
+    "Obesity Cutoff Differences: ICMR uses Asian Indian cutoffs (BMI >= 25 kg/m2, Waist >= 90cm Men / >= 80cm Women) vs WHO/Western cutoffs (BMI >= 30, Waist >= 102M / >= 88F).",
+    "ICMR Sample Granularity: The ICMR file is an N=500 sample with pre-categorized binary flags (v36-v41) rather than raw continuous biomarker concentrations.",
+    "Geography/Urbanicity Suppression: NHANES public files withhold state/urbanicity for privacy, whereas ICMR explicitly includes Indian states (v3) and urban/rural status (v2)."
+  ],
+  "data_leakage_safeguards": [
+    "Target-defining components (e.g. SBP/DBP if predicting HTN; HbA1c/Glucose if predicting Diabetes; direct CVD diagnoses if predicting CVD) must NEVER be included as predictors in the same model.",
+    "For a multi-disease risk score, use baseline clinical predictors (age, gender, BMI, waist, vitals, lifestyle, family history, routine bloods) to predict future / underlying multi-morbidity risk."
+  ]
+}

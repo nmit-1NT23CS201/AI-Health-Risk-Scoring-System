@@ -1,0 +1,6 @@
+variable,file,description,non_null,mean,min,max,unique_values
+WTINT2YR,DEMO_L.xpt,Full sample 2-year interview weight,11933,27404.1,4584.5,170968.3,
+WTMEC2YR,DEMO_L.xpt,Full sample 2-year MEC exam weight,11933,27404.1,0.0,227108.3,
+SDMVPSU,DEMO_L.xpt,Masked variance pseudo-PSU,11933,,1.0,2.0,2.0
+SDMVSTRA,DEMO_L.xpt,Masked variance pseudo-stratum,11933,,173.0,187.0,15.0
+WTSAF2YR,GLU_L / TRIGLY_L,Fasting subsample 2-year weight,3996,70068.2,0.0,561922.4,

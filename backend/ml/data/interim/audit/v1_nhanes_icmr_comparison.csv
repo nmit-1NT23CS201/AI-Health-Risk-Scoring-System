@@ -1,0 +1,15 @@
+v1_feature,v1_type,v1_distribution,nhanes_equivalent,icmr_equivalent,availability,notes
+age,Numeric (years),"Min 19, Max 80, Mean 48.2",RIDAGEYR (DEMO_L),v4 (sample.dta),Available in Both,Direct alignment. NHANES top-codes at 80; ICMR covers 20-89.
+gender,Categorical (Male/Female),"50.3% Female, 49.7% Male","RIAGENDR (DEMO_L, 1=M, 2=F)","v5 (sample.dta, 1=M, 2=F)",Available in Both,Direct alignment. Harmonizable into binary indicator (1/0 or Male/Female).
+bmi,Numeric (kg/m2),"Min 16.8, Max 35.4, Mean 24.6",BMXBMI (BMX_L),v8 (sample.dta),Available in Both,Continuous float in both. ICMR also has v40 (generalized obesity BMI>=25).
+systolic_bp,Numeric (mmHg),"Min 102, Max 180, Mean 137.4",BPXOSY1..3 mean (BPXO_L),v10 (sample.dta),Available in Both,"Direct alignment. In NHANES, mean of 3 oscillometric readings should be used."
+diastolic_bp,Numeric (mmHg),"Min 62, Max 98, Mean 79.1",BPXODI1..3 mean (BPXO_L),v11 (sample.dta),Available in Both,Direct alignment. Oscillometric mean in NHANES.
+cholesterol_mg_dl,Numeric (mg/dL),"Min 148, Max 295, Mean 223.5",LBXTC (TCHOL_L),v41 (Binary dyslipidemia in sample),Continuous in NHANES; Binary flag in ICMR sample,NHANES provides full continuous Total Cholesterol (LBXTC). ICMR sample provides binary dyslipidemia flag v41.
+smoking,Categorical (Yes/No),"39.7% Yes, 60.3% No",SMQ020 + SMQ040 (SMQ_L),v25 / v27 (sample.dta),Available in Both,Harmonizable into binary current smoker (Yes/No) or 3-level (Never/Former/Current).
+alcohol_consumption,Categorical (Yes/No),"35.8% Yes, 64.2% No",ALQ121 / ALQ111 (ALQ_L),v28 (sample.dta),Available in Both,Harmonizable into binary current drinker (Yes/No) or 3-level (Never/Former/Current).
+physical_activity,Categorical (Low/Moderate/High),"35.1% Low, 42.4% Mod, 22.5% High","PAD790Q, PAD810Q (PAQ_L)",v32 (sample.dta GPAQ 1/2/3),Available in Both,Harmonizable directly to Low/Moderate/High.
+family_history,Categorical (Yes/No),"37.7% Yes, 62.3% No",Personal/family high risk flags,v33 (DM) / v34 (HTN) / v35 (CVD),Available in ICMR; Proxied in NHANES 2021-2023,V1 was generic 'family_history'. ICMR has explicit disease-specific family history flags.
+heart_rate_bpm,Numeric (bpm),"Min 50, Max 95, Mean 71.8",BPXOPLS1..3 (Pulse in BPXO_L),Not in ICMR sample (v1-v41),Available in NHANES; Absent in ICMR sample,NHANES records 3 oscillometric pulse readings (BPXOPLS1/2/3). Resting pulse is readily available.
+sdnn_hrv,Numeric (ms),"Min 18.2, Max 62.1, Mean 35.4",None (No Holter/ECG HRV in 2021-2023),None,NOT Available in either real dataset,SDNN HRV is wearable/Holter derived. It was synthetically fabricated in V1 dataset. MUST BE DROPPED or replaced with resting pulse variability.
+rmssd_hrv,Numeric (ms),"Min 14.0, Max 58.4, Mean 31.9",None (No Holter/ECG HRV in 2021-2023),None,NOT Available in either real dataset,RMSSD HRV was synthetically generated in V1. Not present in standard epidemiological surveys. MUST BE DROPPED.
+spo2,Numeric (%),"Min 93.8, Max 99.8, Mean 96.9",None (Oximetry not in 2021-2023 public MEC),None,NOT Available in either real dataset,SpO2 was synthetic in V1. Not available in NHANES 2021-2023 or ICMR sample.

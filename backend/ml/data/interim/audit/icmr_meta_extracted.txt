@@ -1,0 +1,317 @@
+ICMR-INDIAB STUDY DATA DESCRIPTION 
+ 
+Variable name Variable label Categories Variable type Remarks 
+v1 Participant identification number Uniqe ID (De-identified number unique for each individual) Numeric  
+v2 Place of residence 1 "Urban" 
+2 "Rural" Nominal 
+ 
+v3 State Code 2 "Himachal Pradesh" 
+3 "Punjab" 
+4 "Chandigarh" 
+5 "Uttaranchal" 
+6 "Haryana" 
+7 "Delhi" 
+8 "Rajasthan" 
+9 "Uttar Pradesh" 
+10 "Bihar" 
+11 "Sikkim" 
+12 "Arunachal Pradesh" 
+13 "Nagaland" 
+14 "Manipur" 
+15 "Mizoram" 
+16 "Tripura" 
+17 "Meghalaya" 
+18 "Assam" 
+19 "West Bengal" 
+20 "Jharkhand" 
+21 "Odisha" 
+22 "Chhattisgarh" 
+23 "Madhya Pradesh" ; 30 "Goa" 
+24 "Gujarat" ; 32 "Kerala" 
+27 "Maharashtra" ; 33 "Tamil Nadu" 
+28 "Andhra Pradesh" ; 34 "Puducherry" 
+29 "Karnataka" ; 99 "Telangana" 
+Nominal  
+v4 Age of the participant Age in years Numeric  
+ 
+v5 
+ 
+Sex 
+1 "Male" 
+2 "Female" 
+ 
+Nominal 
+ 
+ 
+ 
+v6 
+ 
+ 
+Education 
+1 "No Formal schooling" 
+2 "Primary & high/higher school" 
+3 "Technical education, graduation & postgraduation" 
+ 
+ 
+Nominal 
+ 
+v7 Occupation 1 "Professional/Executive/Manager/ Big business, Clerical/ Medium business" 
+2 "Sales, Services, Skilled manuals" 
+3 "Agriculture/Self employed" 
+4 "Unskilled manuals" 
+5 "Do not work/Unemployed" 
+Nominal  
+v8 Body mass index BMI in kg/m2 Numeric  
+v9 Waist circumference Waist circumference in centimeter Numeric  
+v10 Systolic blood pressure Systolic blood pressure in mmHg Numeric  
+v11 Diastolic blood pressure Diastolic blood pressure in mmHg Numeric  
+ 
+ 
+ 
+v12 
+Migration 1 "Urban" 
+11 "Rural to Urban" 
+2 "Rural" 
+22 "Urban to Rural" 
+ 
+ 
+ 
+Nominal 
+ 
+ 
+ 
+v13 
+Standard of living index: House 1 "Pucca" 
+2 "Semi pucca" 
+0 "Kutcha" 
+ 
+ 
+Nominal 
+ 
+ 
+ 
+ 
+v14 
+Standard of living index: Toilet facility 4 "Own flush toilet" 
+2 "Shared flush toilet/own pit toilet" 
+1 "Shared/public pit toilet" 
+0 "No facility" 
+ 
+ 
+ 
+Nominal 
+ 
+ 
+ 
+v15 
+Standard of living index: Source of lighting 2 "Electricity" 
+1 "Kerosene/gas/oil" 
+0 "Others" 
+ 
+ 
+Nominal 
+ 
+ 
+ 
+v16 
+Standard of living index: Main fuel for cooking 2 "Electricity/LPG/biogas" 
+1 "Coal/charcoal/kerosene" 
+0 "Others" 
+ 
+ 
+Nominal 
+ 
+ 
+v17 
+Standard of living index: Drinking water source 2 "Pipe/ hand pump/ well in residence/ packaged water" 
+1 "Public tap/hand pump/well" 
+0 "Others" 
+ 
+Nominal 
+ 
+ 
+v18 
+Standard of living index: Separate room for cooking 1 "Yes" 
+0 "No" 
+ 
+Nominal 
+ 
+ 
+v19 
+Standard of living index: House ownership 2 "Yes" 
+0 "No" 
+ 
+Nominal 
+ 
+ 
+ 
+ 
+v20 
+Standard of living index: Agricultural land ownership 4 " greater than or equal to 5 acres" 
+3 " two to 4.9 acres" 
+2 "less than 2 acres" 
+0 "No agricultural land" 
+ 
+ 
+ 
+Nominal 
+ 
+ 
+v21 
+Standard of living index: Irrigated land ownership 2 "Yes" 
+0 "No" 
+ 
+Nominal 
+ 
+ 
+ 
+v22 
+Standard of living index: Livestock ownership 4 "Cattle" 
+2 "Poultry" 
+0 "None" 
+ 
+ 
+Nominal 
+ 
+ 
+v23 
+Ownership of durable goods: Car 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v24 
+Ownership of durable goods: Tractor 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v25 
+Ownership of durable goods: Moped/scooter/motorcycle 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v26 
+Ownership of durable goods: Telephone/Mobile facility 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v27 
+Ownership of durable goods: Refrigerator 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v28 
+Ownership of durable goods: Color TV 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v29 
+Ownership of durable goods: Water pump 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v30 
+Ownership of durable goods: Bullock cart 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v31 
+Ownership of durable goods: Washing machine 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v32 
+Ownership of durable goods: Mixie 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v33 
+Ownership of durable goods: Thresher 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v34 
+Ownership of durable goods: Computer 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v35 
+Ownership of durable goods: Air conditioner 2 "Yes" 
+1 "No" 
+ 
+Nominal 
+ 
+ 
+v36 
+Diabetes (FBS ≥126 mg/dl or 2HrPGBS ≥220 mg/dl or self-reported 
+diabetes) 
+1 "Yes" 
+0 "No" 
+ 
+Nominal 
+ 
+ 
+v37 
+Prediabetes (FBS ≥110 mg/dl and 2HrPGBS <160 mg/dl) 1 "Yes" 
+0 "No" 
+ 
+Nominal 
+ 
+ 
+v38 
+Hypertension (systolic BP≥140 mmHg or diastolic BP ≥90 mmHg or 
+self-reported hypertension) 
+1 "Yes" 
+0 "No" 
+ 
+Nominal 
+ 
+ 
+v39 
+Abdominal obesity (waist circumference ≥90 cm for males & ≥80 cm 
+for females) 
+1 "Yes" 
+0 "No" 
+ 
+Nominal 
+ 
+ 
+v40 
+Generalized obesity (Body mass index ≥25 kg/m2) 1 "Yes" 
+0 "No" 
+ 
+Nominal 
+ 
+ 
+v41 
+Dyslipidemia (Hypercholesterolemia or hypertriglyceridemia or low 
+HDL-C or high LDL-C) 
+1 "Yes" 
+0 "No" 
+ 
+Nominal 
+ 
+ 
