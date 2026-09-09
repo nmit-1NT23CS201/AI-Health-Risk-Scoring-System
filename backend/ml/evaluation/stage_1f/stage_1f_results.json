@@ -1,0 +1,2809 @@
+{
+  "stage": "1F",
+  "description": "Probability Calibration & Validation-Set Threshold Optimization",
+  "sklearn_version": "1.9.0",
+  "random_state": 42,
+  "wall_clock_seconds": 13.07,
+  "results": [
+    {
+      "target": "cvd",
+      "mode": "mode_a",
+      "config_key": "cvd_mode_a",
+      "model_name": "Optimized Random Forest",
+      "source_stage": "Stage 1E-3",
+      "source_model_file": "cvd_mode_a_rf_v2_optimized.joblib",
+      "n_train": 5464,
+      "n_val": 1171,
+      "n_test": 1172,
+      "n_features": 13,
+      "features": [
+        "age",
+        "gender",
+        "education_level",
+        "poverty_income_ratio",
+        "bmi",
+        "waist_circumference",
+        "mean_sbp",
+        "mean_dbp",
+        "mean_pulse",
+        "smoking_status",
+        "alcohol_frequency",
+        "physical_activity_level",
+        "sedentary_minutes"
+      ],
+      "validation_calibration_comparison": {
+        "raw": {
+          "brier_score": 0.0924,
+          "roc_auc": 0.8229,
+          "pr_auc": 0.3841,
+          "ece": 0.0271,
+          "mce": 0.5193,
+          "mean_pred_prob": 0.126,
+          "observed_rate": 0.1255,
+          "calibration_curve_prob_true": [
+            0.0219,
+            0.1353,
+            0.2874,
+            0.3816,
+            0.6842,
+            0.0,
+            0.5
+          ],
+          "calibration_curve_prob_pred": [
+            0.0402,
+            0.1469,
+            0.2421,
+            0.3434,
+            0.4304,
+            0.5193,
+            0.617
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 594,
+              "observed_rate": 0.0219,
+              "mean_pred_prob": 0.0402,
+              "abs_error": 0.0183
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 303,
+              "observed_rate": 0.1353,
+              "mean_pred_prob": 0.1469,
+              "abs_error": 0.0116
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 174,
+              "observed_rate": 0.2874,
+              "mean_pred_prob": 0.2421,
+              "abs_error": 0.0453
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 76,
+              "observed_rate": 0.3816,
+              "mean_pred_prob": 0.3434,
+              "abs_error": 0.0382
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 19,
+              "observed_rate": 0.6842,
+              "mean_pred_prob": 0.4304,
+              "abs_error": 0.2538
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 3,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.5193,
+              "abs_error": 0.5193
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 2,
+              "observed_rate": 0.5,
+              "mean_pred_prob": 0.617,
+              "abs_error": 0.117
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            }
+          ]
+        },
+        "sigmoid_oof": {
+          "brier_score": 0.0922,
+          "roc_auc": 0.8216,
+          "pr_auc": 0.3717,
+          "ece": 0.0111,
+          "mce": 0.7511,
+          "mean_pred_prob": 0.1261,
+          "observed_rate": 0.1255,
+          "calibration_curve_prob_true": [
+            0.0301,
+            0.1532,
+            0.2368,
+            0.3881,
+            0.5,
+            0.3333,
+            0.5714,
+            0.0,
+            1.0
+          ],
+          "calibration_curve_prob_pred": [
+            0.0314,
+            0.147,
+            0.2484,
+            0.3548,
+            0.4454,
+            0.5249,
+            0.6354,
+            0.7511,
+            0.8128
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 664,
+              "observed_rate": 0.0301,
+              "mean_pred_prob": 0.0314,
+              "abs_error": 0.0012
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 222,
+              "observed_rate": 0.1532,
+              "mean_pred_prob": 0.147,
+              "abs_error": 0.0061
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 152,
+              "observed_rate": 0.2368,
+              "mean_pred_prob": 0.2484,
+              "abs_error": 0.0115
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 67,
+              "observed_rate": 0.3881,
+              "mean_pred_prob": 0.3548,
+              "abs_error": 0.0333
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 44,
+              "observed_rate": 0.5,
+              "mean_pred_prob": 0.4454,
+              "abs_error": 0.0546
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 12,
+              "observed_rate": 0.3333,
+              "mean_pred_prob": 0.5249,
+              "abs_error": 0.1916
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 7,
+              "observed_rate": 0.5714,
+              "mean_pred_prob": 0.6354,
+              "abs_error": 0.0639
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 2,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.7511,
+              "abs_error": 0.7511
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 1,
+              "observed_rate": 1.0,
+              "mean_pred_prob": 0.8128,
+              "abs_error": 0.1872
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            }
+          ]
+        },
+        "isotonic_oof": {
+          "brier_score": 0.0939,
+          "roc_auc": 0.8131,
+          "pr_auc": 0.3517,
+          "ece": 0.0155,
+          "mce": 0.9775,
+          "mean_pred_prob": 0.1261,
+          "observed_rate": 0.1255,
+          "calibration_curve_prob_true": [
+            0.0369,
+            0.1647,
+            0.25,
+            0.4058,
+            0.4595,
+            0.6667,
+            0.3846,
+            0.2,
+            0.0
+          ],
+          "calibration_curve_prob_pred": [
+            0.0332,
+            0.1744,
+            0.2401,
+            0.3746,
+            0.4495,
+            0.5313,
+            0.6377,
+            0.7857,
+            0.9775
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 728,
+              "observed_rate": 0.0371,
+              "mean_pred_prob": 0.0328,
+              "abs_error": 0.0043
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 174,
+              "observed_rate": 0.1609,
+              "mean_pred_prob": 0.1727,
+              "abs_error": 0.0118
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 132,
+              "observed_rate": 0.25,
+              "mean_pred_prob": 0.2401,
+              "abs_error": 0.0099
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 69,
+              "observed_rate": 0.4058,
+              "mean_pred_prob": 0.3746,
+              "abs_error": 0.0312
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 34,
+              "observed_rate": 0.4412,
+              "mean_pred_prob": 0.445,
+              "abs_error": 0.0039
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 15,
+              "observed_rate": 0.6667,
+              "mean_pred_prob": 0.5251,
+              "abs_error": 0.1416
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 13,
+              "observed_rate": 0.3846,
+              "mean_pred_prob": 0.6377,
+              "abs_error": 0.253
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 5,
+              "observed_rate": 0.2,
+              "mean_pred_prob": 0.7857,
+              "abs_error": 0.5857
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 1,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.9775,
+              "abs_error": 0.9775
+            }
+          ]
+        }
+      },
+      "selected_calibration_method": "sigmoid",
+      "calibration_rationale": "Sigmoid (Platt) calibration selected: provides stable probability mapping, lower/equal OOF Brier (0.0922) and lower ECE (0.0111) than Raw (0.0924), avoiding Isotonic step-function overfitting.",
+      "selected_threshold": 0.13,
+      "threshold_selection_rationale": "Selected threshold t=0.13 based on OOF validation screening tradeoff: Sensitivity=0.8299, Specificity=0.6895, Youden's J=0.5194, F1=0.4157, F2=0.5934.",
+      "validation_metrics_at_opt_threshold": {
+        "threshold": 0.13,
+        "sensitivity": 0.8299,
+        "specificity": 0.6895,
+        "precision": 0.2773,
+        "npv": 0.9658,
+        "accuracy": 0.7071,
+        "balanced_accuracy": 0.7597,
+        "f1": 0.4157,
+        "f2": 0.5934,
+        "youden_j": 0.5194,
+        "tp": 122.0,
+        "fp": 318.0,
+        "fn": 25.0,
+        "tn": 706.0
+      },
+      "test_metrics": {
+        "roc_auc": 0.8137,
+        "pr_auc": 0.4159,
+        "brier_score": 0.0912,
+        "ece": 0.0125,
+        "mce": 0.3484,
+        "mean_pred_prob": 0.1155,
+        "observed_rate": 0.1263
+      },
+      "test_binary_at_default_050": {
+        "threshold": 0.5,
+        "sensitivity": 0.0946,
+        "specificity": 0.9922,
+        "precision": 0.6364,
+        "npv": 0.8835,
+        "accuracy": 0.8788,
+        "balanced_accuracy": 0.5434,
+        "f1": 0.1647,
+        "f2": 0.114,
+        "youden_j": 0.0868,
+        "tp": 14,
+        "fp": 8,
+        "fn": 134,
+        "tn": 1016
+      },
+      "test_binary_at_optimized_threshold": {
+        "threshold": 0.13,
+        "sensitivity": 0.6824,
+        "specificity": 0.7803,
+        "precision": 0.3098,
+        "npv": 0.9444,
+        "accuracy": 0.7679,
+        "balanced_accuracy": 0.7314,
+        "f1": 0.4262,
+        "f2": 0.5501,
+        "youden_j": 0.4627,
+        "tp": 101,
+        "fp": 225,
+        "fn": 47,
+        "tn": 799
+      },
+      "exploratory_risk_bands": [
+        {
+          "tier": "Low Risk (Prototype)",
+          "probability_range": "< 0.078",
+          "count": 672,
+          "percentage_of_population": 57.3,
+          "observed_positive_count": 27,
+          "observed_positive_rate": 4.0
+        },
+        {
+          "tier": "Moderate Risk (Prototype)",
+          "probability_range": "[0.078, 0.182)",
+          "count": 291,
+          "percentage_of_population": 24.8,
+          "observed_positive_count": 40,
+          "observed_positive_rate": 13.7
+        },
+        {
+          "tier": "High Risk (Prototype)",
+          "probability_range": ">= 0.182",
+          "count": 209,
+          "percentage_of_population": 17.8,
+          "observed_positive_count": 81,
+          "observed_positive_rate": 38.8
+        }
+      ],
+      "artifact_paths": {
+        "joblib": "ml\\evaluation\\stage_1f\\models\\cvd_mode_a_calibrated.joblib",
+        "pkl": "ml\\evaluation\\stage_1f\\models\\cvd_mode_a_calibrated.pkl",
+        "calibration_csv": "ml\\evaluation\\stage_1f\\calibration\\cvd_mode_a_calibration_data.csv",
+        "threshold_sweep_csv": "ml\\evaluation\\stage_1f\\thresholds\\cvd_mode_a_threshold_sweep.csv"
+      }
+    },
+    {
+      "target": "cvd",
+      "mode": "mode_b",
+      "config_key": "cvd_mode_b",
+      "model_name": "Optimized Random Forest",
+      "source_stage": "Stage 1E-3",
+      "source_model_file": "cvd_mode_b_rf_v2_optimized.joblib",
+      "n_train": 5464,
+      "n_val": 1171,
+      "n_test": 1172,
+      "n_features": 29,
+      "features": [
+        "age",
+        "gender",
+        "education_level",
+        "poverty_income_ratio",
+        "bmi",
+        "waist_circumference",
+        "mean_sbp",
+        "mean_dbp",
+        "mean_pulse",
+        "smoking_status",
+        "alcohol_frequency",
+        "physical_activity_level",
+        "sedentary_minutes",
+        "hba1c",
+        "fasting_glucose",
+        "total_cholesterol",
+        "hdl_cholesterol",
+        "triglycerides",
+        "ldl_cholesterol",
+        "serum_creatinine",
+        "blood_urea_nitrogen",
+        "serum_uric_acid",
+        "alt_enzyme",
+        "ast_enzyme",
+        "hemoglobin",
+        "wbc_count",
+        "platelet_count",
+        "rdw",
+        "serum_albumin"
+      ],
+      "validation_calibration_comparison": {
+        "raw": {
+          "brier_score": 0.0885,
+          "roc_auc": 0.8325,
+          "pr_auc": 0.4394,
+          "ece": 0.0167,
+          "mce": 0.2437,
+          "mean_pred_prob": 0.1227,
+          "observed_rate": 0.1255,
+          "calibration_curve_prob_true": [
+            0.0329,
+            0.1176,
+            0.2923,
+            0.3514,
+            0.5098,
+            0.7778
+          ],
+          "calibration_curve_prob_pred": [
+            0.0356,
+            0.1439,
+            0.2485,
+            0.343,
+            0.4523,
+            0.5341
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 669,
+              "observed_rate": 0.0329,
+              "mean_pred_prob": 0.0356,
+              "abs_error": 0.0027
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 238,
+              "observed_rate": 0.1176,
+              "mean_pred_prob": 0.1439,
+              "abs_error": 0.0263
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 130,
+              "observed_rate": 0.2923,
+              "mean_pred_prob": 0.2485,
+              "abs_error": 0.0438
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 74,
+              "observed_rate": 0.3514,
+              "mean_pred_prob": 0.343,
+              "abs_error": 0.0083
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 51,
+              "observed_rate": 0.5098,
+              "mean_pred_prob": 0.4523,
+              "abs_error": 0.0575
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 9,
+              "observed_rate": 0.7778,
+              "mean_pred_prob": 0.5341,
+              "abs_error": 0.2437
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            }
+          ]
+        },
+        "sigmoid_oof": {
+          "brier_score": 0.0884,
+          "roc_auc": 0.8313,
+          "pr_auc": 0.4272,
+          "ece": 0.0101,
+          "mce": 0.3731,
+          "mean_pred_prob": 0.1258,
+          "observed_rate": 0.1255,
+          "calibration_curve_prob_true": [
+            0.032,
+            0.1232,
+            0.2743,
+            0.3537,
+            0.4634,
+            0.4848,
+            1.0
+          ],
+          "calibration_curve_prob_pred": [
+            0.0317,
+            0.1434,
+            0.2487,
+            0.3472,
+            0.4496,
+            0.5388,
+            0.6269
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 687,
+              "observed_rate": 0.032,
+              "mean_pred_prob": 0.0317,
+              "abs_error": 0.0004
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 211,
+              "observed_rate": 0.1232,
+              "mean_pred_prob": 0.1434,
+              "abs_error": 0.0202
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 113,
+              "observed_rate": 0.2743,
+              "mean_pred_prob": 0.2487,
+              "abs_error": 0.0256
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 82,
+              "observed_rate": 0.3537,
+              "mean_pred_prob": 0.3472,
+              "abs_error": 0.0065
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 41,
+              "observed_rate": 0.4634,
+              "mean_pred_prob": 0.4496,
+              "abs_error": 0.0139
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 33,
+              "observed_rate": 0.4848,
+              "mean_pred_prob": 0.5388,
+              "abs_error": 0.0539
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 4,
+              "observed_rate": 1.0,
+              "mean_pred_prob": 0.6269,
+              "abs_error": 0.3731
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            }
+          ]
+        },
+        "isotonic_oof": {
+          "brier_score": 0.0902,
+          "roc_auc": 0.8188,
+          "pr_auc": 0.3945,
+          "ece": 0.0236,
+          "mce": 0.869,
+          "mean_pred_prob": 0.1256,
+          "observed_rate": 0.1255,
+          "calibration_curve_prob_true": [
+            0.0396,
+            0.1756,
+            0.2549,
+            0.5385,
+            0.7308,
+            0.375,
+            0.0,
+            1.0,
+            0.0,
+            1.0
+          ],
+          "calibration_curve_prob_pred": [
+            0.034,
+            0.1762,
+            0.2673,
+            0.3492,
+            0.4565,
+            0.5578,
+            0.6353,
+            0.7537,
+            0.869,
+            1.0
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 782,
+              "observed_rate": 0.0396,
+              "mean_pred_prob": 0.034,
+              "abs_error": 0.0056
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 131,
+              "observed_rate": 0.1756,
+              "mean_pred_prob": 0.1762,
+              "abs_error": 0.0006
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 153,
+              "observed_rate": 0.2549,
+              "mean_pred_prob": 0.2673,
+              "abs_error": 0.0124
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 12,
+              "observed_rate": 0.5,
+              "mean_pred_prob": 0.345,
+              "abs_error": 0.155
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 22,
+              "observed_rate": 0.7727,
+              "mean_pred_prob": 0.444,
+              "abs_error": 0.3287
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 61,
+              "observed_rate": 0.3934,
+              "mean_pred_prob": 0.5531,
+              "abs_error": 0.1597
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 2,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.6353,
+              "abs_error": 0.6353
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 1,
+              "observed_rate": 1.0,
+              "mean_pred_prob": 0.7537,
+              "abs_error": 0.2463
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 1,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.869,
+              "abs_error": 0.869
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 6,
+              "observed_rate": 1.0,
+              "mean_pred_prob": 1.0,
+              "abs_error": 0.0
+            }
+          ]
+        }
+      },
+      "selected_calibration_method": "sigmoid",
+      "calibration_rationale": "Sigmoid (Platt) calibration selected: provides stable probability mapping, lower/equal OOF Brier (0.0884) and lower ECE (0.0101) than Raw (0.0885), avoiding Isotonic step-function overfitting.",
+      "selected_threshold": 0.15,
+      "threshold_selection_rationale": "Selected threshold t=0.15 based on OOF validation screening tradeoff: Sensitivity=0.7755, Specificity=0.7617, Youden's J=0.5372, F1=0.4515, F2=0.6025.",
+      "validation_metrics_at_opt_threshold": {
+        "threshold": 0.15,
+        "sensitivity": 0.7755,
+        "specificity": 0.7617,
+        "precision": 0.3184,
+        "npv": 0.9594,
+        "accuracy": 0.7635,
+        "balanced_accuracy": 0.7686,
+        "f1": 0.4515,
+        "f2": 0.6025,
+        "youden_j": 0.5372,
+        "tp": 114.0,
+        "fp": 244.0,
+        "fn": 33.0,
+        "tn": 780.0
+      },
+      "test_metrics": {
+        "roc_auc": 0.8218,
+        "pr_auc": 0.434,
+        "brier_score": 0.0906,
+        "ece": 0.0368,
+        "mce": 0.2846,
+        "mean_pred_prob": 0.1176,
+        "observed_rate": 0.1263
+      },
+      "test_binary_at_default_050": {
+        "threshold": 0.5,
+        "sensitivity": 0.1959,
+        "specificity": 0.9834,
+        "precision": 0.6304,
+        "npv": 0.8943,
+        "accuracy": 0.884,
+        "balanced_accuracy": 0.5897,
+        "f1": 0.299,
+        "f2": 0.2273,
+        "youden_j": 0.1793,
+        "tp": 29,
+        "fp": 17,
+        "fn": 119,
+        "tn": 1007
+      },
+      "test_binary_at_optimized_threshold": {
+        "threshold": 0.15,
+        "sensitivity": 0.6081,
+        "specificity": 0.8438,
+        "precision": 0.36,
+        "npv": 0.9371,
+        "accuracy": 0.814,
+        "balanced_accuracy": 0.7259,
+        "f1": 0.4523,
+        "f2": 0.5344,
+        "youden_j": 0.4519,
+        "tp": 90,
+        "fp": 160,
+        "fn": 58,
+        "tn": 864
+      },
+      "exploratory_risk_bands": [
+        {
+          "tier": "Low Risk (Prototype)",
+          "probability_range": "< 0.090",
+          "count": 753,
+          "percentage_of_population": 64.2,
+          "observed_positive_count": 28,
+          "observed_positive_rate": 3.7
+        },
+        {
+          "tier": "Moderate Risk (Prototype)",
+          "probability_range": "[0.090, 0.210)",
+          "count": 245,
+          "percentage_of_population": 20.9,
+          "observed_positive_count": 51,
+          "observed_positive_rate": 20.8
+        },
+        {
+          "tier": "High Risk (Prototype)",
+          "probability_range": ">= 0.210",
+          "count": 174,
+          "percentage_of_population": 14.8,
+          "observed_positive_count": 69,
+          "observed_positive_rate": 39.7
+        }
+      ],
+      "artifact_paths": {
+        "joblib": "ml\\evaluation\\stage_1f\\models\\cvd_mode_b_calibrated.joblib",
+        "pkl": "ml\\evaluation\\stage_1f\\models\\cvd_mode_b_calibrated.pkl",
+        "calibration_csv": "ml\\evaluation\\stage_1f\\calibration\\cvd_mode_b_calibration_data.csv",
+        "threshold_sweep_csv": "ml\\evaluation\\stage_1f\\thresholds\\cvd_mode_b_threshold_sweep.csv"
+      }
+    },
+    {
+      "target": "diabetes",
+      "mode": "mode_a",
+      "config_key": "diabetes_mode_a",
+      "model_name": "HistGradientBoosting",
+      "source_stage": "Stage 1E-2",
+      "source_model_file": "diabetes_mode_a_hist_gradient_boosting_v2_optimized.joblib",
+      "n_train": 5464,
+      "n_val": 1171,
+      "n_test": 1171,
+      "n_features": 13,
+      "features": [
+        "age",
+        "gender",
+        "education_level",
+        "poverty_income_ratio",
+        "bmi",
+        "waist_circumference",
+        "mean_sbp",
+        "mean_dbp",
+        "mean_pulse",
+        "smoking_status",
+        "alcohol_frequency",
+        "physical_activity_level",
+        "sedentary_minutes"
+      ],
+      "validation_calibration_comparison": {
+        "raw": {
+          "brier_score": 0.1238,
+          "roc_auc": 0.8025,
+          "pr_auc": 0.4171,
+          "ece": 0.0429,
+          "mce": 0.2373,
+          "mean_pred_prob": 0.1781,
+          "observed_rate": 0.1776,
+          "calibration_curve_prob_true": [
+            0.026,
+            0.2101,
+            0.2986,
+            0.3563,
+            0.2969,
+            0.4727,
+            0.6071,
+            0.5
+          ],
+          "calibration_curve_prob_pred": [
+            0.0399,
+            0.1388,
+            0.2487,
+            0.3485,
+            0.4417,
+            0.5419,
+            0.6445,
+            0.7373
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 539,
+              "observed_rate": 0.026,
+              "mean_pred_prob": 0.0399,
+              "abs_error": 0.0139
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 238,
+              "observed_rate": 0.2101,
+              "mean_pred_prob": 0.1388,
+              "abs_error": 0.0713
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 144,
+              "observed_rate": 0.2986,
+              "mean_pred_prob": 0.2487,
+              "abs_error": 0.0499
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 87,
+              "observed_rate": 0.3563,
+              "mean_pred_prob": 0.3485,
+              "abs_error": 0.0079
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 64,
+              "observed_rate": 0.2969,
+              "mean_pred_prob": 0.4417,
+              "abs_error": 0.1448
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 55,
+              "observed_rate": 0.4727,
+              "mean_pred_prob": 0.5419,
+              "abs_error": 0.0692
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 28,
+              "observed_rate": 0.6071,
+              "mean_pred_prob": 0.6445,
+              "abs_error": 0.0374
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 16,
+              "observed_rate": 0.5,
+              "mean_pred_prob": 0.7373,
+              "abs_error": 0.2373
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            }
+          ]
+        },
+        "sigmoid_oof": {
+          "brier_score": 0.1231,
+          "roc_auc": 0.8019,
+          "pr_auc": 0.4124,
+          "ece": 0.0373,
+          "mce": 0.1005,
+          "mean_pred_prob": 0.1776,
+          "observed_rate": 0.1776,
+          "calibration_curve_prob_true": [
+            0.022,
+            0.1912,
+            0.3,
+            0.3469,
+            0.3521,
+            0.5238,
+            0.56,
+            0.6667
+          ],
+          "calibration_curve_prob_pred": [
+            0.0441,
+            0.1406,
+            0.2494,
+            0.3496,
+            0.4526,
+            0.5445,
+            0.6544,
+            0.7178
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 500,
+              "observed_rate": 0.022,
+              "mean_pred_prob": 0.0441,
+              "abs_error": 0.0221
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 272,
+              "observed_rate": 0.1912,
+              "mean_pred_prob": 0.1406,
+              "abs_error": 0.0505
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 160,
+              "observed_rate": 0.3,
+              "mean_pred_prob": 0.2494,
+              "abs_error": 0.0506
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 98,
+              "observed_rate": 0.3469,
+              "mean_pred_prob": 0.3496,
+              "abs_error": 0.0026
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 71,
+              "observed_rate": 0.3521,
+              "mean_pred_prob": 0.4526,
+              "abs_error": 0.1005
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 42,
+              "observed_rate": 0.5238,
+              "mean_pred_prob": 0.5445,
+              "abs_error": 0.0207
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 25,
+              "observed_rate": 0.56,
+              "mean_pred_prob": 0.6544,
+              "abs_error": 0.0944
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 3,
+              "observed_rate": 0.6667,
+              "mean_pred_prob": 0.7178,
+              "abs_error": 0.0511
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            }
+          ]
+        },
+        "isotonic_oof": {
+          "brier_score": 0.1239,
+          "roc_auc": 0.7836,
+          "pr_auc": 0.3783,
+          "ece": 0.0256,
+          "mce": 0.2762,
+          "mean_pred_prob": 0.1787,
+          "observed_rate": 0.1776,
+          "calibration_curve_prob_true": [
+            0.0284,
+            0.2044,
+            0.2905,
+            0.2775,
+            0.4186,
+            0.6757,
+            0.3684
+          ],
+          "calibration_curve_prob_pred": [
+            0.0227,
+            0.1658,
+            0.2635,
+            0.334,
+            0.4318,
+            0.5611,
+            0.6447
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 529,
+              "observed_rate": 0.0284,
+              "mean_pred_prob": 0.0227,
+              "abs_error": 0.0056
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 137,
+              "observed_rate": 0.2044,
+              "mean_pred_prob": 0.1658,
+              "abs_error": 0.0385
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 179,
+              "observed_rate": 0.2905,
+              "mean_pred_prob": 0.2635,
+              "abs_error": 0.027
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 213,
+              "observed_rate": 0.2864,
+              "mean_pred_prob": 0.3296,
+              "abs_error": 0.0432
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 49,
+              "observed_rate": 0.3878,
+              "mean_pred_prob": 0.4116,
+              "abs_error": 0.0239
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 45,
+              "observed_rate": 0.5778,
+              "mean_pred_prob": 0.5503,
+              "abs_error": 0.0275
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 19,
+              "observed_rate": 0.3684,
+              "mean_pred_prob": 0.6447,
+              "abs_error": 0.2762
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            }
+          ]
+        }
+      },
+      "selected_calibration_method": "sigmoid",
+      "calibration_rationale": "Sigmoid (Platt) calibration selected: provides stable probability mapping, lower/equal OOF Brier (0.1231) and lower ECE (0.0373) than Raw (0.1238), avoiding Isotonic step-function overfitting.",
+      "selected_threshold": 0.15,
+      "threshold_selection_rationale": "Selected threshold t=0.15 based on OOF validation screening tradeoff: Sensitivity=0.8173, Specificity=0.6615, Youden's J=0.4788, F1=0.4830, F2=0.6401.",
+      "validation_metrics_at_opt_threshold": {
+        "threshold": 0.15,
+        "sensitivity": 0.8173,
+        "specificity": 0.6615,
+        "precision": 0.3427,
+        "npv": 0.9437,
+        "accuracy": 0.6892,
+        "balanced_accuracy": 0.7394,
+        "f1": 0.483,
+        "f2": 0.6401,
+        "youden_j": 0.4788,
+        "tp": 170.0,
+        "fp": 326.0,
+        "fn": 38.0,
+        "tn": 637.0
+      },
+      "test_metrics": {
+        "roc_auc": 0.7957,
+        "pr_auc": 0.4348,
+        "brier_score": 0.1222,
+        "ece": 0.025,
+        "mce": 0.1033,
+        "mean_pred_prob": 0.1819,
+        "observed_rate": 0.1776
+      },
+      "test_binary_at_default_050": {
+        "threshold": 0.5,
+        "sensitivity": 0.2163,
+        "specificity": 0.9678,
+        "precision": 0.5921,
+        "npv": 0.8511,
+        "accuracy": 0.8343,
+        "balanced_accuracy": 0.5921,
+        "f1": 0.3169,
+        "f2": 0.2478,
+        "youden_j": 0.1842,
+        "tp": 45,
+        "fp": 31,
+        "fn": 163,
+        "tn": 932
+      },
+      "test_binary_at_optimized_threshold": {
+        "threshold": 0.15,
+        "sensitivity": 0.8173,
+        "specificity": 0.6397,
+        "precision": 0.3288,
+        "npv": 0.9419,
+        "accuracy": 0.6712,
+        "balanced_accuracy": 0.7285,
+        "f1": 0.469,
+        "f2": 0.6301,
+        "youden_j": 0.457,
+        "tp": 170,
+        "fp": 347,
+        "fn": 38,
+        "tn": 616
+      },
+      "exploratory_risk_bands": [
+        {
+          "tier": "Low Risk (Prototype)",
+          "probability_range": "< 0.090",
+          "count": 434,
+          "percentage_of_population": 37.1,
+          "observed_positive_count": 11,
+          "observed_positive_rate": 2.5
+        },
+        {
+          "tier": "Moderate Risk (Prototype)",
+          "probability_range": "[0.090, 0.210)",
+          "count": 349,
+          "percentage_of_population": 29.8,
+          "observed_positive_count": 55,
+          "observed_positive_rate": 15.8
+        },
+        {
+          "tier": "High Risk (Prototype)",
+          "probability_range": ">= 0.210",
+          "count": 388,
+          "percentage_of_population": 33.1,
+          "observed_positive_count": 142,
+          "observed_positive_rate": 36.6
+        }
+      ],
+      "artifact_paths": {
+        "joblib": "ml\\evaluation\\stage_1f\\models\\diabetes_mode_a_calibrated.joblib",
+        "pkl": "ml\\evaluation\\stage_1f\\models\\diabetes_mode_a_calibrated.pkl",
+        "calibration_csv": "ml\\evaluation\\stage_1f\\calibration\\diabetes_mode_a_calibration_data.csv",
+        "threshold_sweep_csv": "ml\\evaluation\\stage_1f\\thresholds\\diabetes_mode_a_threshold_sweep.csv"
+      }
+    },
+    {
+      "target": "diabetes",
+      "mode": "mode_b",
+      "config_key": "diabetes_mode_b",
+      "model_name": "XGBoost",
+      "source_stage": "Stage 1E-2",
+      "source_model_file": "diabetes_mode_b_xgboost_v2_optimized.joblib",
+      "n_train": 5464,
+      "n_val": 1171,
+      "n_test": 1171,
+      "n_features": 27,
+      "features": [
+        "age",
+        "gender",
+        "education_level",
+        "poverty_income_ratio",
+        "bmi",
+        "waist_circumference",
+        "mean_sbp",
+        "mean_dbp",
+        "mean_pulse",
+        "smoking_status",
+        "alcohol_frequency",
+        "physical_activity_level",
+        "sedentary_minutes",
+        "total_cholesterol",
+        "hdl_cholesterol",
+        "triglycerides",
+        "ldl_cholesterol",
+        "serum_creatinine",
+        "blood_urea_nitrogen",
+        "serum_uric_acid",
+        "alt_enzyme",
+        "ast_enzyme",
+        "hemoglobin",
+        "wbc_count",
+        "platelet_count",
+        "rdw",
+        "serum_albumin"
+      ],
+      "validation_calibration_comparison": {
+        "raw": {
+          "brier_score": 0.1132,
+          "roc_auc": 0.8328,
+          "pr_auc": 0.5082,
+          "ece": 0.0395,
+          "mce": 0.091,
+          "mean_pred_prob": 0.1769,
+          "observed_rate": 0.1776,
+          "calibration_curve_prob_true": [
+            0.02,
+            0.1901,
+            0.3219,
+            0.2625,
+            0.4058,
+            0.5517,
+            0.6897,
+            0.7647,
+            0.75
+          ],
+          "calibration_curve_prob_pred": [
+            0.0432,
+            0.1453,
+            0.2476,
+            0.3392,
+            0.4501,
+            0.5385,
+            0.644,
+            0.7552,
+            0.841
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 551,
+              "observed_rate": 0.02,
+              "mean_pred_prob": 0.0432,
+              "abs_error": 0.0233
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 242,
+              "observed_rate": 0.1901,
+              "mean_pred_prob": 0.1453,
+              "abs_error": 0.0448
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 146,
+              "observed_rate": 0.3219,
+              "mean_pred_prob": 0.2476,
+              "abs_error": 0.0743
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 80,
+              "observed_rate": 0.2625,
+              "mean_pred_prob": 0.3392,
+              "abs_error": 0.0767
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 69,
+              "observed_rate": 0.4058,
+              "mean_pred_prob": 0.4501,
+              "abs_error": 0.0443
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 29,
+              "observed_rate": 0.5517,
+              "mean_pred_prob": 0.5385,
+              "abs_error": 0.0132
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 29,
+              "observed_rate": 0.6897,
+              "mean_pred_prob": 0.644,
+              "abs_error": 0.0457
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 17,
+              "observed_rate": 0.7647,
+              "mean_pred_prob": 0.7552,
+              "abs_error": 0.0095
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 8,
+              "observed_rate": 0.75,
+              "mean_pred_prob": 0.841,
+              "abs_error": 0.091
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            }
+          ]
+        },
+        "sigmoid_oof": {
+          "brier_score": 0.1136,
+          "roc_auc": 0.8322,
+          "pr_auc": 0.5048,
+          "ece": 0.0346,
+          "mce": 0.1511,
+          "mean_pred_prob": 0.1779,
+          "observed_rate": 0.1776,
+          "calibration_curve_prob_true": [
+            0.0282,
+            0.1842,
+            0.3259,
+            0.2738,
+            0.3571,
+            0.5366,
+            0.6333,
+            0.7647,
+            0.6923
+          ],
+          "calibration_curve_prob_pred": [
+            0.0411,
+            0.1451,
+            0.2467,
+            0.3408,
+            0.4472,
+            0.5293,
+            0.6498,
+            0.7522,
+            0.8434
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 567,
+              "observed_rate": 0.0282,
+              "mean_pred_prob": 0.0411,
+              "abs_error": 0.0129
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 228,
+              "observed_rate": 0.1842,
+              "mean_pred_prob": 0.1451,
+              "abs_error": 0.0391
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 135,
+              "observed_rate": 0.3259,
+              "mean_pred_prob": 0.2467,
+              "abs_error": 0.0792
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 84,
+              "observed_rate": 0.2738,
+              "mean_pred_prob": 0.3408,
+              "abs_error": 0.067
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 56,
+              "observed_rate": 0.3571,
+              "mean_pred_prob": 0.4472,
+              "abs_error": 0.0901
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 41,
+              "observed_rate": 0.5366,
+              "mean_pred_prob": 0.5293,
+              "abs_error": 0.0073
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 30,
+              "observed_rate": 0.6333,
+              "mean_pred_prob": 0.6498,
+              "abs_error": 0.0165
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 17,
+              "observed_rate": 0.7647,
+              "mean_pred_prob": 0.7522,
+              "abs_error": 0.0125
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 13,
+              "observed_rate": 0.6923,
+              "mean_pred_prob": 0.8434,
+              "abs_error": 0.1511
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            }
+          ]
+        },
+        "isotonic_oof": {
+          "brier_score": 0.1149,
+          "roc_auc": 0.8173,
+          "pr_auc": 0.4656,
+          "ece": 0.0336,
+          "mce": 0.5,
+          "mean_pred_prob": 0.1786,
+          "observed_rate": 0.1776,
+          "calibration_curve_prob_true": [
+            0.0235,
+            0.163,
+            0.3714,
+            0.2805,
+            0.5333,
+            0.4595,
+            0.7059,
+            0.8636,
+            0.5,
+            0.5
+          ],
+          "calibration_curve_prob_pred": [
+            0.0194,
+            0.1741,
+            0.2566,
+            0.3218,
+            0.4668,
+            0.5413,
+            0.6463,
+            0.738,
+            0.8344,
+            1.0
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 554,
+              "observed_rate": 0.0235,
+              "mean_pred_prob": 0.0194,
+              "abs_error": 0.0041
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 184,
+              "observed_rate": 0.163,
+              "mean_pred_prob": 0.1741,
+              "abs_error": 0.011
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 105,
+              "observed_rate": 0.3714,
+              "mean_pred_prob": 0.2566,
+              "abs_error": 0.1148
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 221,
+              "observed_rate": 0.2805,
+              "mean_pred_prob": 0.3218,
+              "abs_error": 0.0413
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 15,
+              "observed_rate": 0.5333,
+              "mean_pred_prob": 0.4668,
+              "abs_error": 0.0665
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 37,
+              "observed_rate": 0.4595,
+              "mean_pred_prob": 0.5413,
+              "abs_error": 0.0819
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 17,
+              "observed_rate": 0.7059,
+              "mean_pred_prob": 0.6463,
+              "abs_error": 0.0595
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 22,
+              "observed_rate": 0.8636,
+              "mean_pred_prob": 0.738,
+              "abs_error": 0.1257
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 12,
+              "observed_rate": 0.5,
+              "mean_pred_prob": 0.8344,
+              "abs_error": 0.3344
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 4,
+              "observed_rate": 0.5,
+              "mean_pred_prob": 1.0,
+              "abs_error": 0.5
+            }
+          ]
+        }
+      },
+      "selected_calibration_method": "sigmoid",
+      "calibration_rationale": "Sigmoid (Platt) calibration selected: provides stable probability mapping, lower/equal OOF Brier (0.1136) and lower ECE (0.0346) than Raw (0.1132), avoiding Isotonic step-function overfitting.",
+      "selected_threshold": 0.17,
+      "threshold_selection_rationale": "Selected threshold t=0.17 based on OOF validation screening tradeoff: Sensitivity=0.7933, Specificity=0.7207, Youden's J=0.5139, F1=0.5140, F2=0.6517.",
+      "validation_metrics_at_opt_threshold": {
+        "threshold": 0.17,
+        "sensitivity": 0.7933,
+        "specificity": 0.7207,
+        "precision": 0.3802,
+        "npv": 0.9417,
+        "accuracy": 0.7336,
+        "balanced_accuracy": 0.757,
+        "f1": 0.514,
+        "f2": 0.6517,
+        "youden_j": 0.5139,
+        "tp": 165.0,
+        "fp": 269.0,
+        "fn": 43.0,
+        "tn": 694.0
+      },
+      "test_metrics": {
+        "roc_auc": 0.8162,
+        "pr_auc": 0.4793,
+        "brier_score": 0.1203,
+        "ece": 0.047,
+        "mce": 0.2207,
+        "mean_pred_prob": 0.1729,
+        "observed_rate": 0.1776
+      },
+      "test_binary_at_default_050": {
+        "threshold": 0.5,
+        "sensitivity": 0.274,
+        "specificity": 0.9626,
+        "precision": 0.6129,
+        "npv": 0.8599,
+        "accuracy": 0.8403,
+        "balanced_accuracy": 0.6183,
+        "f1": 0.3787,
+        "f2": 0.3081,
+        "youden_j": 0.2367,
+        "tp": 57,
+        "fp": 36,
+        "fn": 151,
+        "tn": 927
+      },
+      "test_binary_at_optimized_threshold": {
+        "threshold": 0.17,
+        "sensitivity": 0.6202,
+        "specificity": 0.81,
+        "precision": 0.4135,
+        "npv": 0.908,
+        "accuracy": 0.7763,
+        "balanced_accuracy": 0.7151,
+        "f1": 0.4962,
+        "f2": 0.5638,
+        "youden_j": 0.4302,
+        "tp": 129,
+        "fp": 183,
+        "fn": 79,
+        "tn": 780
+      },
+      "exploratory_risk_bands": [
+        {
+          "tier": "Low Risk (Prototype)",
+          "probability_range": "< 0.102",
+          "count": 589,
+          "percentage_of_population": 50.3,
+          "observed_positive_count": 27,
+          "observed_positive_rate": 4.6
+        },
+        {
+          "tier": "Moderate Risk (Prototype)",
+          "probability_range": "[0.102, 0.238)",
+          "count": 355,
+          "percentage_of_population": 30.3,
+          "observed_positive_count": 77,
+          "observed_positive_rate": 21.7
+        },
+        {
+          "tier": "High Risk (Prototype)",
+          "probability_range": ">= 0.238",
+          "count": 227,
+          "percentage_of_population": 19.4,
+          "observed_positive_count": 104,
+          "observed_positive_rate": 45.8
+        }
+      ],
+      "artifact_paths": {
+        "joblib": "ml\\evaluation\\stage_1f\\models\\diabetes_mode_b_calibrated.joblib",
+        "pkl": "ml\\evaluation\\stage_1f\\models\\diabetes_mode_b_calibrated.pkl",
+        "calibration_csv": "ml\\evaluation\\stage_1f\\calibration\\diabetes_mode_b_calibration_data.csv",
+        "threshold_sweep_csv": "ml\\evaluation\\stage_1f\\thresholds\\diabetes_mode_b_threshold_sweep.csv"
+      }
+    },
+    {
+      "target": "hypertension",
+      "mode": "mode_a",
+      "config_key": "hypertension_mode_a",
+      "model_name": "Logistic Regression",
+      "source_stage": "Stage 1E-2",
+      "source_model_file": "hypertension_mode_a_logistic_regression_v2_optimized.joblib",
+      "n_train": 5460,
+      "n_val": 1170,
+      "n_test": 1170,
+      "n_features": 11,
+      "features": [
+        "age",
+        "gender",
+        "education_level",
+        "poverty_income_ratio",
+        "bmi",
+        "waist_circumference",
+        "mean_pulse",
+        "smoking_status",
+        "alcohol_frequency",
+        "physical_activity_level",
+        "sedentary_minutes"
+      ],
+      "validation_calibration_comparison": {
+        "raw": {
+          "brier_score": 0.1874,
+          "roc_auc": 0.7883,
+          "pr_auc": 0.6802,
+          "ece": 0.0582,
+          "mce": 0.1157,
+          "mean_pred_prob": 0.4855,
+          "observed_rate": 0.4274,
+          "calibration_curve_prob_true": [
+            0.0323,
+            0.0904,
+            0.1463,
+            0.3204,
+            0.3793,
+            0.5038,
+            0.628,
+            0.711,
+            0.7203,
+            0.8333
+          ],
+          "calibration_curve_prob_pred": [
+            0.0829,
+            0.1497,
+            0.2476,
+            0.3498,
+            0.4499,
+            0.5507,
+            0.651,
+            0.7497,
+            0.836,
+            0.9193
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 62,
+              "observed_rate": 0.0323,
+              "mean_pred_prob": 0.0829,
+              "abs_error": 0.0506
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 166,
+              "observed_rate": 0.0904,
+              "mean_pred_prob": 0.1497,
+              "abs_error": 0.0593
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 123,
+              "observed_rate": 0.1463,
+              "mean_pred_prob": 0.2476,
+              "abs_error": 0.1012
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 103,
+              "observed_rate": 0.3204,
+              "mean_pred_prob": 0.3498,
+              "abs_error": 0.0294
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 116,
+              "observed_rate": 0.3793,
+              "mean_pred_prob": 0.4499,
+              "abs_error": 0.0706
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 133,
+              "observed_rate": 0.5038,
+              "mean_pred_prob": 0.5507,
+              "abs_error": 0.0469
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 164,
+              "observed_rate": 0.628,
+              "mean_pred_prob": 0.651,
+              "abs_error": 0.0229
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 173,
+              "observed_rate": 0.711,
+              "mean_pred_prob": 0.7497,
+              "abs_error": 0.0388
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 118,
+              "observed_rate": 0.7203,
+              "mean_pred_prob": 0.836,
+              "abs_error": 0.1157
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 12,
+              "observed_rate": 0.8333,
+              "mean_pred_prob": 0.9193,
+              "abs_error": 0.0859
+            }
+          ]
+        },
+        "sigmoid_oof": {
+          "brier_score": 0.1848,
+          "roc_auc": 0.7879,
+          "pr_auc": 0.68,
+          "ece": 0.0323,
+          "mce": 0.1283,
+          "mean_pred_prob": 0.4275,
+          "observed_rate": 0.4274,
+          "calibration_curve_prob_true": [
+            0.0588,
+            0.1123,
+            0.2521,
+            0.371,
+            0.4959,
+            0.5915,
+            0.6818,
+            0.7222,
+            0.7091,
+            0.8
+          ],
+          "calibration_curve_prob_pred": [
+            0.0718,
+            0.1445,
+            0.2481,
+            0.3522,
+            0.4532,
+            0.5506,
+            0.6492,
+            0.7485,
+            0.8374,
+            0.9203
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 119,
+              "observed_rate": 0.0588,
+              "mean_pred_prob": 0.0718,
+              "abs_error": 0.013
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 187,
+              "observed_rate": 0.1123,
+              "mean_pred_prob": 0.1445,
+              "abs_error": 0.0322
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 119,
+              "observed_rate": 0.2521,
+              "mean_pred_prob": 0.2481,
+              "abs_error": 0.004
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 124,
+              "observed_rate": 0.371,
+              "mean_pred_prob": 0.3522,
+              "abs_error": 0.0187
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 121,
+              "observed_rate": 0.4959,
+              "mean_pred_prob": 0.4532,
+              "abs_error": 0.0427
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 142,
+              "observed_rate": 0.5915,
+              "mean_pred_prob": 0.5506,
+              "abs_error": 0.041
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 154,
+              "observed_rate": 0.6818,
+              "mean_pred_prob": 0.6492,
+              "abs_error": 0.0326
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 144,
+              "observed_rate": 0.7222,
+              "mean_pred_prob": 0.7485,
+              "abs_error": 0.0263
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 55,
+              "observed_rate": 0.7091,
+              "mean_pred_prob": 0.8374,
+              "abs_error": 0.1283
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 5,
+              "observed_rate": 0.8,
+              "mean_pred_prob": 0.9203,
+              "abs_error": 0.1203
+            }
+          ]
+        },
+        "isotonic_oof": {
+          "brier_score": 0.1864,
+          "roc_auc": 0.7782,
+          "pr_auc": 0.66,
+          "ece": 0.0283,
+          "mce": 0.3333,
+          "mean_pred_prob": 0.4272,
+          "observed_rate": 0.4274,
+          "calibration_curve_prob_true": [
+            0.0973,
+            0.1094,
+            0.3725,
+            0.3435,
+            0.4643,
+            0.5842,
+            0.6398,
+            0.7143,
+            1.0,
+            0.6667
+          ],
+          "calibration_curve_prob_pred": [
+            0.0657,
+            0.1476,
+            0.2867,
+            0.3611,
+            0.4673,
+            0.5383,
+            0.6482,
+            0.7359,
+            0.8182,
+            1.0
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 216,
+              "observed_rate": 0.0972,
+              "mean_pred_prob": 0.0641,
+              "abs_error": 0.0331
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 137,
+              "observed_rate": 0.1022,
+              "mean_pred_prob": 0.1438,
+              "abs_error": 0.0416
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 52,
+              "observed_rate": 0.3846,
+              "mean_pred_prob": 0.2851,
+              "abs_error": 0.0996
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 131,
+              "observed_rate": 0.3435,
+              "mean_pred_prob": 0.3611,
+              "abs_error": 0.0176
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 65,
+              "observed_rate": 0.4615,
+              "mean_pred_prob": 0.4436,
+              "abs_error": 0.0179
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 148,
+              "observed_rate": 0.5473,
+              "mean_pred_prob": 0.5261,
+              "abs_error": 0.0211
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 161,
+              "observed_rate": 0.6398,
+              "mean_pred_prob": 0.6482,
+              "abs_error": 0.0084
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 243,
+              "observed_rate": 0.716,
+              "mean_pred_prob": 0.7336,
+              "abs_error": 0.0175
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 11,
+              "observed_rate": 0.7273,
+              "mean_pred_prob": 0.8033,
+              "abs_error": 0.076
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 6,
+              "observed_rate": 0.6667,
+              "mean_pred_prob": 1.0,
+              "abs_error": 0.3333
+            }
+          ]
+        }
+      },
+      "selected_calibration_method": "sigmoid",
+      "calibration_rationale": "Sigmoid (Platt) calibration selected: provides stable probability mapping, lower/equal OOF Brier (0.1848) and lower ECE (0.0323) than Raw (0.1874), avoiding Isotonic step-function overfitting.",
+      "selected_threshold": 0.41,
+      "threshold_selection_rationale": "Selected threshold t=0.41 based on OOF validation screening tradeoff: Sensitivity=0.7900, Specificity=0.6716, Youden's J=0.4616, F1=0.7085, F2=0.7553.",
+      "validation_metrics_at_opt_threshold": {
+        "threshold": 0.41,
+        "sensitivity": 0.79,
+        "specificity": 0.6716,
+        "precision": 0.6423,
+        "npv": 0.8108,
+        "accuracy": 0.7222,
+        "balanced_accuracy": 0.7308,
+        "f1": 0.7085,
+        "f2": 0.7553,
+        "youden_j": 0.4616,
+        "tp": 395.0,
+        "fp": 220.0,
+        "fn": 105.0,
+        "tn": 450.0
+      },
+      "test_metrics": {
+        "roc_auc": 0.7662,
+        "pr_auc": 0.6541,
+        "brier_score": 0.1946,
+        "ece": 0.0331,
+        "mce": 0.1669,
+        "mean_pred_prob": 0.4227,
+        "observed_rate": 0.4265
+      },
+      "test_binary_at_default_050": {
+        "threshold": 0.5,
+        "sensitivity": 0.6253,
+        "specificity": 0.7541,
+        "precision": 0.6541,
+        "npv": 0.7302,
+        "accuracy": 0.6991,
+        "balanced_accuracy": 0.6897,
+        "f1": 0.6393,
+        "f2": 0.6308,
+        "youden_j": 0.3793,
+        "tp": 312,
+        "fp": 165,
+        "fn": 187,
+        "tn": 506
+      },
+      "test_binary_at_optimized_threshold": {
+        "threshold": 0.41,
+        "sensitivity": 0.7615,
+        "specificity": 0.6647,
+        "precision": 0.6281,
+        "npv": 0.7894,
+        "accuracy": 0.706,
+        "balanced_accuracy": 0.7131,
+        "f1": 0.6884,
+        "f2": 0.7305,
+        "youden_j": 0.4262,
+        "tp": 380,
+        "fp": 225,
+        "fn": 119,
+        "tn": 446
+      },
+      "exploratory_risk_bands": [
+        {
+          "tier": "Low Risk (Prototype)",
+          "probability_range": "< 0.246",
+          "count": 363,
+          "percentage_of_population": 31.0,
+          "observed_positive_count": 46,
+          "observed_positive_rate": 12.7
+        },
+        {
+          "tier": "Moderate Risk (Prototype)",
+          "probability_range": "[0.246, 0.574)",
+          "count": 438,
+          "percentage_of_population": 37.4,
+          "observed_positive_count": 207,
+          "observed_positive_rate": 47.3
+        },
+        {
+          "tier": "High Risk (Prototype)",
+          "probability_range": ">= 0.574",
+          "count": 369,
+          "percentage_of_population": 31.5,
+          "observed_positive_count": 246,
+          "observed_positive_rate": 66.7
+        }
+      ],
+      "artifact_paths": {
+        "joblib": "ml\\evaluation\\stage_1f\\models\\hypertension_mode_a_calibrated.joblib",
+        "pkl": "ml\\evaluation\\stage_1f\\models\\hypertension_mode_a_calibrated.pkl",
+        "calibration_csv": "ml\\evaluation\\stage_1f\\calibration\\hypertension_mode_a_calibration_data.csv",
+        "threshold_sweep_csv": "ml\\evaluation\\stage_1f\\thresholds\\hypertension_mode_a_threshold_sweep.csv"
+      }
+    },
+    {
+      "target": "hypertension",
+      "mode": "mode_b",
+      "config_key": "hypertension_mode_b",
+      "model_name": "Optimized Random Forest",
+      "source_stage": "Stage 1E-3",
+      "source_model_file": "hypertension_mode_b_rf_v2_optimized.joblib",
+      "n_train": 5460,
+      "n_val": 1170,
+      "n_test": 1170,
+      "n_features": 27,
+      "features": [
+        "age",
+        "gender",
+        "education_level",
+        "poverty_income_ratio",
+        "bmi",
+        "waist_circumference",
+        "mean_pulse",
+        "smoking_status",
+        "alcohol_frequency",
+        "physical_activity_level",
+        "sedentary_minutes",
+        "hba1c",
+        "fasting_glucose",
+        "total_cholesterol",
+        "hdl_cholesterol",
+        "triglycerides",
+        "ldl_cholesterol",
+        "serum_creatinine",
+        "blood_urea_nitrogen",
+        "serum_uric_acid",
+        "alt_enzyme",
+        "ast_enzyme",
+        "hemoglobin",
+        "wbc_count",
+        "platelet_count",
+        "rdw",
+        "serum_albumin"
+      ],
+      "validation_calibration_comparison": {
+        "raw": {
+          "brier_score": 0.1776,
+          "roc_auc": 0.8072,
+          "pr_auc": 0.7324,
+          "ece": 0.0273,
+          "mce": 0.0429,
+          "mean_pred_prob": 0.4315,
+          "observed_rate": 0.4274,
+          "calibration_curve_prob_true": [
+            0.0667,
+            0.1136,
+            0.2174,
+            0.3101,
+            0.4078,
+            0.5618,
+            0.6771,
+            0.7787,
+            0.8776
+          ],
+          "calibration_curve_prob_pred": [
+            0.0768,
+            0.1477,
+            0.2458,
+            0.3462,
+            0.4507,
+            0.5559,
+            0.6438,
+            0.7451,
+            0.8363
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 150,
+              "observed_rate": 0.0667,
+              "mean_pred_prob": 0.0768,
+              "abs_error": 0.0102
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 132,
+              "observed_rate": 0.1136,
+              "mean_pred_prob": 0.1477,
+              "abs_error": 0.0341
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 115,
+              "observed_rate": 0.2174,
+              "mean_pred_prob": 0.2458,
+              "abs_error": 0.0284
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 129,
+              "observed_rate": 0.3101,
+              "mean_pred_prob": 0.3462,
+              "abs_error": 0.0361
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 103,
+              "observed_rate": 0.4078,
+              "mean_pred_prob": 0.4507,
+              "abs_error": 0.0429
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 178,
+              "observed_rate": 0.5618,
+              "mean_pred_prob": 0.5559,
+              "abs_error": 0.0059
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 192,
+              "observed_rate": 0.6771,
+              "mean_pred_prob": 0.6438,
+              "abs_error": 0.0333
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 122,
+              "observed_rate": 0.7787,
+              "mean_pred_prob": 0.7451,
+              "abs_error": 0.0336
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 49,
+              "observed_rate": 0.8776,
+              "mean_pred_prob": 0.8363,
+              "abs_error": 0.0413
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 0,
+              "observed_rate": 0.0,
+              "mean_pred_prob": 0.0,
+              "abs_error": 0.0
+            }
+          ]
+        },
+        "sigmoid_oof": {
+          "brier_score": 0.1772,
+          "roc_auc": 0.8062,
+          "pr_auc": 0.7315,
+          "ece": 0.0334,
+          "mce": 0.1684,
+          "mean_pred_prob": 0.4276,
+          "observed_rate": 0.4274,
+          "calibration_curve_prob_true": [
+            0.0649,
+            0.1739,
+            0.2743,
+            0.2885,
+            0.4,
+            0.5226,
+            0.6816,
+            0.7923,
+            0.8056,
+            0.75
+          ],
+          "calibration_curve_prob_pred": [
+            0.0603,
+            0.147,
+            0.2522,
+            0.3486,
+            0.4509,
+            0.557,
+            0.6446,
+            0.7485,
+            0.8447,
+            0.9184
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 185,
+              "observed_rate": 0.0649,
+              "mean_pred_prob": 0.0603,
+              "abs_error": 0.0045
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 138,
+              "observed_rate": 0.1739,
+              "mean_pred_prob": 0.147,
+              "abs_error": 0.0269
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 113,
+              "observed_rate": 0.2743,
+              "mean_pred_prob": 0.2522,
+              "abs_error": 0.0221
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 104,
+              "observed_rate": 0.2885,
+              "mean_pred_prob": 0.3486,
+              "abs_error": 0.0601
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 90,
+              "observed_rate": 0.4,
+              "mean_pred_prob": 0.4509,
+              "abs_error": 0.0509
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 155,
+              "observed_rate": 0.5226,
+              "mean_pred_prob": 0.557,
+              "abs_error": 0.0345
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 179,
+              "observed_rate": 0.6816,
+              "mean_pred_prob": 0.6446,
+              "abs_error": 0.037
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 130,
+              "observed_rate": 0.7923,
+              "mean_pred_prob": 0.7485,
+              "abs_error": 0.0438
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 72,
+              "observed_rate": 0.8056,
+              "mean_pred_prob": 0.8447,
+              "abs_error": 0.0391
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 4,
+              "observed_rate": 0.75,
+              "mean_pred_prob": 0.9184,
+              "abs_error": 0.1684
+            }
+          ]
+        },
+        "isotonic_oof": {
+          "brier_score": 0.1802,
+          "roc_auc": 0.7963,
+          "pr_auc": 0.7073,
+          "ece": 0.0343,
+          "mce": 0.1546,
+          "mean_pred_prob": 0.4262,
+          "observed_rate": 0.4274,
+          "calibration_curve_prob_true": [
+            0.0945,
+            0.1556,
+            0.2593,
+            0.3575,
+            0.3448,
+            0.5044,
+            0.7296,
+            0.7248,
+            0.7778,
+            0.7826
+          ],
+          "calibration_curve_prob_pred": [
+            0.0619,
+            0.1561,
+            0.2471,
+            0.3411,
+            0.445,
+            0.5219,
+            0.6703,
+            0.7508,
+            0.8237,
+            0.9372
+          ],
+          "bin_details": [
+            {
+              "bin": 1,
+              "range": "[0.00, 0.10]",
+              "count": 201,
+              "observed_rate": 0.0945,
+              "mean_pred_prob": 0.0619,
+              "abs_error": 0.0326
+            },
+            {
+              "bin": 2,
+              "range": "[0.10, 0.20]",
+              "count": 135,
+              "observed_rate": 0.1556,
+              "mean_pred_prob": 0.1561,
+              "abs_error": 0.0006
+            },
+            {
+              "bin": 3,
+              "range": "[0.20, 0.30]",
+              "count": 81,
+              "observed_rate": 0.2593,
+              "mean_pred_prob": 0.2471,
+              "abs_error": 0.0121
+            },
+            {
+              "bin": 4,
+              "range": "[0.30, 0.40]",
+              "count": 177,
+              "observed_rate": 0.3616,
+              "mean_pred_prob": 0.3404,
+              "abs_error": 0.0212
+            },
+            {
+              "bin": 5,
+              "range": "[0.40, 0.50]",
+              "count": 46,
+              "observed_rate": 0.3261,
+              "mean_pred_prob": 0.4263,
+              "abs_error": 0.1002
+            },
+            {
+              "bin": 6,
+              "range": "[0.50, 0.60]",
+              "count": 127,
+              "observed_rate": 0.4882,
+              "mean_pred_prob": 0.5195,
+              "abs_error": 0.0313
+            },
+            {
+              "bin": 7,
+              "range": "[0.60, 0.70]",
+              "count": 159,
+              "observed_rate": 0.7296,
+              "mean_pred_prob": 0.6703,
+              "abs_error": 0.0593
+            },
+            {
+              "bin": 8,
+              "range": "[0.70, 0.80]",
+              "count": 147,
+              "observed_rate": 0.7211,
+              "mean_pred_prob": 0.7502,
+              "abs_error": 0.0291
+            },
+            {
+              "bin": 9,
+              "range": "[0.80, 0.90]",
+              "count": 74,
+              "observed_rate": 0.7838,
+              "mean_pred_prob": 0.823,
+              "abs_error": 0.0392
+            },
+            {
+              "bin": 10,
+              "range": "[0.90, 1.00]",
+              "count": 23,
+              "observed_rate": 0.7826,
+              "mean_pred_prob": 0.9372,
+              "abs_error": 0.1546
+            }
+          ]
+        }
+      },
+      "selected_calibration_method": "sigmoid",
+      "calibration_rationale": "Sigmoid (Platt) calibration selected: provides stable probability mapping, lower/equal OOF Brier (0.1772) and lower ECE (0.0334) than Raw (0.1776), avoiding Isotonic step-function overfitting.",
+      "selected_threshold": 0.52,
+      "threshold_selection_rationale": "Selected threshold t=0.52 based on OOF validation screening tradeoff: Sensitivity=0.7260, Specificity=0.7657, Youden's J=0.4917, F1=0.7118, F2=0.7202.",
+      "validation_metrics_at_opt_threshold": {
+        "threshold": 0.52,
+        "sensitivity": 0.726,
+        "specificity": 0.7657,
+        "precision": 0.6981,
+        "npv": 0.7892,
+        "accuracy": 0.7487,
+        "balanced_accuracy": 0.7458,
+        "f1": 0.7118,
+        "f2": 0.7202,
+        "youden_j": 0.4917,
+        "tp": 363.0,
+        "fp": 157.0,
+        "fn": 137.0,
+        "tn": 513.0
+      },
+      "test_metrics": {
+        "roc_auc": 0.7731,
+        "pr_auc": 0.6898,
+        "brier_score": 0.1916,
+        "ece": 0.0465,
+        "mce": 0.1222,
+        "mean_pred_prob": 0.4211,
+        "observed_rate": 0.4265
+      },
+      "test_binary_at_default_050": {
+        "threshold": 0.5,
+        "sensitivity": 0.6593,
+        "specificity": 0.7332,
+        "precision": 0.6476,
+        "npv": 0.7432,
+        "accuracy": 0.7017,
+        "balanced_accuracy": 0.6963,
+        "f1": 0.6534,
+        "f2": 0.6569,
+        "youden_j": 0.3926,
+        "tp": 329,
+        "fp": 179,
+        "fn": 170,
+        "tn": 492
+      },
+      "test_binary_at_optimized_threshold": {
+        "threshold": 0.52,
+        "sensitivity": 0.6253,
+        "specificity": 0.7511,
+        "precision": 0.6514,
+        "npv": 0.7294,
+        "accuracy": 0.6974,
+        "balanced_accuracy": 0.6882,
+        "f1": 0.638,
+        "f2": 0.6303,
+        "youden_j": 0.3764,
+        "tp": 312,
+        "fp": 167,
+        "fn": 187,
+        "tn": 504
+      },
+      "exploratory_risk_bands": [
+        {
+          "tier": "Low Risk (Prototype)",
+          "probability_range": "< 0.312",
+          "count": 487,
+          "percentage_of_population": 41.6,
+          "observed_positive_count": 84,
+          "observed_positive_rate": 17.2
+        },
+        {
+          "tier": "Moderate Risk (Prototype)",
+          "probability_range": "[0.312, 0.728)",
+          "count": 496,
+          "percentage_of_population": 42.4,
+          "observed_positive_count": 279,
+          "observed_positive_rate": 56.2
+        },
+        {
+          "tier": "High Risk (Prototype)",
+          "probability_range": ">= 0.728",
+          "count": 187,
+          "percentage_of_population": 16.0,
+          "observed_positive_count": 136,
+          "observed_positive_rate": 72.7
+        }
+      ],
+      "artifact_paths": {
+        "joblib": "ml\\evaluation\\stage_1f\\models\\hypertension_mode_b_calibrated.joblib",
+        "pkl": "ml\\evaluation\\stage_1f\\models\\hypertension_mode_b_calibrated.pkl",
+        "calibration_csv": "ml\\evaluation\\stage_1f\\calibration\\hypertension_mode_b_calibration_data.csv",
+        "threshold_sweep_csv": "ml\\evaluation\\stage_1f\\thresholds\\hypertension_mode_b_threshold_sweep.csv"
+      }
+    }
+  ]
+}
