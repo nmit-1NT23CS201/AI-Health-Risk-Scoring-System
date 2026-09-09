@@ -1,0 +1,7 @@
+target,mode,v1_rf_model,v1_rf_test_roc,v1_rf_test_pr,stage1e2_candidate,stage1e2_test_roc,stage1e2_test_pr,opt_rf_cv_roc,opt_rf_cv_roc_std,opt_rf_test_roc,opt_rf_test_pr,opt_rf_test_recall,opt_rf_test_spec,opt_rf_test_f1,opt_rf_test_brier,delta_roc_vs_v1,delta_roc_vs_1e2,best_n_estimators,best_max_depth,best_max_features,best_class_weight,recommendation
+cvd,mode_a,random_forest,0.7821,0.3512,logistic_regression,0.8093,0.3699,0.811,0.0103,0.814,0.4086,0.0068,0.999,0.0133,0.093,0.0318,0.0047,500,8,log2,,OPTIMIZED RF IS BEST
+cvd,mode_b,random_forest,0.7996,0.3763,logistic_regression,0.822,0.4349,0.8306,0.0073,0.8244,0.4304,0.0946,0.9951,0.1677,0.09,0.0248,0.0024,800,8,0.5,,OPTIMIZED RF IS BEST
+diabetes,mode_a,random_forest_balanced,0.7673,0.3852,hist_gradient_boosting,0.7892,0.4136,0.7985,0.0165,0.7791,0.4053,0.0913,0.9782,0.1532,0.1248,0.0118,-0.0101,800,12,log2,,KEEP STAGE 1E-2 (hist_gradient_boosting)
+diabetes,mode_b,random_forest,0.7801,0.4363,xgboost,0.8153,0.4695,0.8291,0.0188,0.802,0.451,0.1202,0.9844,0.2016,0.1204,0.0219,-0.0133,800,12,log2,,KEEP STAGE 1E-2 (xgboost)
+hypertension,mode_a,random_forest,0.7437,0.6446,logistic_regression,0.7655,0.6529,0.785,0.004,0.7611,0.6659,0.6653,0.7109,0.6478,0.1951,0.0174,-0.0044,800,8,0.5,,KEEP STAGE 1E-2 (logistic_regression)
+hypertension,mode_b,random_forest,0.7592,0.6594,hist_gradient_boosting,0.7678,0.6754,0.7953,0.0085,0.7717,0.6814,0.6633,0.7317,0.6554,0.1904,0.0125,0.0039,800,8,0.5,,OPTIMIZED RF IS BEST
