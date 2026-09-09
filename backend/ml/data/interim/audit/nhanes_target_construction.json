@@ -1,0 +1,48 @@
+{
+  "n_adults_total": 7809,
+  "targets": {
+    "target_cvd": {
+      "definition": "MCQ160B=1 OR MCQ160C=1 OR MCQ160D=1 OR MCQ160E=1 OR MCQ160F=1",
+      "source_variables": [
+        "MCQ160B",
+        "MCQ160C",
+        "MCQ160D",
+        "MCQ160E",
+        "MCQ160F"
+      ],
+      "n_positive": 982,
+      "n_negative": 6825,
+      "n_undeterminable": 2,
+      "n_evaluable": 7807,
+      "prevalence_pct": 12.58
+    },
+    "target_diabetes": {
+      "definition": "hba1c>=6.5 OR fasting_glucose>=126 OR DIQ010=1 OR DIQ050=1 OR DIQ070=1 (ADA criteria)",
+      "source_variables": [
+        "hba1c",
+        "fasting_glucose",
+        "DIQ010",
+        "DIQ050",
+        "DIQ070"
+      ],
+      "n_positive": 1385,
+      "n_negative": 6421,
+      "n_undeterminable": 3,
+      "n_evaluable": 7806,
+      "prevalence_pct": 17.74
+    },
+    "target_hypertension": {
+      "definition": "mean_sbp>=140 OR mean_dbp>=90 OR BPQ020=1 (JNC7 definition)",
+      "source_variables": [
+        "mean_sbp",
+        "mean_dbp",
+        "BPQ020"
+      ],
+      "n_positive": 3331,
+      "n_negative": 4469,
+      "n_undeterminable": 9,
+      "n_evaluable": 7800,
+      "prevalence_pct": 42.71
+    }
+  }
+}

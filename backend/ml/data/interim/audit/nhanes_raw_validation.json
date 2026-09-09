@@ -1,0 +1,342 @@
+{
+  "status": "OK",
+  "files": {
+    "DEMO_L": {
+      "file": "DEMO_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\DEMO_L.xpt",
+      "exists": true,
+      "purpose": "Demographics, SES, survey design weights",
+      "population": "All interviewed (N~11933)",
+      "required_columns": [
+        "SEQN",
+        "RIDAGEYR",
+        "RIAGENDR",
+        "DMDEDUC2",
+        "INDFMPIR",
+        "WTINT2YR",
+        "WTMEC2YR",
+        "SDMVSTRA",
+        "SDMVPSU"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 11933,
+      "cols_in_file": 27,
+      "epsilon_fixes": {
+        "RIDAGEYR": 189,
+        "INDFMPIR": 100,
+        "WTMEC2YR": 3073
+      },
+      "status": "OK",
+      "error": null
+    },
+    "BMX_L": {
+      "file": "BMX_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\BMX_L.xpt",
+      "exists": true,
+      "purpose": "Anthropometrics (BMI, waist)",
+      "population": "MEC examined (N~8860)",
+      "required_columns": [
+        "SEQN",
+        "BMXBMI",
+        "BMXWAIST"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 8860,
+      "cols_in_file": 22,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "BPXO_L": {
+      "file": "BPXO_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\BPXO_L.xpt",
+      "exists": true,
+      "purpose": "Blood pressure readings (3 oscillometric readings each)",
+      "population": "MEC oscillometric exam (N~7801)",
+      "required_columns": [
+        "SEQN",
+        "BPXOSY1",
+        "BPXOSY2",
+        "BPXOSY3",
+        "BPXODI1",
+        "BPXODI2",
+        "BPXODI3",
+        "BPXOPLS1",
+        "BPXOPLS2",
+        "BPXOPLS3"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 7801,
+      "cols_in_file": 12,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "BPQ_L": {
+      "file": "BPQ_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\BPQ_L.xpt",
+      "exists": true,
+      "purpose": "HTN model target component (BPQ020=diagnosed hypertension)",
+      "population": "Interviewed adults (N~8501)",
+      "required_columns": [
+        "SEQN",
+        "BPQ020"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 8501,
+      "cols_in_file": 6,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "SMQ_L": {
+      "file": "SMQ_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\SMQ_L.xpt",
+      "exists": true,
+      "purpose": "Smoking status (Mode A predictor)",
+      "population": "Interviewed (N~9015)",
+      "required_columns": [
+        "SEQN",
+        "SMQ020",
+        "SMQ040"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 9015,
+      "cols_in_file": 9,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "ALQ_L": {
+      "file": "ALQ_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\ALQ_L.xpt",
+      "exists": true,
+      "purpose": "Alcohol consumption (Mode A predictor)",
+      "population": "Interviewed adults (N~6337)",
+      "required_columns": [
+        "SEQN",
+        "ALQ111",
+        "ALQ121"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 6337,
+      "cols_in_file": 9,
+      "epsilon_fixes": {
+        "ALQ121": 836
+      },
+      "status": "OK",
+      "error": null
+    },
+    "PAQ_L": {
+      "file": "PAQ_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\PAQ_L.xpt",
+      "exists": true,
+      "purpose": "Physical activity (Mode A predictor)",
+      "population": "Interviewed (N~8153)",
+      "required_columns": [
+        "SEQN",
+        "PAD790Q",
+        "PAD810Q",
+        "PAD680"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 8153,
+      "cols_in_file": 8,
+      "epsilon_fixes": {
+        "PAD790Q": 1696,
+        "PAD810Q": 4413,
+        "PAD680": 8
+      },
+      "status": "OK",
+      "error": null
+    },
+    "DIQ_L": {
+      "file": "DIQ_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\DIQ_L.xpt",
+      "exists": true,
+      "purpose": "Diabetes target components (DIQ010=diagnosis, DIQ050=insulin, DIQ070=pills)",
+      "population": "All interviewed (N~11744)",
+      "required_columns": [
+        "SEQN",
+        "DIQ010",
+        "DIQ050",
+        "DIQ070"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 11744,
+      "cols_in_file": 9,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "MCQ_L": {
+      "file": "MCQ_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\MCQ_L.xpt",
+      "exists": true,
+      "purpose": "CVD target components (hard CVD history MCQ160B-F)",
+      "population": "All interviewed (N~11744)",
+      "required_columns": [
+        "SEQN",
+        "MCQ160B",
+        "MCQ160C",
+        "MCQ160D",
+        "MCQ160E",
+        "MCQ160F"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 11744,
+      "cols_in_file": 35,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "GHB_L": {
+      "file": "GHB_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\GHB_L.xpt",
+      "exists": true,
+      "purpose": "HbA1c \u2014 Mode B predictor; PROHIBITED in DM model",
+      "population": "Routine lab panel (N~7199)",
+      "required_columns": [
+        "SEQN",
+        "LBXGH"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 7199,
+      "cols_in_file": 3,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "GLU_L": {
+      "file": "GLU_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\GLU_L.xpt",
+      "exists": true,
+      "purpose": "Fasting glucose \u2014 Mode B predictor; PROHIBITED in DM model. WTSAF2YR=fasting weight",
+      "population": "Fasting subsample (N~3996)",
+      "required_columns": [
+        "SEQN",
+        "LBXGLU",
+        "WTSAF2YR"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 3996,
+      "cols_in_file": 4,
+      "epsilon_fixes": {
+        "WTSAF2YR": 635
+      },
+      "status": "OK",
+      "error": null
+    },
+    "TCHOL_L": {
+      "file": "TCHOL_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\TCHOL_L.xpt",
+      "exists": true,
+      "purpose": "Total cholesterol \u2014 Mode B predictor",
+      "population": "Routine lab panel (N~8068)",
+      "required_columns": [
+        "SEQN",
+        "LBXTC"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 8068,
+      "cols_in_file": 4,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "HDL_L": {
+      "file": "HDL_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\HDL_L.xpt",
+      "exists": true,
+      "purpose": "HDL cholesterol \u2014 Mode B predictor",
+      "population": "Routine lab panel (N~8068)",
+      "required_columns": [
+        "SEQN",
+        "LBDHDD"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 8068,
+      "cols_in_file": 4,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "TRIGLY_L": {
+      "file": "TRIGLY_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\TRIGLY_L.xpt",
+      "exists": true,
+      "purpose": "Triglycerides and calculated LDL \u2014 Mode B predictor (fasting subsample)",
+      "population": "Fasting subsample (N~3996)",
+      "required_columns": [
+        "SEQN",
+        "LBXTLG",
+        "LBDLDL"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 3996,
+      "cols_in_file": 10,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "BIOPRO_L": {
+      "file": "BIOPRO_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\BIOPRO_L.xpt",
+      "exists": true,
+      "purpose": "Biochemistry profile: creatinine, BUN, uric acid, ALT, AST, albumin",
+      "population": "Routine lab panel (N~7199)",
+      "required_columns": [
+        "SEQN",
+        "LBXSCR",
+        "LBXSBU",
+        "LBXSUA",
+        "LBXSATSI",
+        "LBXSASSI",
+        "LBXSAL"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 7199,
+      "cols_in_file": 42,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    },
+    "CBC_L": {
+      "file": "CBC_L.xpt",
+      "path": "backend\\ml\\data\\raw\\nhanes_2021_2023\\CBC_L.xpt",
+      "exists": true,
+      "purpose": "Complete blood count: hemoglobin, WBC, platelets, RDW",
+      "population": "CBC lab panel (N~8727)",
+      "required_columns": [
+        "SEQN",
+        "LBXHGB",
+        "LBXWBCSI",
+        "LBXPLTSI",
+        "LBXRDW"
+      ],
+      "missing_columns": [],
+      "duplicate_seqn": 0,
+      "rows": 8727,
+      "cols_in_file": 23,
+      "epsilon_fixes": {},
+      "status": "OK",
+      "error": null
+    }
+  },
+  "errors": []
+}

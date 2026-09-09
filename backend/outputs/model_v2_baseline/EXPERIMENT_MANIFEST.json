@@ -1,0 +1,50 @@
+{
+  "stage": "1D",
+  "random_state": 42,
+  "environment": {
+    "python_version": "3.13.3 (tags/v3.13.3:6280bb5, Apr  8 2025, 14:47:33) [MSC v.1943 64 bit (AMD64)]",
+    "sklearn_version": "1.9.0",
+    "xgboost": "SKIPPED (not installed)",
+    "lightgbm": "SKIPPED (not installed)"
+  },
+  "configs_benchmarked": [
+    "cvd_mode_a",
+    "cvd_mode_b",
+    "diabetes_mode_a",
+    "diabetes_mode_b",
+    "hypertension_mode_a",
+    "hypertension_mode_b"
+  ],
+  "best_models_val_roc_auc": {
+    "cvd_mode_a": {
+      "model": "logistic_regression",
+      "val_roc_auc": 0.8166387648809523,
+      "test_roc_auc": 0.8124637088260135
+    },
+    "cvd_mode_b": {
+      "model": "logistic_regression_balanced",
+      "val_roc_auc": 0.8323368409863945,
+      "test_roc_auc": 0.8191412848395271
+    },
+    "diabetes_mode_a": {
+      "model": "hist_gradient_boosting",
+      "val_roc_auc": 0.7966890326703411,
+      "test_roc_auc": 0.7809529515136991
+    },
+    "diabetes_mode_b": {
+      "model": "hist_gradient_boosting",
+      "val_roc_auc": 0.8233734723220705,
+      "test_roc_auc": 0.8002536145059509
+    },
+    "hypertension_mode_a": {
+      "model": "logistic_regression",
+      "val_roc_auc": 0.7884417910447762,
+      "test_roc_auc": 0.7662806985058044
+    },
+    "hypertension_mode_b": {
+      "model": "hist_gradient_boosting_balanced",
+      "val_roc_auc": 0.7983149253731343,
+      "test_roc_auc": 0.7636599577694883
+    }
+  }
+}

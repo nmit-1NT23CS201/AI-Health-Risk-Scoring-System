@@ -1,0 +1,146 @@
+{
+  "step": "nhanes_harmonizer.merge_nhanes",
+  "transformations": {
+    "column_renames": "NHANES variable names renamed to human-readable snake_case equivalents. NHANES variable names still documented in model_v2_feature_matrix.csv."
+  },
+  "epsilon_fixes": {},
+  "missing_recode": {
+    "DMDEDUC2": {
+      "9": 11
+    },
+    "SMQ020": {
+      "7": 7,
+      "9": 7
+    },
+    "DIQ010": {
+      "9": 1
+    },
+    "DIQ070": {
+      "9": 7
+    },
+    "MCQ160B": {
+      "9": 17
+    },
+    "MCQ160C": {
+      "9": 34
+    },
+    "MCQ160D": {
+      "9": 25
+    },
+    "MCQ160E": {
+      "9": 13
+    },
+    "MCQ160F": {
+      "9": 21
+    },
+    "BPQ020": {
+      "7": 1,
+      "9": 10
+    },
+    "ALQ111": {
+      "9": 5
+    },
+    "PAD790Q": {
+      "7777": 8,
+      "9999": 37
+    },
+    "PAD810Q": {
+      "7777": 3,
+      "9999": 35
+    },
+    "PAD680": {
+      "7777": 6,
+      "9999": 66
+    }
+  },
+  "derived_features": {
+    "mean_sbp": "Mean of BPXOSY1/2/3 (skipna)",
+    "mean_dbp": "Mean of BPXODI1/2/3 (skipna)",
+    "mean_pulse": "Mean of BPXOPLS1/2/3 (skipna)",
+    "smoking_status": "0=Never (SMQ020=2), 1=Former (SMQ020=1 & SMQ040=3), 2=Current (SMQ020=1 & SMQ040 in 1,2)",
+    "alcohol_frequency": "0=Never (ALQ111=2), 1=Former (ALQ111=1 & ALQ121=0), 2=Current (ALQ111=1 & ALQ121>0)",
+    "physical_activity_level": "1=High (vig>=3d/wk OR mod>=5d/wk), 2=Moderate (between), 3=Low (both=0)",
+    "asian_obesity_flag": "1 if BMXBMI >= 25 kg/m\u00b2 (Asian Indian cutoff, IDF/WHO Asia-Pacific). NaN if BMI missing.",
+    "south_asian_waist_flag": "1 if waist >= 90 cm (Men) or >= 80 cm (Women) per ICMR/IDF South Asian criteria. NaN if waist missing."
+  },
+  "merge_stats": {
+    "raw_demo_rows": 11933,
+    "adults_20plus": 7809,
+    "BMX_L": {
+      "description": "MEC anthropometrics",
+      "rows_in_component": 8860,
+      "adults_matched": 6064
+    },
+    "BPXO_L": {
+      "description": "Blood pressure readings",
+      "rows_in_component": 7801,
+      "adults_matched": 6064
+    },
+    "BPQ_L": {
+      "description": "Hypertension diagnosis (BPQ020)",
+      "rows_in_component": 8501,
+      "adults_matched": 7809
+    },
+    "SMQ_L": {
+      "description": "Smoking questionnaire",
+      "rows_in_component": 9015,
+      "adults_matched": 7809
+    },
+    "ALQ_L": {
+      "description": "Alcohol questionnaire",
+      "rows_in_component": 6337,
+      "adults_matched": 6064
+    },
+    "PAQ_L": {
+      "description": "Physical activity (GPAQ)",
+      "rows_in_component": 8153,
+      "adults_matched": 7809
+    },
+    "DIQ_L": {
+      "description": "Diabetes questionnaire",
+      "rows_in_component": 11744,
+      "adults_matched": 7809
+    },
+    "MCQ_L": {
+      "description": "Medical conditions / CVD history",
+      "rows_in_component": 11744,
+      "adults_matched": 7809
+    },
+    "GHB_L": {
+      "description": "HbA1c laboratory",
+      "rows_in_component": 7199,
+      "adults_matched": 6064
+    },
+    "GLU_L": {
+      "description": "Fasting glucose (subsample) + WTSAF2YR",
+      "rows_in_component": 3996,
+      "adults_matched": 3425
+    },
+    "TCHOL_L": {
+      "description": "Total cholesterol",
+      "rows_in_component": 8068,
+      "adults_matched": 6064
+    },
+    "HDL_L": {
+      "description": "HDL cholesterol",
+      "rows_in_component": 8068,
+      "adults_matched": 6064
+    },
+    "TRIGLY_L": {
+      "description": "Triglycerides + LDL (fasting subsample)",
+      "rows_in_component": 3996,
+      "adults_matched": 3425
+    },
+    "BIOPRO_L": {
+      "description": "Biochemistry profile",
+      "rows_in_component": 7199,
+      "adults_matched": 6064
+    },
+    "CBC_L": {
+      "description": "Complete blood count",
+      "rows_in_component": 8727,
+      "adults_matched": 6064
+    },
+    "merged_adult_rows": 7809
+  }
+}
