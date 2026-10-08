@@ -1,0 +1,669 @@
+{
+  "stage": "1G-1",
+  "title": "AI Health Risk Scoring System - Stage 1G-1 Locked V2 Research Pipeline Integrity Audit",
+  "audit_timestamp": "2026-10-08T09:45:00Z",
+  "overall_status": "PASS",
+  "summary": {
+    "total_pipelines_audited": 6,
+    "pipelines_passed": 6,
+    "pipelines_warning": 0,
+    "pipelines_failed": 0,
+    "all_artifacts_exist": true,
+    "all_models_loadable": true,
+    "all_features_clean": true,
+    "zero_leakage_confirmed": true,
+    "zero_v1_contamination_confirmed": true,
+    "split_disjointness_confirmed": true,
+    "metric_cross_validation_parity": true
+  },
+  "pipelines": [
+    {
+      "pipeline": "cvd_mode_a",
+      "target": "cvd",
+      "mode": "mode_a",
+      "status": "PASS",
+      "artifacts": {
+        "model_joblib": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\cvd_mode_a_calibrated.joblib",
+          "exists": true,
+          "size_bytes": 8433283,
+          "status": "PASS"
+        },
+        "model_pkl": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\cvd_mode_a_calibrated.pkl",
+          "exists": true,
+          "size_bytes": 8386154,
+          "status": "PASS"
+        },
+        "calibration_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\calibration\\cvd_mode_a_calibration_data.csv",
+          "exists": true,
+          "size_bytes": 2620,
+          "status": "PASS"
+        },
+        "threshold_sweep_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\thresholds\\cvd_mode_a_threshold_sweep.csv",
+          "exists": true,
+          "size_bytes": 7189,
+          "status": "PASS"
+        }
+      },
+      "model_architecture": {
+        "wrapper_class": "CalibratedClassifierCV",
+        "calibration_method": "sigmoid",
+        "calibration_method_expected": "sigmoid",
+        "calibration_match": true,
+        "base_estimator_type": "Pipeline",
+        "final_classifier_name": "RandomForestClassifier",
+        "expected_model": "Optimized Random Forest",
+        "source_stage": "Stage 1E-3",
+        "status": "PASS"
+      },
+      "threshold": {
+        "locked_threshold": 0.13,
+        "expected_threshold": 0.13,
+        "comparison_csv_threshold": 0.13,
+        "match": true,
+        "status": "PASS"
+      },
+      "features": {
+        "count": 13,
+        "expected_count": 13,
+        "count_match": true,
+        "names_match_json": true,
+        "features_list": [
+          "age",
+          "gender",
+          "education_level",
+          "poverty_income_ratio",
+          "bmi",
+          "waist_circumference",
+          "mean_sbp",
+          "mean_dbp",
+          "mean_pulse",
+          "smoking_status",
+          "alcohol_frequency",
+          "physical_activity_level",
+          "sedentary_minutes"
+        ],
+        "status": "PASS"
+      },
+      "splits": {
+        "n_train": 5464,
+        "n_val": 1171,
+        "n_test": 1172,
+        "disjoint": true,
+        "matches_recorded_counts": true,
+        "status": "PASS"
+      },
+      "leakage_and_contamination": {
+        "target_leakage_detected": [],
+        "survey_design_leaked": [],
+        "v1_features_detected": [],
+        "status": "PASS"
+      },
+      "metric_consistency": {
+        "test_roc_auc_json": 0.8137,
+        "test_roc_auc_csv": 0.8137,
+        "test_pr_auc_json": 0.4159,
+        "test_pr_auc_csv": 0.4159,
+        "test_brier_json": 0.0912,
+        "test_brier_csv": 0.0912,
+        "test_sens_json": 0.6824,
+        "test_sens_csv": 0.6824,
+        "test_spec_json": 0.7803,
+        "test_spec_csv": 0.7803,
+        "test_f1_json": 0.4262,
+        "test_f1_csv": 0.4262,
+        "status": "PASS"
+      }
+    },
+    {
+      "pipeline": "cvd_mode_b",
+      "target": "cvd",
+      "mode": "mode_b",
+      "status": "PASS",
+      "artifacts": {
+        "model_joblib": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\cvd_mode_b_calibrated.joblib",
+          "exists": true,
+          "size_bytes": 8765914,
+          "status": "PASS"
+        },
+        "model_pkl": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\cvd_mode_b_calibrated.pkl",
+          "exists": true,
+          "size_bytes": 8695625,
+          "status": "PASS"
+        },
+        "calibration_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\calibration\\cvd_mode_b_calibration_data.csv",
+          "exists": true,
+          "size_bytes": 2597,
+          "status": "PASS"
+        },
+        "threshold_sweep_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\thresholds\\cvd_mode_b_threshold_sweep.csv",
+          "exists": true,
+          "size_bytes": 6864,
+          "status": "PASS"
+        }
+      },
+      "model_architecture": {
+        "wrapper_class": "CalibratedClassifierCV",
+        "calibration_method": "sigmoid",
+        "calibration_method_expected": "sigmoid",
+        "calibration_match": true,
+        "base_estimator_type": "Pipeline",
+        "final_classifier_name": "RandomForestClassifier",
+        "expected_model": "Optimized Random Forest",
+        "source_stage": "Stage 1E-3",
+        "status": "PASS"
+      },
+      "threshold": {
+        "locked_threshold": 0.15,
+        "expected_threshold": 0.15,
+        "comparison_csv_threshold": 0.15,
+        "match": true,
+        "status": "PASS"
+      },
+      "features": {
+        "count": 29,
+        "expected_count": 29,
+        "count_match": true,
+        "names_match_json": true,
+        "features_list": [
+          "age",
+          "gender",
+          "education_level",
+          "poverty_income_ratio",
+          "bmi",
+          "waist_circumference",
+          "mean_sbp",
+          "mean_dbp",
+          "mean_pulse",
+          "smoking_status",
+          "alcohol_frequency",
+          "physical_activity_level",
+          "sedentary_minutes",
+          "hba1c",
+          "fasting_glucose",
+          "total_cholesterol",
+          "hdl_cholesterol",
+          "triglycerides",
+          "ldl_cholesterol",
+          "serum_creatinine",
+          "blood_urea_nitrogen",
+          "serum_uric_acid",
+          "alt_enzyme",
+          "ast_enzyme",
+          "hemoglobin",
+          "wbc_count",
+          "platelet_count",
+          "rdw",
+          "serum_albumin"
+        ],
+        "status": "PASS"
+      },
+      "splits": {
+        "n_train": 5464,
+        "n_val": 1171,
+        "n_test": 1172,
+        "disjoint": true,
+        "matches_recorded_counts": true,
+        "status": "PASS"
+      },
+      "leakage_and_contamination": {
+        "target_leakage_detected": [],
+        "survey_design_leaked": [],
+        "v1_features_detected": [],
+        "status": "PASS"
+      },
+      "metric_consistency": {
+        "test_roc_auc_json": 0.8218,
+        "test_roc_auc_csv": 0.8218,
+        "test_pr_auc_json": 0.434,
+        "test_pr_auc_csv": 0.434,
+        "test_brier_json": 0.0906,
+        "test_brier_csv": 0.0906,
+        "test_sens_json": 0.6081,
+        "test_sens_csv": 0.6081,
+        "test_spec_json": 0.8438,
+        "test_spec_csv": 0.8438,
+        "test_f1_json": 0.4523,
+        "test_f1_csv": 0.4523,
+        "status": "PASS"
+      }
+    },
+    {
+      "pipeline": "diabetes_mode_a",
+      "target": "diabetes",
+      "mode": "mode_a",
+      "status": "PASS",
+      "artifacts": {
+        "model_joblib": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\diabetes_mode_a_calibrated.joblib",
+          "exists": true,
+          "size_bytes": 380978,
+          "status": "PASS"
+        },
+        "model_pkl": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\diabetes_mode_a_calibrated.pkl",
+          "exists": true,
+          "size_bytes": 366774,
+          "status": "PASS"
+        },
+        "calibration_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\calibration\\diabetes_mode_a_calibration_data.csv",
+          "exists": true,
+          "size_bytes": 2684,
+          "status": "PASS"
+        },
+        "threshold_sweep_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\thresholds\\diabetes_mode_a_threshold_sweep.csv",
+          "exists": true,
+          "size_bytes": 7031,
+          "status": "PASS"
+        }
+      },
+      "model_architecture": {
+        "wrapper_class": "CalibratedClassifierCV",
+        "calibration_method": "sigmoid",
+        "calibration_method_expected": "sigmoid",
+        "calibration_match": true,
+        "base_estimator_type": "HistGradientBoostingClassifier",
+        "final_classifier_name": "HistGradientBoostingClassifier",
+        "expected_model": "HistGradientBoosting",
+        "source_stage": "Stage 1E-2",
+        "status": "PASS"
+      },
+      "threshold": {
+        "locked_threshold": 0.15,
+        "expected_threshold": 0.15,
+        "comparison_csv_threshold": 0.15,
+        "match": true,
+        "status": "PASS"
+      },
+      "features": {
+        "count": 13,
+        "expected_count": 13,
+        "count_match": true,
+        "names_match_json": true,
+        "features_list": [
+          "age",
+          "gender",
+          "education_level",
+          "poverty_income_ratio",
+          "bmi",
+          "waist_circumference",
+          "mean_sbp",
+          "mean_dbp",
+          "mean_pulse",
+          "smoking_status",
+          "alcohol_frequency",
+          "physical_activity_level",
+          "sedentary_minutes"
+        ],
+        "status": "PASS"
+      },
+      "splits": {
+        "n_train": 5464,
+        "n_val": 1171,
+        "n_test": 1171,
+        "disjoint": true,
+        "matches_recorded_counts": true,
+        "status": "PASS"
+      },
+      "leakage_and_contamination": {
+        "target_leakage_detected": [],
+        "survey_design_leaked": [],
+        "v1_features_detected": [],
+        "status": "PASS"
+      },
+      "metric_consistency": {
+        "test_roc_auc_json": 0.7957,
+        "test_roc_auc_csv": 0.7957,
+        "test_pr_auc_json": 0.4348,
+        "test_pr_auc_csv": 0.4348,
+        "test_brier_json": 0.1222,
+        "test_brier_csv": 0.1222,
+        "test_sens_json": 0.8173,
+        "test_sens_csv": 0.8173,
+        "test_spec_json": 0.6397,
+        "test_spec_csv": 0.6397,
+        "test_f1_json": 0.469,
+        "test_f1_csv": 0.469,
+        "status": "PASS"
+      }
+    },
+    {
+      "pipeline": "diabetes_mode_b",
+      "target": "diabetes",
+      "mode": "mode_b",
+      "status": "PASS",
+      "artifacts": {
+        "model_joblib": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\diabetes_mode_b_calibrated.joblib",
+          "exists": true,
+          "size_bytes": 978468,
+          "status": "PASS"
+        },
+        "model_pkl": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\diabetes_mode_b_calibrated.pkl",
+          "exists": true,
+          "size_bytes": 978262,
+          "status": "PASS"
+        },
+        "calibration_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\calibration\\diabetes_mode_b_calibration_data.csv",
+          "exists": true,
+          "size_bytes": 2331,
+          "status": "PASS"
+        },
+        "threshold_sweep_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\thresholds\\diabetes_mode_b_threshold_sweep.csv",
+          "exists": true,
+          "size_bytes": 7398,
+          "status": "PASS"
+        }
+      },
+      "model_architecture": {
+        "wrapper_class": "CalibratedClassifierCV",
+        "calibration_method": "sigmoid",
+        "calibration_method_expected": "sigmoid",
+        "calibration_match": true,
+        "base_estimator_type": "XGBClassifier",
+        "final_classifier_name": "XGBClassifier",
+        "expected_model": "XGBoost",
+        "source_stage": "Stage 1E-2",
+        "status": "PASS"
+      },
+      "threshold": {
+        "locked_threshold": 0.17,
+        "expected_threshold": 0.17,
+        "comparison_csv_threshold": 0.17,
+        "match": true,
+        "status": "PASS"
+      },
+      "features": {
+        "count": 27,
+        "expected_count": 27,
+        "count_match": true,
+        "names_match_json": true,
+        "features_list": [
+          "age",
+          "gender",
+          "education_level",
+          "poverty_income_ratio",
+          "bmi",
+          "waist_circumference",
+          "mean_sbp",
+          "mean_dbp",
+          "mean_pulse",
+          "smoking_status",
+          "alcohol_frequency",
+          "physical_activity_level",
+          "sedentary_minutes",
+          "total_cholesterol",
+          "hdl_cholesterol",
+          "triglycerides",
+          "ldl_cholesterol",
+          "serum_creatinine",
+          "blood_urea_nitrogen",
+          "serum_uric_acid",
+          "alt_enzyme",
+          "ast_enzyme",
+          "hemoglobin",
+          "wbc_count",
+          "platelet_count",
+          "rdw",
+          "serum_albumin"
+        ],
+        "status": "PASS"
+      },
+      "splits": {
+        "n_train": 5464,
+        "n_val": 1171,
+        "n_test": 1171,
+        "disjoint": true,
+        "matches_recorded_counts": true,
+        "status": "PASS"
+      },
+      "leakage_and_contamination": {
+        "target_leakage_detected": [],
+        "survey_design_leaked": [],
+        "v1_features_detected": [],
+        "status": "PASS"
+      },
+      "metric_consistency": {
+        "test_roc_auc_json": 0.8162,
+        "test_roc_auc_csv": 0.8162,
+        "test_pr_auc_json": 0.4793,
+        "test_pr_auc_csv": 0.4793,
+        "test_brier_json": 0.1203,
+        "test_brier_csv": 0.1203,
+        "test_sens_json": 0.6202,
+        "test_sens_csv": 0.6202,
+        "test_spec_json": 0.81,
+        "test_spec_csv": 0.81,
+        "test_f1_json": 0.4962,
+        "test_f1_csv": 0.4962,
+        "status": "PASS"
+      }
+    },
+    {
+      "pipeline": "hypertension_mode_a",
+      "target": "hypertension",
+      "mode": "mode_a",
+      "status": "PASS",
+      "artifacts": {
+        "model_joblib": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\hypertension_mode_a_calibrated.joblib",
+          "exists": true,
+          "size_bytes": 3437,
+          "status": "PASS"
+        },
+        "model_pkl": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\hypertension_mode_a_calibrated.pkl",
+          "exists": true,
+          "size_bytes": 2534,
+          "status": "PASS"
+        },
+        "calibration_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\calibration\\hypertension_mode_a_calibration_data.csv",
+          "exists": true,
+          "size_bytes": 2850,
+          "status": "PASS"
+        },
+        "threshold_sweep_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\thresholds\\hypertension_mode_a_threshold_sweep.csv",
+          "exists": true,
+          "size_bytes": 7430,
+          "status": "PASS"
+        }
+      },
+      "model_architecture": {
+        "wrapper_class": "CalibratedClassifierCV",
+        "calibration_method": "sigmoid",
+        "calibration_method_expected": "sigmoid",
+        "calibration_match": true,
+        "base_estimator_type": "Pipeline",
+        "final_classifier_name": "LogisticRegression",
+        "expected_model": "Logistic Regression",
+        "source_stage": "Stage 1E-2",
+        "status": "PASS"
+      },
+      "threshold": {
+        "locked_threshold": 0.41,
+        "expected_threshold": 0.41,
+        "comparison_csv_threshold": 0.41,
+        "match": true,
+        "status": "PASS"
+      },
+      "features": {
+        "count": 11,
+        "expected_count": 11,
+        "count_match": true,
+        "names_match_json": true,
+        "features_list": [
+          "age",
+          "gender",
+          "education_level",
+          "poverty_income_ratio",
+          "bmi",
+          "waist_circumference",
+          "mean_pulse",
+          "smoking_status",
+          "alcohol_frequency",
+          "physical_activity_level",
+          "sedentary_minutes"
+        ],
+        "status": "PASS"
+      },
+      "splits": {
+        "n_train": 5460,
+        "n_val": 1170,
+        "n_test": 1170,
+        "disjoint": true,
+        "matches_recorded_counts": true,
+        "status": "PASS"
+      },
+      "leakage_and_contamination": {
+        "target_leakage_detected": [],
+        "survey_design_leaked": [],
+        "v1_features_detected": [],
+        "status": "PASS"
+      },
+      "metric_consistency": {
+        "test_roc_auc_json": 0.7662,
+        "test_roc_auc_csv": 0.7662,
+        "test_pr_auc_json": 0.6541,
+        "test_pr_auc_csv": 0.6541,
+        "test_brier_json": 0.1946,
+        "test_brier_csv": 0.1946,
+        "test_sens_json": 0.7615,
+        "test_sens_csv": 0.7615,
+        "test_spec_json": 0.6647,
+        "test_spec_csv": 0.6647,
+        "test_f1_json": 0.6884,
+        "test_f1_csv": 0.6884,
+        "status": "PASS"
+      }
+    },
+    {
+      "pipeline": "hypertension_mode_b",
+      "target": "hypertension",
+      "mode": "mode_b",
+      "status": "PASS",
+      "artifacts": {
+        "model_joblib": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\hypertension_mode_b_calibrated.joblib",
+          "exists": true,
+          "size_bytes": 12649364,
+          "status": "PASS"
+        },
+        "model_pkl": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\models\\hypertension_mode_b_calibrated.pkl",
+          "exists": true,
+          "size_bytes": 12579566,
+          "status": "PASS"
+        },
+        "calibration_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\calibration\\hypertension_mode_b_calibration_data.csv",
+          "exists": true,
+          "size_bytes": 2967,
+          "status": "PASS"
+        },
+        "threshold_sweep_csv": {
+          "path": "backend\\ml\\evaluation\\stage_1f\\thresholds\\hypertension_mode_b_threshold_sweep.csv",
+          "exists": true,
+          "size_bytes": 7450,
+          "status": "PASS"
+        }
+      },
+      "model_architecture": {
+        "wrapper_class": "CalibratedClassifierCV",
+        "calibration_method": "sigmoid",
+        "calibration_method_expected": "sigmoid",
+        "calibration_match": true,
+        "base_estimator_type": "Pipeline",
+        "final_classifier_name": "RandomForestClassifier",
+        "expected_model": "Optimized Random Forest",
+        "source_stage": "Stage 1E-3",
+        "status": "PASS"
+      },
+      "threshold": {
+        "locked_threshold": 0.52,
+        "expected_threshold": 0.52,
+        "comparison_csv_threshold": 0.52,
+        "match": true,
+        "status": "PASS"
+      },
+      "features": {
+        "count": 27,
+        "expected_count": 27,
+        "count_match": true,
+        "names_match_json": true,
+        "features_list": [
+          "age",
+          "gender",
+          "education_level",
+          "poverty_income_ratio",
+          "bmi",
+          "waist_circumference",
+          "mean_pulse",
+          "smoking_status",
+          "alcohol_frequency",
+          "physical_activity_level",
+          "sedentary_minutes",
+          "hba1c",
+          "fasting_glucose",
+          "total_cholesterol",
+          "hdl_cholesterol",
+          "triglycerides",
+          "ldl_cholesterol",
+          "serum_creatinine",
+          "blood_urea_nitrogen",
+          "serum_uric_acid",
+          "alt_enzyme",
+          "ast_enzyme",
+          "hemoglobin",
+          "wbc_count",
+          "platelet_count",
+          "rdw",
+          "serum_albumin"
+        ],
+        "status": "PASS"
+      },
+      "splits": {
+        "n_train": 5460,
+        "n_val": 1170,
+        "n_test": 1170,
+        "disjoint": true,
+        "matches_recorded_counts": true,
+        "status": "PASS"
+      },
+      "leakage_and_contamination": {
+        "target_leakage_detected": [],
+        "survey_design_leaked": [],
+        "v1_features_detected": [],
+        "status": "PASS"
+      },
+      "metric_consistency": {
+        "test_roc_auc_json": 0.7731,
+        "test_roc_auc_csv": 0.7731,
+        "test_pr_auc_json": 0.6898,
+        "test_pr_auc_csv": 0.6898,
+        "test_brier_json": 0.1916,
+        "test_brier_csv": 0.1916,
+        "test_sens_json": 0.6253,
+        "test_sens_csv": 0.6253,
+        "test_spec_json": 0.7511,
+        "test_spec_csv": 0.7511,
+        "test_f1_json": 0.638,
+        "test_f1_csv": 0.638,
+        "status": "PASS"
+      }
+    }
+  ]
+}

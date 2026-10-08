@@ -1,0 +1,482 @@
+[
+  {
+    "target": "CVD",
+    "mode": "A",
+    "feature": "age",
+    "mean_abs_shap": 0.06419314409532809,
+    "rank": 1,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "A",
+    "feature": "smoking_status",
+    "mean_abs_shap": 0.018282195306560004,
+    "rank": 2,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "A",
+    "feature": "physical_activity_level",
+    "mean_abs_shap": 0.014613312311573767,
+    "rank": 3,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "A",
+    "feature": "waist_circumference",
+    "mean_abs_shap": 0.013572886679158132,
+    "rank": 4,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "A",
+    "feature": "education_level",
+    "mean_abs_shap": 0.010528124301322335,
+    "rank": 5,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "A",
+    "feature": "mean_sbp",
+    "mean_abs_shap": 0.00937212811051132,
+    "rank": 6,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "A",
+    "feature": "poverty_income_ratio",
+    "mean_abs_shap": 0.008771194458833464,
+    "rank": 7,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "A",
+    "feature": "mean_dbp",
+    "mean_abs_shap": 0.008348889244893036,
+    "rank": 8,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "A",
+    "feature": "gender",
+    "mean_abs_shap": 0.007690402066684618,
+    "rank": 9,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "A",
+    "feature": "sedentary_minutes",
+    "mean_abs_shap": 0.005283666856752718,
+    "rank": 10,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "B",
+    "feature": "age",
+    "mean_abs_shap": 0.07435933452204208,
+    "rank": 1,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "B",
+    "feature": "total_cholesterol",
+    "mean_abs_shap": 0.02463986787407564,
+    "rank": 2,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "B",
+    "feature": "hba1c",
+    "mean_abs_shap": 0.00946508935604144,
+    "rank": 3,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "B",
+    "feature": "physical_activity_level",
+    "mean_abs_shap": 0.008576869389169454,
+    "rank": 4,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "B",
+    "feature": "smoking_status",
+    "mean_abs_shap": 0.007732041135886418,
+    "rank": 5,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "B",
+    "feature": "serum_creatinine",
+    "mean_abs_shap": 0.007647802763822579,
+    "rank": 6,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "B",
+    "feature": "rdw",
+    "mean_abs_shap": 0.006773793199336033,
+    "rank": 7,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "B",
+    "feature": "poverty_income_ratio",
+    "mean_abs_shap": 0.006769770531511584,
+    "rank": 8,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "B",
+    "feature": "waist_circumference",
+    "mean_abs_shap": 0.004302087037814412,
+    "rank": 9,
+    "n_test": 1172
+  },
+  {
+    "target": "CVD",
+    "mode": "B",
+    "feature": "education_level",
+    "mean_abs_shap": 0.004292507053088778,
+    "rank": 10,
+    "n_test": 1172
+  },
+  {
+    "target": "Diabetes",
+    "mode": "A",
+    "feature": "age",
+    "mean_abs_shap": 0.773966211318229,
+    "rank": 1,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "A",
+    "feature": "waist_circumference",
+    "mean_abs_shap": 0.3694381628160317,
+    "rank": 2,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "A",
+    "feature": "mean_dbp",
+    "mean_abs_shap": 0.2958667652621149,
+    "rank": 3,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "A",
+    "feature": "mean_pulse",
+    "mean_abs_shap": 0.2759907755950494,
+    "rank": 4,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "A",
+    "feature": "bmi",
+    "mean_abs_shap": 0.24743483088204285,
+    "rank": 5,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "A",
+    "feature": "mean_sbp",
+    "mean_abs_shap": 0.22679448475863062,
+    "rank": 6,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "A",
+    "feature": "poverty_income_ratio",
+    "mean_abs_shap": 0.1500359633266777,
+    "rank": 7,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "A",
+    "feature": "education_level",
+    "mean_abs_shap": 0.14816677898713956,
+    "rank": 8,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "A",
+    "feature": "physical_activity_level",
+    "mean_abs_shap": 0.0939083818199597,
+    "rank": 9,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "A",
+    "feature": "sedentary_minutes",
+    "mean_abs_shap": 0.08378233438833621,
+    "rank": 10,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "B",
+    "feature": "age",
+    "mean_abs_shap": 0.6330646276473999,
+    "rank": 1,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "B",
+    "feature": "waist_circumference",
+    "mean_abs_shap": 0.2420758605003357,
+    "rank": 2,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "B",
+    "feature": "total_cholesterol",
+    "mean_abs_shap": 0.18920370936393738,
+    "rank": 3,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "B",
+    "feature": "bmi",
+    "mean_abs_shap": 0.18432675302028656,
+    "rank": 4,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "B",
+    "feature": "mean_pulse",
+    "mean_abs_shap": 0.16580766439437866,
+    "rank": 5,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "B",
+    "feature": "hdl_cholesterol",
+    "mean_abs_shap": 0.13979800045490265,
+    "rank": 6,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "B",
+    "feature": "mean_dbp",
+    "mean_abs_shap": 0.13812658190727234,
+    "rank": 7,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "B",
+    "feature": "triglycerides",
+    "mean_abs_shap": 0.12010836601257324,
+    "rank": 8,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "B",
+    "feature": "mean_sbp",
+    "mean_abs_shap": 0.11143852025270462,
+    "rank": 9,
+    "n_test": 1171
+  },
+  {
+    "target": "Diabetes",
+    "mode": "B",
+    "feature": "poverty_income_ratio",
+    "mean_abs_shap": 0.09923451393842697,
+    "rank": 10,
+    "n_test": 1171
+  },
+  {
+    "target": "Hypertension",
+    "mode": "A",
+    "feature": "age",
+    "mean_abs_shap": 0.9661336029446297,
+    "rank": 1,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "A",
+    "feature": "bmi",
+    "mean_abs_shap": 0.20564587061738587,
+    "rank": 2,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "A",
+    "feature": "mean_pulse",
+    "mean_abs_shap": 0.09274446914109032,
+    "rank": 3,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "A",
+    "feature": "sedentary_minutes",
+    "mean_abs_shap": 0.08969337517143966,
+    "rank": 4,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "A",
+    "feature": "waist_circumference",
+    "mean_abs_shap": 0.08915982920928718,
+    "rank": 5,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "A",
+    "feature": "poverty_income_ratio",
+    "mean_abs_shap": 0.08820556314072636,
+    "rank": 6,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "A",
+    "feature": "education_level",
+    "mean_abs_shap": 0.07497496369012786,
+    "rank": 7,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "A",
+    "feature": "gender",
+    "mean_abs_shap": 0.05034742433626826,
+    "rank": 8,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "A",
+    "feature": "smoking_status",
+    "mean_abs_shap": 0.044125324201532416,
+    "rank": 9,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "A",
+    "feature": "physical_activity_level",
+    "mean_abs_shap": 0.03706544143595293,
+    "rank": 10,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "B",
+    "feature": "age",
+    "mean_abs_shap": 0.17117114344937082,
+    "rank": 1,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "B",
+    "feature": "hba1c",
+    "mean_abs_shap": 0.0402011071982795,
+    "rank": 2,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "B",
+    "feature": "waist_circumference",
+    "mean_abs_shap": 0.02707874992948962,
+    "rank": 3,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "B",
+    "feature": "bmi",
+    "mean_abs_shap": 0.023936468585646554,
+    "rank": 4,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "B",
+    "feature": "serum_uric_acid",
+    "mean_abs_shap": 0.009621741819063018,
+    "rank": 5,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "B",
+    "feature": "poverty_income_ratio",
+    "mean_abs_shap": 0.009422718305321714,
+    "rank": 6,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "B",
+    "feature": "mean_pulse",
+    "mean_abs_shap": 0.009238881808280652,
+    "rank": 7,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "B",
+    "feature": "fasting_glucose",
+    "mean_abs_shap": 0.007709807988034183,
+    "rank": 8,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "B",
+    "feature": "sedentary_minutes",
+    "mean_abs_shap": 0.0074258111770638645,
+    "rank": 9,
+    "n_test": 1170
+  },
+  {
+    "target": "Hypertension",
+    "mode": "B",
+    "feature": "ldl_cholesterol",
+    "mean_abs_shap": 0.007121102281838755,
+    "rank": 10,
+    "n_test": 1170
+  }
+]
