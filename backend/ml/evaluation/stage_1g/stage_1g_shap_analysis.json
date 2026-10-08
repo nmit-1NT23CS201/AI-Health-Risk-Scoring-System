@@ -1,0 +1,563 @@
+{
+  "metadata": {
+    "stage": "1G-3",
+    "stage_title": "V2 SHAP Interpretability Validation & Research Figures",
+    "project": "AI Health Risk Scoring System",
+    "execution_timestamp": "2026-10-08T10:40:00Z",
+    "evaluation_partition": "NHANES 2021-2023 15% Held-Out Test Set (Participant-Level)",
+    "overall_status": "PASS",
+    "v1_contamination_detected": false
+  },
+  "existing_figures_audit": {
+    "shap_summary_plot_png": {
+      "initial_status": "Unavailable / Missing prior to audit",
+      "resolution": "Generated genuine V2 directional beeswarm summary plot on 300 held-out test participants (Diabetes Mode B XGBoost, log-odds margin space)",
+      "artifact_path": "shap_summary_plot.png",
+      "stage_1g_figure_path": "backend/ml/evaluation/stage_1g/figures/shap_summary_plot.png",
+      "validation": "PASS"
+    },
+    "shap_waterfall_plot_png": {
+      "initial_status": "Unavailable / Missing prior to audit",
+      "resolution": "Generated genuine V2 individual waterfall explanation for test participant SEQN 130670 (Diabetes Mode B XGBoost, log-odds margin space)",
+      "artifact_path": "shap_waterfall_plot.png",
+      "stage_1g_figure_path": "backend/ml/evaluation/stage_1g/figures/shap_waterfall_plot.png",
+      "validation": "PASS"
+    },
+    "fig3_global_shap_feature_importance": {
+      "initial_status": "Available in root, synced to Stage 1G figures",
+      "formats": [
+        "png",
+        "pdf",
+        "svg"
+      ],
+      "resolution": "Six-panel publication-grade figure displaying exact top-10 mean(|SHAP value|) for all six locked pipelines",
+      "artifact_path": "fig3_global_shap_feature_importance.png",
+      "stage_1g_figure_path": "backend/ml/evaluation/stage_1g/figures/fig3_global_shap_feature_importance.png",
+      "validation": "PASS"
+    }
+  },
+  "pipeline_shap_evaluations": {
+    "cvd_mode_a": {
+      "disease": "Cardiovascular Disease",
+      "mode": "Mode A (Non-Invasive)",
+      "model_artifact": "backend/ml/evaluation/stage_1f/models/cvd_mode_a_calibrated.joblib",
+      "calibration_wrapper": "sklearn.calibration.CalibratedClassifierCV (method='sigmoid', cv='prefit')",
+      "inner_unwrapped_class": "sklearn.pipeline.Pipeline",
+      "estimator_class": "sklearn.ensemble.RandomForestClassifier",
+      "preprocessing_pipeline": "Pipeline(steps=[('imputer', SimpleImputer(strategy='median'))])",
+      "explainer_type": "shap.TreeExplainer",
+      "explanation_output": "Positive class vote proportion / uncalibrated margin (raw base estimator output)",
+      "calibrated_mapping": "Monotonic Sigmoid / Platt scaling: P = 1 / (1 + exp(A * f(x) + B))",
+      "feature_space": "Original tabular features (1-to-1 mapping preserved through SimpleImputer; 0 one-hot encoding)",
+      "sample_count": 1172,
+      "background_sample_count": null,
+      "random_seed": 42,
+      "locked_decision_threshold": 0.13,
+      "top_features": [
+        {
+          "rank": 1,
+          "feature": "age",
+          "mean_abs_shap": 0.06419314409532809
+        },
+        {
+          "rank": 2,
+          "feature": "smoking_status",
+          "mean_abs_shap": 0.018282195306560004
+        },
+        {
+          "rank": 3,
+          "feature": "physical_activity_level",
+          "mean_abs_shap": 0.014613312311573767
+        },
+        {
+          "rank": 4,
+          "feature": "waist_circumference",
+          "mean_abs_shap": 0.013572886679158132
+        },
+        {
+          "rank": 5,
+          "feature": "education_level",
+          "mean_abs_shap": 0.010528124301322335
+        },
+        {
+          "rank": 6,
+          "feature": "mean_sbp",
+          "mean_abs_shap": 0.00937212811051132
+        },
+        {
+          "rank": 7,
+          "feature": "poverty_income_ratio",
+          "mean_abs_shap": 0.008771194458833464
+        },
+        {
+          "rank": 8,
+          "feature": "mean_dbp",
+          "mean_abs_shap": 0.008348889244893036
+        },
+        {
+          "rank": 9,
+          "feature": "gender",
+          "mean_abs_shap": 0.007690402066684618
+        },
+        {
+          "rank": 10,
+          "feature": "sedentary_minutes",
+          "mean_abs_shap": 0.005283666856752718
+        }
+      ],
+      "validation_status": "PASS",
+      "feature_count": 13
+    },
+    "cvd_mode_b": {
+      "disease": "Cardiovascular Disease",
+      "mode": "Mode B (Biomarker-Enhanced)",
+      "model_artifact": "backend/ml/evaluation/stage_1f/models/cvd_mode_b_calibrated.joblib",
+      "calibration_wrapper": "sklearn.calibration.CalibratedClassifierCV (method='sigmoid', cv='prefit')",
+      "inner_unwrapped_class": "sklearn.pipeline.Pipeline",
+      "estimator_class": "sklearn.ensemble.RandomForestClassifier",
+      "preprocessing_pipeline": "Pipeline(steps=[('imputer', SimpleImputer(strategy='median'))])",
+      "explainer_type": "shap.TreeExplainer",
+      "explanation_output": "Positive class vote proportion / uncalibrated margin (raw base estimator output)",
+      "calibrated_mapping": "Monotonic Sigmoid / Platt scaling: P = 1 / (1 + exp(A * f(x) + B))",
+      "feature_space": "Original tabular features (1-to-1 mapping preserved through SimpleImputer; 0 one-hot encoding)",
+      "sample_count": 1172,
+      "background_sample_count": null,
+      "random_seed": 42,
+      "locked_decision_threshold": 0.15,
+      "top_features": [
+        {
+          "rank": 1,
+          "feature": "age",
+          "mean_abs_shap": 0.07435933452204208
+        },
+        {
+          "rank": 2,
+          "feature": "total_cholesterol",
+          "mean_abs_shap": 0.02463986787407564
+        },
+        {
+          "rank": 3,
+          "feature": "hba1c",
+          "mean_abs_shap": 0.00946508935604144
+        },
+        {
+          "rank": 4,
+          "feature": "physical_activity_level",
+          "mean_abs_shap": 0.008576869389169454
+        },
+        {
+          "rank": 5,
+          "feature": "smoking_status",
+          "mean_abs_shap": 0.007732041135886418
+        },
+        {
+          "rank": 6,
+          "feature": "serum_creatinine",
+          "mean_abs_shap": 0.007647802763822579
+        },
+        {
+          "rank": 7,
+          "feature": "rdw",
+          "mean_abs_shap": 0.006773793199336033
+        },
+        {
+          "rank": 8,
+          "feature": "poverty_income_ratio",
+          "mean_abs_shap": 0.006769770531511584
+        },
+        {
+          "rank": 9,
+          "feature": "waist_circumference",
+          "mean_abs_shap": 0.004302087037814412
+        },
+        {
+          "rank": 10,
+          "feature": "education_level",
+          "mean_abs_shap": 0.004292507053088778
+        }
+      ],
+      "validation_status": "PASS",
+      "feature_count": 29
+    },
+    "diabetes_mode_a": {
+      "disease": "Diabetes",
+      "mode": "Mode A (Non-Invasive)",
+      "model_artifact": "backend/ml/evaluation/stage_1f/models/diabetes_mode_a_calibrated.joblib",
+      "calibration_wrapper": "sklearn.calibration.CalibratedClassifierCV (method='sigmoid', cv='prefit')",
+      "inner_unwrapped_class": "sklearn.ensemble.HistGradientBoostingClassifier",
+      "estimator_class": "sklearn.ensemble.HistGradientBoostingClassifier",
+      "preprocessing_pipeline": "Native missing-value routing inside tree split nodes (no separate preprocessor step)",
+      "explainer_type": "shap.TreeExplainer",
+      "explanation_output": "Raw log-odds margin f(x) (uncalibrated decision space)",
+      "calibrated_mapping": "Monotonic Sigmoid / Platt scaling: P = 1 / (1 + exp(A * f(x) + B))",
+      "feature_space": "Original tabular features (1-to-1 direct mapping; 0 one-hot encoding)",
+      "sample_count": 1171,
+      "background_sample_count": null,
+      "random_seed": 42,
+      "locked_decision_threshold": 0.15,
+      "top_features": [
+        {
+          "rank": 1,
+          "feature": "age",
+          "mean_abs_shap": 0.773966211318229
+        },
+        {
+          "rank": 2,
+          "feature": "waist_circumference",
+          "mean_abs_shap": 0.3694381628160317
+        },
+        {
+          "rank": 3,
+          "feature": "mean_dbp",
+          "mean_abs_shap": 0.2958667652621149
+        },
+        {
+          "rank": 4,
+          "feature": "mean_pulse",
+          "mean_abs_shap": 0.2759907755950494
+        },
+        {
+          "rank": 5,
+          "feature": "bmi",
+          "mean_abs_shap": 0.24743483088204285
+        },
+        {
+          "rank": 6,
+          "feature": "mean_sbp",
+          "mean_abs_shap": 0.22679448475863062
+        },
+        {
+          "rank": 7,
+          "feature": "poverty_income_ratio",
+          "mean_abs_shap": 0.1500359633266777
+        },
+        {
+          "rank": 8,
+          "feature": "education_level",
+          "mean_abs_shap": 0.14816677898713956
+        },
+        {
+          "rank": 9,
+          "feature": "physical_activity_level",
+          "mean_abs_shap": 0.0939083818199597
+        },
+        {
+          "rank": 10,
+          "feature": "sedentary_minutes",
+          "mean_abs_shap": 0.08378233438833621
+        }
+      ],
+      "validation_status": "PASS",
+      "feature_count": 13
+    },
+    "diabetes_mode_b": {
+      "disease": "Diabetes",
+      "mode": "Mode B (Biomarker-Enhanced)",
+      "model_artifact": "backend/ml/evaluation/stage_1f/models/diabetes_mode_b_calibrated.joblib",
+      "calibration_wrapper": "sklearn.calibration.CalibratedClassifierCV (method='sigmoid', cv='prefit')",
+      "inner_unwrapped_class": "xgboost.sklearn.XGBClassifier",
+      "estimator_class": "xgboost.sklearn.XGBClassifier",
+      "preprocessing_pipeline": "Native missing-value routing inside tree split nodes (no separate preprocessor step)",
+      "explainer_type": "shap.TreeExplainer",
+      "explanation_output": "Raw log-odds margin f(x) (uncalibrated decision space)",
+      "calibrated_mapping": "Monotonic Sigmoid / Platt scaling: P = 1 / (1 + exp(A * f(x) + B))",
+      "feature_space": "Original tabular features (1-to-1 direct mapping; 0 one-hot encoding)",
+      "sample_count": 1171,
+      "background_sample_count": null,
+      "random_seed": 42,
+      "locked_decision_threshold": 0.17,
+      "top_features": [
+        {
+          "rank": 1,
+          "feature": "age",
+          "mean_abs_shap": 0.6330646276473999
+        },
+        {
+          "rank": 2,
+          "feature": "waist_circumference",
+          "mean_abs_shap": 0.2420758605003357
+        },
+        {
+          "rank": 3,
+          "feature": "total_cholesterol",
+          "mean_abs_shap": 0.18920370936393738
+        },
+        {
+          "rank": 4,
+          "feature": "bmi",
+          "mean_abs_shap": 0.18432675302028656
+        },
+        {
+          "rank": 5,
+          "feature": "mean_pulse",
+          "mean_abs_shap": 0.16580766439437866
+        },
+        {
+          "rank": 6,
+          "feature": "hdl_cholesterol",
+          "mean_abs_shap": 0.13979800045490265
+        },
+        {
+          "rank": 7,
+          "feature": "mean_dbp",
+          "mean_abs_shap": 0.13812658190727234
+        },
+        {
+          "rank": 8,
+          "feature": "triglycerides",
+          "mean_abs_shap": 0.12010836601257324
+        },
+        {
+          "rank": 9,
+          "feature": "mean_sbp",
+          "mean_abs_shap": 0.11143852025270462
+        },
+        {
+          "rank": 10,
+          "feature": "poverty_income_ratio",
+          "mean_abs_shap": 0.09923451393842697
+        }
+      ],
+      "validation_status": "PASS",
+      "feature_count": 27
+    },
+    "hypertension_mode_a": {
+      "disease": "Hypertension",
+      "mode": "Mode A (Non-Invasive)",
+      "model_artifact": "backend/ml/evaluation/stage_1f/models/hypertension_mode_a_calibrated.joblib",
+      "calibration_wrapper": "sklearn.calibration.CalibratedClassifierCV (method='sigmoid', cv='prefit')",
+      "inner_unwrapped_class": "sklearn.pipeline.Pipeline",
+      "estimator_class": "sklearn.linear_model.LogisticRegression",
+      "preprocessing_pipeline": "Pipeline(steps=[('imputer', SimpleImputer(strategy='median')), ('scaler', StandardScaler())])",
+      "explainer_type": "shap.LinearExplainer",
+      "explanation_output": "Decision function / log-odds space (uncalibrated linear margin)",
+      "calibrated_mapping": "Monotonic Sigmoid / Platt scaling: P = 1 / (1 + exp(A * f(x) + B))",
+      "feature_space": "Standardized continuous predictors (1-to-1 mapping preserved through imputer and scaler; 0 one-hot encoding)",
+      "sample_count": 1170,
+      "background_sample_count": 200,
+      "random_seed": 42,
+      "locked_decision_threshold": 0.41,
+      "top_features": [
+        {
+          "rank": 1,
+          "feature": "age",
+          "mean_abs_shap": 0.9661336029446297
+        },
+        {
+          "rank": 2,
+          "feature": "bmi",
+          "mean_abs_shap": 0.20564587061738587
+        },
+        {
+          "rank": 3,
+          "feature": "mean_pulse",
+          "mean_abs_shap": 0.09274446914109032
+        },
+        {
+          "rank": 4,
+          "feature": "sedentary_minutes",
+          "mean_abs_shap": 0.08969337517143966
+        },
+        {
+          "rank": 5,
+          "feature": "waist_circumference",
+          "mean_abs_shap": 0.08915982920928718
+        },
+        {
+          "rank": 6,
+          "feature": "poverty_income_ratio",
+          "mean_abs_shap": 0.08820556314072636
+        },
+        {
+          "rank": 7,
+          "feature": "education_level",
+          "mean_abs_shap": 0.07497496369012786
+        },
+        {
+          "rank": 8,
+          "feature": "gender",
+          "mean_abs_shap": 0.05034742433626826
+        },
+        {
+          "rank": 9,
+          "feature": "smoking_status",
+          "mean_abs_shap": 0.044125324201532416
+        },
+        {
+          "rank": 10,
+          "feature": "physical_activity_level",
+          "mean_abs_shap": 0.03706544143595293
+        }
+      ],
+      "validation_status": "PASS",
+      "feature_count": 11
+    },
+    "hypertension_mode_b": {
+      "disease": "Hypertension",
+      "mode": "Mode B (Biomarker-Enhanced)",
+      "model_artifact": "backend/ml/evaluation/stage_1f/models/hypertension_mode_b_calibrated.joblib",
+      "calibration_wrapper": "sklearn.calibration.CalibratedClassifierCV (method='sigmoid', cv='prefit')",
+      "inner_unwrapped_class": "sklearn.pipeline.Pipeline",
+      "estimator_class": "sklearn.ensemble.RandomForestClassifier",
+      "preprocessing_pipeline": "Pipeline(steps=[('imputer', SimpleImputer(strategy='median'))])",
+      "explainer_type": "shap.TreeExplainer",
+      "explanation_output": "Positive class vote proportion / uncalibrated margin (raw base estimator output)",
+      "calibrated_mapping": "Monotonic Sigmoid / Platt scaling: P = 1 / (1 + exp(A * f(x) + B))",
+      "feature_space": "Original tabular features (1-to-1 mapping preserved through SimpleImputer; 0 one-hot encoding)",
+      "sample_count": 1170,
+      "background_sample_count": null,
+      "random_seed": 42,
+      "locked_decision_threshold": 0.52,
+      "top_features": [
+        {
+          "rank": 1,
+          "feature": "age",
+          "mean_abs_shap": 0.17117114344937082
+        },
+        {
+          "rank": 2,
+          "feature": "hba1c",
+          "mean_abs_shap": 0.0402011071982795
+        },
+        {
+          "rank": 3,
+          "feature": "waist_circumference",
+          "mean_abs_shap": 0.02707874992948962
+        },
+        {
+          "rank": 4,
+          "feature": "bmi",
+          "mean_abs_shap": 0.023936468585646554
+        },
+        {
+          "rank": 5,
+          "feature": "serum_uric_acid",
+          "mean_abs_shap": 0.009621741819063018
+        },
+        {
+          "rank": 6,
+          "feature": "poverty_income_ratio",
+          "mean_abs_shap": 0.009422718305321714
+        },
+        {
+          "rank": 7,
+          "feature": "mean_pulse",
+          "mean_abs_shap": 0.009238881808280652
+        },
+        {
+          "rank": 8,
+          "feature": "fasting_glucose",
+          "mean_abs_shap": 0.007709807988034183
+        },
+        {
+          "rank": 9,
+          "feature": "sedentary_minutes",
+          "mean_abs_shap": 0.0074258111770638645
+        },
+        {
+          "rank": 10,
+          "feature": "ldl_cholesterol",
+          "mean_abs_shap": 0.007121102281838755
+        }
+      ],
+      "validation_status": "PASS",
+      "feature_count": 27
+    }
+  },
+  "individual_case_validation": {
+    "participant_id": "SEQN 130670",
+    "dataset": "nhanes_diabetes_mode_b.parquet",
+    "disease": "Diabetes",
+    "mode": "Mode B (Biomarker-Enhanced)",
+    "estimator_class": "xgboost.sklearn.XGBClassifier",
+    "explainer_type": "shap.TreeExplainer",
+    "base_value_E_f_x": -1.517690896987915,
+    "model_margin_f_x": 0.032671570777893066,
+    "calibrated_probability": 0.5388652980778448,
+    "locked_decision_threshold": 0.17,
+    "predicted_binary_class": 1,
+    "true_ground_truth_label": 1,
+    "case_classification": "True Positive (Moderate Elevated Risk)",
+    "explanation_target": "Log-odds margin space f(x) of base XGBoost estimator",
+    "primary_positive_contributors": [
+      {
+        "feature": "age",
+        "feature_value": 70.0,
+        "shap_contribution": 0.5521
+      },
+      {
+        "feature": "bmi",
+        "feature_value": 41.5,
+        "shap_contribution": 0.4097
+      },
+      {
+        "feature": "waist_circumference",
+        "feature_value": 115.7,
+        "shap_contribution": 0.3898
+      },
+      {
+        "feature": "total_cholesterol",
+        "feature_value": 162.0,
+        "shap_contribution": 0.2616
+      },
+      {
+        "feature": "hemoglobin",
+        "feature_value": 12.8,
+        "shap_contribution": 0.2426
+      },
+      {
+        "feature": "rdw",
+        "feature_value": 14.7,
+        "shap_contribution": 0.1361
+      },
+      {
+        "feature": "triglycerides",
+        "feature_value": 124.0,
+        "shap_contribution": 0.1037
+      },
+      {
+        "feature": "poverty_income_ratio",
+        "feature_value": 1.61,
+        "shap_contribution": 0.1003
+      }
+    ],
+    "primary_negative_contributors": [
+      {
+        "feature": "blood_urea_nitrogen",
+        "feature_value": 13.0,
+        "shap_contribution": -0.1113
+      },
+      {
+        "feature": "ast_enzyme",
+        "feature_value": 22.0,
+        "shap_contribution": -0.0799
+      }
+    ],
+    "validation_status": "PASS"
+  },
+  "research_figures": {
+    "global_six_panel": {
+      "filename": "fig3_global_shap_feature_importance.png",
+      "workspace_path": "fig3_global_shap_feature_importance.png",
+      "stage_1g_path": "backend/ml/evaluation/stage_1g/figures/fig3_global_shap_feature_importance.png",
+      "formats_available": [
+        "png",
+        "pdf",
+        "svg"
+      ],
+      "description": "Six-panel global feature importance showing mean absolute SHAP values for top-10 features per pipeline across all 6 models."
+    },
+    "individual_waterfall": {
+      "filename": "shap_waterfall_plot.png",
+      "workspace_path": "shap_waterfall_plot.png",
+      "stage_1g_path": "backend/ml/evaluation/stage_1g/figures/shap_waterfall_plot.png",
+      "description": "Individual waterfall plot decomposing prediction for SEQN 130670 from base value E[f(X)]=-1.52 to f(x)=+0.03, resulting in calibrated P=0.539."
+    },
+    "directional_beeswarm_summary": {
+      "filename": "shap_summary_plot.png",
+      "workspace_path": "shap_summary_plot.png",
+      "stage_1g_path": "backend/ml/evaluation/stage_1g/figures/shap_summary_plot.png",
+      "description": "Directional beeswarm summary plot across 300 test participants demonstrating feature value versus SHAP impact distributions."
+    }
+  }
+}
