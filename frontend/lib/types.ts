@@ -31,6 +31,7 @@ export interface PredictRequest {
   inputs: Inputs;
   include_explanation?: boolean;
   save_to_history?: boolean;
+  patient_name?: string | null;
 }
 
 export interface FeatureAttribution {
@@ -103,6 +104,7 @@ export interface HistoryResult {
 
 export interface HistorySubmission {
   submission_id: string;
+  patient_name: string | null;
   created_at: string;
   mode: Mode;
   results: HistoryResult[];
@@ -121,6 +123,7 @@ export interface HistoryDetailResult extends HistoryResult {
 
 export interface HistoryDetail {
   submission_id: string;
+  patient_name: string | null;
   created_at: string;
   mode: Mode;
   inputs: Inputs;

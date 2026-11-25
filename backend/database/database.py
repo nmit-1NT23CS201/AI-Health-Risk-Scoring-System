@@ -22,7 +22,7 @@ V2_SCHEMA_VERSION = 1
 _V2_COLUMNS = (
     "submission_id", "created_at", "disease", "mode", "config_key", "inputs_json",
     "model_input_json", "probability", "threshold", "predicted_positive", "imputed_json",
-    "model_version", "artifact_sha256", "schema_version",
+    "model_version", "artifact_sha256", "schema_version", "patient_name",
 )
 
 
@@ -47,9 +47,14 @@ def create_v2_tables():
             imputed_json TEXT,
             model_version TEXT NOT NULL,
             artifact_sha256 TEXT NOT NULL,
-            schema_version INTEGER NOT NULL DEFAULT 1
+            schema_version INTEGER NOT NULL DEFAULT 1,
+            patient_name TEXT
         )
         """)
+        # Idempotent upgrade for databases created before patient_name existed (no data is dropped).
+        existing = {row[1] for row in conn.execute("PRAGMA table_info(v2_assessments)")}
+        if "patient_name" not in existing:
+            conn.execute("ALTER TABLE v2_assessments ADD COLUMN patient_name TEXT")
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_v2_assessments_submission ON v2_assessments(submission_id)"
         )
@@ -72,7 +77,7 @@ def save_v2_submission(rows):
         conn.executemany(
             "INSERT INTO v2_assessments (%s) VALUES (%s)"
             % (", ".join(_V2_COLUMNS), ", ".join("?" for _ in _V2_COLUMNS)),
-            [tuple(row[c] for c in _V2_COLUMNS) for row in rows],
+            [tuple(row.get(c) if c == "patient_name" else row[c] for c in _V2_COLUMNS) for row in rows],
         )
         conn.commit()
         return len(rows)

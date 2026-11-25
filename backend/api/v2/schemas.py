@@ -98,6 +98,16 @@ class _PredictBase(_Strict):
     include_explanation: bool = True
     # Accepted now so clients do not change when Phase 2C lands; currently a no-op.
     save_to_history: bool = True
+    # Optional label stored with the history entry only; never used by the models.
+    patient_name: str | None = Field(default=None, max_length=120)
+
+    @field_validator("patient_name", mode="before")
+    @classmethod
+    def _clean_name(cls, v):
+        if isinstance(v, str):
+            v = v.strip()
+            return v or None
+        return v
 
     @field_validator("diseases")
     @classmethod
@@ -190,6 +200,7 @@ class HistoryResult(BaseModel):
 
 class HistorySubmission(BaseModel):
     submission_id: str
+    patient_name: str | None = None
     created_at: str
     mode: Mode
     results: list[HistoryResult]
@@ -208,6 +219,7 @@ class HistoryDetailResult(HistoryResult):
 
 class HistoryDetail(BaseModel):
     submission_id: str
+    patient_name: str | None = None
     created_at: str
     mode: Mode
     inputs: dict

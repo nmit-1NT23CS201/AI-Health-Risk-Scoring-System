@@ -19,7 +19,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "Preventive Risk Assessment",
+  title: "Health Risk Assessment",
   description:
     "Research prototype for preventive screening support: independent estimates for cardiovascular disease, diabetes and hypertension.",
 };

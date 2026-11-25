@@ -15,6 +15,11 @@ const DISEASE_TITLE: Record<string, { title: string; sub: string }> = {
   hypertension: { title: "Hypertension", sub: "High blood pressure" },
 };
 
+/** Strip survey / guideline codes such as "(NHANES MCQ160B-F)" or "(JNC7-style, NHANES)" for display. */
+function plainDefinition(text: string): string {
+  return text.replace(/\s*\([^)]*(NHANES|JNC7)[^)]*\)/g, "").replace(/\s+\./g, ".");
+}
+
 export const cardVariants: Variants = {
   hidden: { opacity: 0, y: 22 },
   show: { opacity: 1, y: 0, transition: SPRING },
@@ -76,7 +81,8 @@ export default function DiseaseResultCard({
   const tone = positive ? "positive" : "negative";
   const meta = DISEASE_TITLE[result.disease] ?? { title: result.disease, sub: "" };
   const nameOf = (n: string) => labels[n] ?? n;
-  const noteCount = result.ignored_inputs.length + result.warnings.length;
+  const noteCount =
+    result.warnings.length + (result.ignored_inputs.length > 0 ? 1 : 0) + (result.imputed_features.length > 0 ? 1 : 0);
   const expl = result.explanation;
 
   return (
@@ -113,7 +119,7 @@ export default function DiseaseResultCard({
       <div className="target-def">
         <Info size={15} />
         <span>
-          <strong>What this estimates:</strong> {result.target_definition}
+          <strong>What this estimates:</strong> {plainDefinition(result.target_definition)}
         </span>
       </div>
 
@@ -125,108 +131,71 @@ export default function DiseaseResultCard({
           <>
             <ShapDivergingChart explanation={expl} submitted={submitted} units={units} />
             <Disclosure icon={<Info size={15} />} title="How to read this chart">
-              <div className="note-block">
-                <p>
-                  Bar length shows relative influence within this chart only. It is not a change in the estimated
-                  probability and does not show cause and effect.
-                </p>
-              </div>
-              <div className="note-block">
-                <h4>Technical</h4>
-                <dl className="meta-grid">
-                  <dt>Output space</dt>
-                  <dd className="mono">{expl.output_space}</dd>
-                  <dt>Method</dt>
-                  <dd className="mono">
-                    {expl.method} on {expl.explained_estimator}
-                  </dd>
-                  <dt>Reference</dt>
-                  <dd>{expl.reference_population}</dd>
-                </dl>
-              </div>
-              <div className="note-block">
-                <p>{expl.notice}</p>
-              </div>
+              <p>
+                Bar length shows relative influence within this chart only. It is not a percentage-point change in the
+                estimated probability and does not show cause and effect.
+              </p>
             </Disclosure>
           </>
         ) : (
           <div className="banner banner-info" style={{ marginTop: 10 }}>
             <Info size={16} />
-            <span>
-              Contributing factors are unavailable for this model
-              {result.explanation_unavailable_reason ? `: ${result.explanation_unavailable_reason}` : "."}
-            </span>
+            <span>Contributing factors are not available for this estimate.</span>
           </div>
         )}
       </div>
 
-      <Disclosure
-        icon={<ClipboardList size={15} />}
-        title="Model Notes"
-        badge={noteCount > 0 ? <span className="count-badge">{noteCount}</span> : undefined}
-      >
-        {result.warnings.length > 0 && (
-          <div className="note-block">
-            <h4>Warnings</h4>
-            <div className="tag-list">
-              {result.warnings.map((w) => (
-                <span className="tag warn" key={w}>
-                  {w}
-                </span>
-              ))}
+      {noteCount > 0 && (
+        <Disclosure
+          icon={<ClipboardList size={15} />}
+          title="Model Notes"
+          badge={<span className="count-badge">{noteCount}</span>}
+        >
+          {result.warnings.length > 0 && (
+            <div className="note-block">
+              <h4>Warnings</h4>
+              <div className="tag-list">
+                {result.warnings.map((w) => (
+                  <span className="tag warn" key={w}>
+                    {w}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-        {result.ignored_inputs.length > 0 && (
-          <div className="note-block">
-            <h4>Provided but not used by this model</h4>
-            <div className="tag-list">
-              {result.ignored_inputs.map((n) => (
-                <span className="tag" key={n}>
-                  {nameOf(n)}
-                </span>
-              ))}
-            </div>
-            <p style={{ marginTop: 6 }}>
-              Some measurements help define the condition being estimated, so the model deliberately excludes them.
-            </p>
-          </div>
-        )}
-        <div className="note-block">
-          <h4>
-            Not provided ({result.imputed_features.length}) — handled by the model&apos;s missing-value rules
-          </h4>
-          {result.imputed_features.length > 0 ? (
-            <div className="tag-list">
-              {result.imputed_features.map((n) => (
-                <span className="tag" key={n}>
-                  {nameOf(n)}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <p>All inputs used by this model were provided.</p>
           )}
-        </div>
-        <div className="note-block">
-          <h4>Model</h4>
-          <dl className="meta-grid">
-            <dt>Algorithm</dt>
-            <dd>{result.model_name}</dd>
-            <dt>Version</dt>
-            <dd className="mono">{result.model_version}</dd>
-            <dt>Artifact</dt>
-            <dd className="mono">{result.artifact_sha256.slice(0, 16)}…</dd>
-            <dt>Locked threshold</dt>
-            <dd className="mono">{result.threshold.toFixed(2)}</dd>
-          </dl>
-          <p style={{ marginTop: 8 }}>{result.probability_note}</p>
-        </div>
-      </Disclosure>
+          {result.ignored_inputs.length > 0 && (
+            <div className="note-block">
+              <h4>Provided but not used for this condition</h4>
+              <div className="tag-list">
+                {result.ignored_inputs.map((n) => (
+                  <span className="tag" key={n}>
+                    {nameOf(n)}
+                  </span>
+                ))}
+              </div>
+              <p style={{ marginTop: 6 }}>
+                Some measurements help define the condition itself, so they are deliberately left out of its estimate.
+              </p>
+            </div>
+          )}
+          {result.imputed_features.length > 0 && (
+            <div className="note-block">
+              <h4>Missing fields ({result.imputed_features.length})</h4>
+              <div className="tag-list">
+                {result.imputed_features.map((n) => (
+                  <span className="tag" key={n}>
+                    {nameOf(n)}
+                  </span>
+                ))}
+              </div>
+              <p style={{ marginTop: 6 }}>These were left blank, so the estimate relies on the information provided.</p>
+            </div>
+          )}
+        </Disclosure>
+      )}
     </motion.article>
   );
 }
-
 export function DisclaimerNote({ text }: { text: string }) {
   return (
     <div className="disclaimer">

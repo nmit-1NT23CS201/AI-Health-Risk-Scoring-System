@@ -78,6 +78,7 @@ export default function Home() {
   const [featuresError, setFeaturesError] = useState<string | null>(null);
   const [values, setValues] = useState<FormValues>({});
   const [saveToHistory, setSaveToHistory] = useState(true);
+  const [patientName, setPatientName] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
   const [serverErrors, setServerErrors] = useState<string[]>([]);
@@ -123,7 +124,14 @@ export default function Home() {
     setError(null);
     setServerErrors([]);
     try {
-      const response = await predict({ mode, inputs, include_explanation: true, save_to_history: saveToHistory });
+      const name = patientName.trim();
+      const response = await predict({
+        mode,
+        inputs,
+        include_explanation: true,
+        save_to_history: saveToHistory,
+        patient_name: saveToHistory && name ? name : undefined,
+      });
       setResult({ response, submitted: inputs });
       requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
     } catch (e) {
@@ -186,6 +194,8 @@ export default function Home() {
                 profiles={PROFILES[mode]}
                 saveToHistory={saveToHistory}
                 onSaveToHistoryChange={setSaveToHistory}
+                patientName={patientName}
+                onPatientNameChange={setPatientName}
                 submitting={submitting}
                 onSubmit={handleSubmit}
                 serverErrors={serverErrors}

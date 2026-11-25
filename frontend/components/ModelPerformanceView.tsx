@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { AlertCircle, BarChart3, RotateCcw, Scale } from "lucide-react";
+import { AlertCircle, BarChart3, RotateCcw } from "lucide-react";
 import { getModelMetrics } from "@/lib/api";
 import { SPRING } from "@/lib/motion";
 import type { Disease, ModelConfigMetrics, ModelMetricsResponse } from "@/lib/types";
@@ -98,13 +98,9 @@ function DiseasePanel({
               <th scope="col" />
               <th scope="col">
                 <span className="mode-badge">Mode A</span>
-                <small>{a.model_name}</small>
-                <small className="mono">n={a.n_test.toLocaleString()}</small>
               </th>
               <th scope="col">
                 <span className="mode-badge">Mode B</span>
-                <small>{b.model_name}</small>
-                <small className="mono">n={b.n_test.toLocaleString()}</small>
               </th>
               <th scope="col" className="dcol">
                 B − A
@@ -200,8 +196,8 @@ export default function ModelPerformanceView() {
         <div className="eyebrow">Model performance</div>
         <h1>How the models were evaluated</h1>
         <p>
-          Held-out test results for each condition in both modes. Each condition has its own model; nothing here is
-          combined into a single score.
+          How each condition performs in Basic (Mode A) and Extended + Labs (Mode B). Each condition is assessed on its
+          own; nothing here is combined into a single score.
         </p>
       </div>
 
@@ -234,44 +230,28 @@ export default function ModelPerformanceView() {
 
       {data && pairs && summary && (
         <div className="stack">
-          <section className="glass callout" aria-label="Methodology and limitations">
-            <div className="callout-head">
-              <Scale size={18} />
-              <h2>Read these results with these limits in mind</h2>
-            </div>
-            <ul className="callout-list">
-              {data.caveats.map((c) => (
-                <li key={c}>{c}</li>
-              ))}
-              <li>
-                These are research results for a prototype, not clinical validation. The screening thresholds were
-                fixed in advance on separate validation data.
-              </li>
-            </ul>
-          </section>
-
           <section className="glass callout tradeoff" aria-label="Mode A versus Mode B">
             <div className="callout-head">
               <BarChart3 size={18} />
               <h2>Mode A vs Mode B: a trade-off, not an upgrade</h2>
             </div>
             <p>
-              Adding laboratory results (Mode B) raised ROC-AUC in {summary.bAuc} of {summary.total} conditions and
-              PR-AUC in {summary.bPr} of {summary.total}. At the locked screening thresholds, however, Mode A had the
-              higher sensitivity in {summary.aSens} of {summary.total} conditions and the higher balanced accuracy in{" "}
-              {summary.aBacc} of {summary.total}. The two modes operate at different thresholds, so better ranking does
-              not automatically mean more people with the condition are flagged. Which mode suits a given situation
-              depends on whether catching more cases or limiting false alarms matters more.
+              Adding laboratory results (Mode B) improved how well the models rank people by risk in {summary.bAuc} of{" "}
+              {summary.total} conditions. At the screening thresholds, however, Mode A flagged more people who have the
+              condition in {summary.aSens} of {summary.total}. Better ranking does not automatically mean more cases are
+              caught, so the right mode depends on whether catching more cases or limiting false alarms matters more.
+            </p>
+            <p style={{ marginTop: 10 }}>
+              These are offline evaluation results for a research prototype, not clinical validation.
             </p>
           </section>
-
           {pairs.map((p) => (
             <DiseasePanel key={p.meta.id} meta={p.meta} a={p.a} b={p.b} />
           ))}
 
           <p className="disclaimer-line">
-            Teal and amber in the “B − A” column show whether Mode B is better or worse than Mode A on that metric
-            (for Brier score and ECE, lower is better). Evaluation: {data.evaluation.replace(/_/g, " ")}.
+            Teal and amber in the “B − A” column show whether Mode B is better or worse than Mode A on that metric (for
+            Brier score and calibration error, lower is better).
           </p>
         </div>
       )}

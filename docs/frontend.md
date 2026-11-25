@@ -28,7 +28,7 @@ The backend must be running (`uvicorn backend.api.main:app`) and CORS only allow
 ```
 frontend/
 ├── app/
-│   ├── layout.tsx        # fonts, metadata ("Preventive Risk Assessment")
+│   ├── layout.tsx        # fonts, metadata ("Health Risk Assessment")
 │   ├── page.tsx          # single route "/": tab state, assessment orchestration, sample profiles
 │   └── globals.css       # design tokens, glass utilities, all component styles
 ├── components/
@@ -72,18 +72,20 @@ There is one route (`/`); the three tabs are client-side views, not URLs.
 - **Mode A / Mode B** toggle (spring-animated pill). The form is rendered entirely from `GET /v2/features/{mode}`: labels, units, bounds, enum options and required markers come from the backend, so no field list or encoding table is duplicated in TypeScript. Fields are only *grouped* for layout (profile, vitals, lifestyle); any field not in a known group falls into the collapsible **Laboratory biomarkers** section (animated expand/collapse; opens automatically when a sample fills it).
 - Required: `age`, `gender`, `bmi`. Everything else is optional; empty fields are omitted from the request and the backend sends them to the model as missing. Client-side checks use the backend's hard bounds; the backend remains authoritative (422 messages are shown too).
 - **Quick-fill sample profiles** (lower/higher-risk, per mode) are demonstration data in `page.tsx`; their option strings are the backend's allowed values.
-- "Save this assessment to history" (default on) sends `save_to_history`.
+- "Save this assessment to history" (default on) sends `save_to_history`. While it is checked, an animated optional **Patient name** field appears (placeholder "e.g., Aarav Sharma"); the trimmed name is sent as `patient_name` only when saving is on and the field is non-empty.
+- **Missing-labs nudge:** in Mode B, when fewer than 4 laboratory fields are filled, a soft-amber, non-blocking banner explains that Mode A gives a more reliable estimate without lab results, with a one-click "Switch to Mode A" button (Phase 2 found Mode B estimates drift lower when labs are omitted).
 - **Results**: three independent cards (CVD, Diabetes, Hypertension), staggered entrance, shimmer skeleton while loading. There is **no overall score or composite tier anywhere**.
   - *Decision pill*: "At or above screening threshold" (coral) / "Below screening threshold" (emerald), from `decision_label`.
   - *Estimated probability* with an animated bar and a pin at the locked threshold (adaptive scale so low probabilities stay readable).
   - *What this estimates*: the backend's `target_definition` (e.g. CVD is a self-reported prior diagnosis).
   - *Key Contributing Factors*: a diverging bar chart centred at 0 (right = raises model output, left = lowers it). **Relative magnitude only**: no `%`, no numeric probability, never described as a change in probability. An expandable "How to read this chart" shows `output_space`, `method`, `reference_population` and `notice`. Features the user did not provide are labelled "not provided".
-  - *Model Notes* (collapsible): `warnings`, `ignored_inputs` (e.g. blood pressure for Hypertension, HbA1c/glucose for Diabetes B), `imputed_features`, algorithm, version, artifact hash prefix and the locked threshold.
+  - *Model Notes* (collapsible, **hidden when empty**): `warnings`, "Provided but not used for this condition" (`ignored_inputs`, e.g. blood pressure for Hypertension, HbA1c/glucose for Diabetes B) and "Missing fields" (`imputed_features`, only when any). Algorithm, version, artifact hash and the locked threshold are no longer shown.
+  - *What this estimates* shows the backend definition with survey/guideline codes such as "(NHANES MCQ160B-F)" stripped for display. "How to read this chart" is a plain two-sentence explanation (relative influence within the chart only; not a percentage-point change in probability; not cause and effect); the technical block (output space, method, reference) is not shown.
   - Top-level `warnings`, `input_adjustments` (e.g. age top-coding), a "Saved to history" note and the research-prototype `disclaimer` are shown under the cards.
 
 ### 4.2 History
 
-Newest first with cursor pagination ("Load more", using `next_before_id`; duplicates are filtered). Each card shows the local-time timestamp, a `Mode A`/`Mode B` badge and three compact per-condition pills (probability plus decision colour). Expanding a card calls `GET /v2/history/{id}` and shows the submitted inputs (labels/units from the feature metadata, enums capitalised, education decoded) and, per condition, probability, locked threshold, decision and number of missing inputs. A single submission is deleted with an inline "Delete this assessment? Delete / Cancel" step (a 404 is treated as already deleted); "Clear all history" uses an inline confirmation and sends `?confirm=true`. Empty and error states (with retry) are handled.
+Newest first with cursor pagination ("Load more", using `next_before_id`; duplicates are filtered). Each card shows the **patient name as its title** (or "Unnamed assessment" when none was saved), the local-time timestamp, a `Mode A`/`Mode B` badge and three compact per-condition pills (probability plus decision colour). Expanding a card calls `GET /v2/history/{id}` and shows the patient name, the submitted inputs (labels/units from the feature metadata, enums capitalised, education decoded) and, per condition, probability, locked threshold, decision and number of missing inputs. A single submission is deleted with an inline "Delete this assessment? Delete / Cancel" step (a 404 is treated as already deleted); "Clear all history" uses an inline confirmation and sends `?confirm=true`. Empty and error states (with retry) are handled.
 
 ### 4.3 Model Performance
 
@@ -92,8 +94,7 @@ Fetches `GET /v2/model-metrics` and shows, per condition, Mode A and Mode B side
 - **Discrimination:** ROC-AUC, PR-AUC. **Calibration:** Brier score, ECE.
 - **Operating point at the locked threshold:** threshold, sensitivity, specificity, precision, NPV, F1, balanced accuracy.
 - Row labels carry plain-language tooltips; the delta column is teal when Mode B is better and amber when worse on that metric (for Brier and ECE lower is better).
-- A methodology callout renders the backend's `caveats` verbatim (unweighted NHANES 2021–2023 test split, test split also informed model-family choice, US cohort with no external validation, CVD is self-reported prior diagnosis) plus a note that these are research results, not clinical validation.
-- A "trade-off, not an upgrade" callout whose counts are **computed from the returned numbers** (not hard-coded): how many conditions Mode B improves in ROC-AUC/PR-AUC versus how many conditions Mode A has higher sensitivity/balanced accuracy at the locked thresholds. Mode B is never presented as universally better.
+- One concise summary card ("Mode A vs Mode B: a trade-off, not an upgrade") whose counts are **computed from the returned numbers** (not hard-coded): how many conditions Mode B improves in ROC-AUC/PR-AUC versus how many conditions Mode A flags more true cases at the screening thresholds, followed by one line noting these are offline research-prototype results, not clinical validation. Mode B is never presented as universally better. The backend `caveats` list is still returned by `/v2/model-metrics` but is no longer rendered as a separate callout.
 
 ## 5. Design system
 

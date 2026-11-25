@@ -1888,3 +1888,35 @@ button {
     animation: none;
   }
 }
+
+/* History titles */
+.hist-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.hist-title.unnamed {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.hist-when {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.hist-detail-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.hist-detail-name .hist-when {
+  font-family: var(--font-body);
+  font-weight: 500;
+}

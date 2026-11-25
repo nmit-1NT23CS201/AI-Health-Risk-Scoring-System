@@ -48,7 +48,7 @@ def test_tables_created_by_lifespan_not_import(monkeypatch, tmp_path, preserve_v
     cols = {r["name"]: r for r in _rows("PRAGMA table_info(v2_assessments)")}
     assert list(cols) == ["id", "submission_id", "created_at", "disease", "mode", "config_key", "inputs_json",
                           "model_input_json", "probability", "threshold", "predicted_positive", "imputed_json",
-                          "model_version", "artifact_sha256", "schema_version"]
+                          "model_version", "artifact_sha256", "schema_version", "patient_name"]
     idx = {r["name"] for r in _rows("SELECT name FROM sqlite_master WHERE type='index'")}
     assert {"idx_v2_assessments_submission", "idx_v2_assessments_created"} <= idx
 
@@ -211,3 +211,61 @@ def test_history_db_error_is_503_not_500(client, monkeypatch):
     r = client.get("/v2/history")
     assert r.status_code == 503 and r.json()["error"] == "v2_history_unavailable"
     assert "no such table" not in r.text
+
+# ------------------------------------------------------------------ patient_name
+def test_patient_name_saved_listed_and_in_detail(client):
+    sid = _post(client, patient_name="  Aarav Sharma  ")["submission_id"]
+    assert _rows()[0]["patient_name"] == "Aarav Sharma"  # trimmed
+    listed = client.get("/v2/history").json()["items"][0]
+    assert listed["submission_id"] == sid and listed["patient_name"] == "Aarav Sharma"
+    assert client.get(f"/v2/history/{sid}").json()["patient_name"] == "Aarav Sharma"
+
+
+def test_patient_name_defaults_to_none_and_blank_is_none(client):
+    sid_a = _post(client)["submission_id"]
+    sid_b = _post(client, patient_name="   ")["submission_id"]
+    assert all(r["patient_name"] is None for r in _rows())
+    items = {i["submission_id"]: i for i in client.get("/v2/history").json()["items"]}
+    assert items[sid_a]["patient_name"] is None and items[sid_b]["patient_name"] is None
+    assert client.get(f"/v2/history/{sid_a}").json()["patient_name"] is None
+
+
+def test_patient_name_length_limit(client):
+    ok = client.post("/v2/predict", json={"mode": "A", "inputs": A, "include_explanation": False,
+                                          "patient_name": "x" * 120})
+    assert ok.status_code == 200
+    bad = client.post("/v2/predict", json={"mode": "A", "inputs": A, "patient_name": "x" * 121})
+    assert bad.status_code == 422
+
+
+def test_patient_name_not_stored_when_history_disabled(client):
+    _post(client, patient_name="Nobody", save_to_history=False)
+    assert _rows() == []
+
+
+def test_existing_database_is_upgraded_without_data_loss(monkeypatch, tmp_path):
+    """A DB created before patient_name existed gains the column; old rows survive with NULL."""
+    path = tmp_path / "old.db"
+    monkeypatch.setattr(db, "DB_PATH", path)
+    conn = sqlite3.connect(path)
+    conn.execute("""CREATE TABLE v2_assessments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, submission_id TEXT NOT NULL, created_at TEXT NOT NULL,
+        disease TEXT NOT NULL CHECK (disease IN ('cvd','diabetes','hypertension')),
+        mode TEXT NOT NULL CHECK (mode IN ('A','B')), config_key TEXT NOT NULL, inputs_json TEXT NOT NULL,
+        model_input_json TEXT NOT NULL, probability REAL NOT NULL, threshold REAL NOT NULL,
+        predicted_positive INTEGER NOT NULL CHECK (predicted_positive IN (0,1)), imputed_json TEXT,
+        model_version TEXT NOT NULL, artifact_sha256 TEXT NOT NULL, schema_version INTEGER NOT NULL DEFAULT 1)""")
+    conn.execute("INSERT INTO v2_assessments (submission_id, created_at, disease, mode, config_key, inputs_json,"
+                 " model_input_json, probability, threshold, predicted_positive, model_version, artifact_sha256)"
+                 " VALUES ('old','2026-01-01T00:00:00.000Z','cvd','A','cvd_mode_a','{}','{}',0.1,0.13,0,'v','x')")
+    conn.commit()
+    conn.close()
+    db.create_v2_tables()
+    db.create_v2_tables()  # idempotent
+    rows = db.get_v2_submission("old")
+    assert len(rows) == 1 and rows[0]["patient_name"] is None and rows[0]["probability"] == 0.1
+    row = {**rows[0]}
+    row.pop("id")
+    row.update(submission_id="new", patient_name="Priya")
+    db.save_v2_submission([row])
+    assert db.get_v2_submission("new")[0]["patient_name"] == "Priya"

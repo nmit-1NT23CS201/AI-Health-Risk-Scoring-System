@@ -67,6 +67,14 @@ function DetailPanel({ detail, meta }: { detail: HistoryDetail; meta: FeatureMet
   return (
     <div className="hist-detail">
       <div className="note-block">
+        <h4>Patient</h4>
+        <p className="hist-detail-name">
+          {detail.patient_name || "Unnamed assessment"}
+          <span className="hist-when"> · {formatWhen(detail.created_at)}</span>
+        </p>
+      </div>
+
+      <div className="note-block">
         <h4>Submitted inputs</h4>
         <dl className="inputs-grid">
           {entries.map(([name, value]) => {
@@ -176,9 +184,12 @@ function SubmissionCard({
       <div className="hist-top">
         <button type="button" className="hist-main" aria-expanded={open} onClick={onToggle}>
           <div className="hist-meta">
-            <span className="hist-time">{formatWhen(item.created_at)}</span>
+            <span className={`hist-title${item.patient_name ? "" : " unnamed"}`}>
+              {item.patient_name || "Unnamed assessment"}
+            </span>
             <span className="mode-badge">Mode {item.mode}</span>
           </div>
+          <div className="hist-when">{formatWhen(item.created_at)}</div>
           <div className="hist-pills">
             {item.results.map((r) => (
               <DiseasePill key={r.config_key} disease={r.disease} probability={r.probability} positive={r.predicted_positive} />

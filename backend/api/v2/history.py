@@ -54,6 +54,7 @@ def save_submission(
             "model_version": r.model_version,
             "artifact_sha256": r.artifact_sha256,
             "schema_version": database.V2_SCHEMA_VERSION,
+            "patient_name": request.patient_name,
         }
         for r, frame in zip(response.results, frames)
     ]
@@ -72,7 +73,8 @@ def list_history(limit: int, before_id: int | None) -> HistoryList:
     groups = database.list_v2_history(limit=limit, before_id=before_id)
     items = [
         HistorySubmission(
-            submission_id=g["submission_id"], created_at=g["rows"][0]["created_at"], mode=g["rows"][0]["mode"],
+            submission_id=g["submission_id"], patient_name=g["rows"][0].get("patient_name"),
+            created_at=g["rows"][0]["created_at"], mode=g["rows"][0]["mode"],
             results=[_result(r) for r in g["rows"]],
         )
         for g in groups
@@ -87,7 +89,8 @@ def get_submission(submission_id: str) -> HistoryDetail | None:
         return None
     first = rows[0]
     return HistoryDetail(
-        submission_id=submission_id, created_at=first["created_at"], mode=first["mode"],
+        submission_id=submission_id, patient_name=first.get("patient_name"),
+        created_at=first["created_at"], mode=first["mode"],
         inputs=json.loads(first["inputs_json"]),
         results=[
             HistoryDetailResult(

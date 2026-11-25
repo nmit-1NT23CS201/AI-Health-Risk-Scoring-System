@@ -55,7 +55,7 @@ History routes need only the database, so they keep working while the model regi
 
 ### 3.1 `POST /v2/predict`
 
-Request: `{ "mode": "A" | "B", "diseases": [...] (default all three, unique, non-empty), "inputs": {...}, "include_explanation": true, "save_to_history": true }`. `inputs` is `ModeAInputs` (13 fields) or `ModeBInputs` (+16 labs), discriminated by `mode`; unknown fields and lab fields under Mode A are 422.
+Request: `{ "mode": "A" | "B", "diseases": [...] (default all three, unique, non-empty), "inputs": {...}, "include_explanation": true, "save_to_history": true, "patient_name": null }`. `patient_name` is an optional label (max 120 characters; surrounding whitespace is trimmed and a blank value becomes `null`); it is stored with the history entry only and is never used by the models. `inputs` is `ModeAInputs` (13 fields) or `ModeBInputs` (+16 labs), discriminated by `mode`; unknown fields and lab fields under Mode A are 422.
 
 - **Required:** only `age` (20-100; >80 is top-coded to 80 and reported in `input_adjustments`), `gender` (`male`/`female`), `bmi`. Everything else is optional and sent to the model as `NaN` when absent (in-distribution: BP, waist and labs are 24-61% missing in the training data). Hard plausibility bounds reject impossible values; values outside the NHANES training range produce per-disease `warnings`.
 - **Per disease** the response returns `probability` (calibrated `predict_proba[:, 1]`, never `predict()`, never a second sigmoid), `threshold` (locked), `predicted_positive` (`probability >= threshold`), `decision_label` (`screen_positive`/`screen_negative`), `imputed_features`, `ignored_inputs`, `warnings`, `model_version` (`stage1f/<config_key>`), `artifact_sha256`, and `explanation` (or `explanation_unavailable_reason`).
@@ -117,6 +117,9 @@ Created by `create_v2_tables()` (`CREATE TABLE IF NOT EXISTS`, idempotent) from 
 | `model_version` | TEXT NOT NULL | `stage1f/<config_key>` |
 | `artifact_sha256` | TEXT NOT NULL | SHA-256 of the model file used |
 | `schema_version` | INTEGER NOT NULL DEFAULT 1 | for future migrations |
+| `patient_name` | TEXT (nullable) | optional label from the request; returned by `GET /v2/history` and `GET /v2/history/{id}` as `patient_name` (`null` when omitted) |
+
+**Automatic upgrade:** `create_v2_tables()` checks `PRAGMA table_info(v2_assessments)` and runs `ALTER TABLE ... ADD COLUMN patient_name TEXT` when the column is missing, so existing local databases are upgraded in place on the next startup without losing rows (idempotent; covered by a test).
 
 Functions: `create_v2_tables`, `save_v2_submission` (single transaction; all rows or none), `list_v2_history(limit, before_id)` (groups by submission, positioned by each submission's highest row id), `get_v2_submission`, `delete_v2_submission`, `delete_all_v2_history`. SHAP explanations are **not** stored (recomputable). There are no users or foreign keys. The old V1 `assessments` table is no longer created or used (see §4).
 

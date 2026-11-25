@@ -21,8 +21,8 @@ export default function Navbar({ tab, onChange }: { tab: TabId; onChange: (t: Ta
             <HeartPulse size={20} strokeWidth={2.2} />
           </div>
           <div>
-            <div className="brand-name">Preventive Risk Assessment</div>
-            <div className="brand-sub">Research prototype · NHANES 2021–2023</div>
+            <div className="brand-name">Health Risk Assessment</div>
+            <div className="brand-sub">Preventive Screening Support</div>
           </div>
         </div>
 

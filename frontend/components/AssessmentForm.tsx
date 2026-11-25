@@ -159,6 +159,8 @@ export default function AssessmentForm({
   profiles,
   saveToHistory,
   onSaveToHistoryChange,
+  patientName,
+  onPatientNameChange,
   submitting,
   onSubmit,
   serverErrors,
@@ -176,6 +178,8 @@ export default function AssessmentForm({
   profiles: SampleProfile[];
   saveToHistory: boolean;
   onSaveToHistoryChange: (v: boolean) => void;
+  patientName: string;
+  onPatientNameChange: (v: string) => void;
   submitting: boolean;
   onSubmit: (values: FormValues) => void;
   serverErrors: string[];
@@ -196,6 +200,8 @@ export default function AssessmentForm({
   }, [features]);
 
   const labsFilled = grouped.labs.filter((f) => (values[f.name] ?? "").trim() !== "").length;
+  // Mode B estimates drift lower when labs are left out, so nudge toward Mode A (non-blocking).
+  const showLabsNudge = mode === "B" && grouped.labs.length > 0 && labsFilled < 4;
 
   // Open the lab section automatically when a sample profile fills it (unless the user toggled it).
   useEffect(() => {
@@ -330,6 +336,37 @@ export default function AssessmentForm({
             </section>
           )}
 
+          <AnimatePresence initial={false}>
+            {showLabsNudge && (
+              <motion.div
+                key="labs-nudge"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={FLOW}
+                style={{ overflow: "hidden" }}
+              >
+                <div className="banner banner-warn" role="status" style={{ marginTop: 18 }}>
+                  <FlaskConical size={16} />
+                  <div>
+                    Most laboratory fields are empty. Without lab results, Mode A provides a more reliable screening
+                    estimate.
+                    <div>
+                      <button
+                        type="button"
+                        className="btn-ghost"
+                        style={{ marginTop: 8 }}
+                        onClick={() => onModeChange("A")}
+                      >
+                        Switch to Mode A
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {(Object.values(errors).some(Boolean) || serverErrors.length > 0) && (
             <div className="banner banner-error" role="alert" style={{ marginTop: 18 }}>
               <AlertCircle size={16} />
@@ -351,6 +388,35 @@ export default function AssessmentForm({
               <input type="checkbox" checked={saveToHistory} onChange={(e) => onSaveToHistoryChange(e.target.checked)} />
               Save this assessment to history
             </label>
+            <AnimatePresence initial={false}>
+              {saveToHistory && (
+                <motion.div
+                  key="patient-name"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={FLOW}
+                  style={{ overflow: "hidden" }}
+                >
+                  <div className="field" style={{ paddingTop: 2 }}>
+                    <label className="field-label" htmlFor="patient-name">
+                      Patient name <span style={{ color: "var(--faint)", fontWeight: 500 }}>(optional)</span>
+                    </label>
+                    <input
+                      id="patient-name"
+                      className="input"
+                      style={{ paddingRight: 16 }}
+                      type="text"
+                      maxLength={120}
+                      value={patientName}
+                      placeholder="e.g., Aarav Sharma"
+                      autoComplete="off"
+                      onChange={(e) => onPatientNameChange(e.target.value)}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
             <div className="form-actions">
               <button type="button" className="btn-ghost" onClick={onReset} aria-label="Clear form">
                 <RotateCcw size={14} /> Clear
