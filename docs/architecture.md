@@ -8,8 +8,8 @@ Two generations coexist in the repository:
 
 | Generation | What it is | Status |
 |---|---|---|
-| **V1** | Next.js + FastAPI + SQLite web app. One Random Forest **regressor** on a small synthetic Indian dataset, outputting a universal 0–100 score with SHAP plots, rule-based insights, recommendations and history. | Still the only UI. Implemented; V1 API contract verified by automated tests. |
-| **V2** | Disease-specific calibrated risk models for **CVD, Diabetes and Hypertension** on **NHANES 2021–2023**, each in **Mode A** (basic information) and **Mode B** (basic + labs): six configurations. | ML pipeline frozen (Stage 1G-4: CONDITIONAL PASS). **Backend integrated and tested** (`/v2/*`, live SHAP, V2 history). **No frontend yet.** |
+| **V1** | Next.js + FastAPI + SQLite web app. One Random Forest **regressor** on a small synthetic Indian dataset, outputting a universal 0–100 score with SHAP plots, rule-based insights, recommendations and history. | The V1 UI has been replaced in `frontend/` by the V2 interface; the V1 API routes remain and are verified by automated tests. |
+| **V2** | Disease-specific calibrated risk models for **CVD, Diabetes and Hypertension** on **NHANES 2021–2023**, each in **Mode A** (basic information) and **Mode B** (basic + labs): six configurations. | ML pipeline frozen (Stage 1G-4: CONDITIONAL PASS). **Backend integrated and tested** (`/v2/*`, live SHAP, V2 history). **V2 frontend implemented** (Assessment, History, Model Performance); browser end-to-end verification pending. |
 
 ## 2. Objectives
 
@@ -83,14 +83,14 @@ AI-Health-Risk-Scoring-System/
 
 ```mermaid
 flowchart LR
-    subgraph FE["frontend/ (Next.js, V1 only)"]
+    subgraph FE["frontend/ (Next.js, V2)"]
         P["app/page.tsx"]
     end
     subgraph APP["uvicorn backend.api.main:app (one FastAPI app, one CORS config)"]
         V1["V1 routes: /predict /history /model-metrics /health"]
         V2["V2 routes: /v2/predict /v2/health /v2/model-metrics /v2/features/{mode} /v2/history*"]
     end
-    P -- "fetch (NEXT_PUBLIC_API_BASE_URL)" --> V1
+    P -- "fetch (NEXT_PUBLIC_API_BASE_URL)" --> V2
     V1 --> V1A["V1 assets: random_forest_model.pkl, indian_health_risk_dataset.csv, metrics.json, confusion_matrix.png"]
     V1 --> DB[("healthrisk.db: assessments")]
     V2 --> REG["Registry: stage_1f_results.json + 6 x *_calibrated.joblib"]
@@ -100,7 +100,7 @@ flowchart LR
     BG["assets/hypertension_mode_a_shap_background.parquet"] --> SHAP
 ```
 
-The V2 frontend (Phase 3) is not built; until then V2 is reachable only via HTTP clients and the tests.
+The Next.js frontend (see [frontend.md](frontend.md)) now consumes the V2 routes only; the V1 routes remain in the backend but no UI calls them.
 
 ### V2 request flow (implemented)
 
@@ -117,9 +117,9 @@ The V2 frontend (Phase 3) is not built; until then V2 is reachable only via HTTP
 | V2 live SHAP (all six configs) | Implemented & verified (additivity ≤ 2.2e-6; 3-disease Mode B p95 ≈ 261 ms) |
 | V2 `/v2/predict`, `/v2/health`, `/v2/model-metrics`, `/v2/features/{mode}` | Implemented & verified (automated tests) |
 | V2 persistence and `/v2/history*` | Implemented & verified (automated tests) |
-| V1 FastAPI / SQLite / Next.js UI | Implemented; V1 API contract verified by tests (frontend itself not run) |
+| V1 FastAPI routes / SQLite `assessments` | Implemented; V1 API contract verified by tests (no frontend uses it any more) |
 | Streamlit dashboard | Partially implemented (predict path broken, V1) |
-| V2 frontend (Mode A/B, three disease results, SHAP display, history) | Not started (Phase 3) |
+| V2 frontend (Mode A/B form, three condition cards, SHAP chart, History, Model Performance) | Implemented; type-check and production build clean; API shapes checked against the live backend; **not yet browser-tested end to end** |
 | Authentication / users | Not started (none planned) |
 | Deployment / CI configuration | Not started |
 
@@ -128,8 +128,8 @@ The V2 frontend (Phase 3) is not built; until then V2 is reachable only via HTTP
 | Phase | Content | Status |
 |---|---|---|
 | 2A–2C | V2 integration audit, backend, persistence + tests | **Done** |
-| 3 | V2 Next.js frontend consuming `/v2/features/{mode}`, `/v2/predict`, `/v2/history*` | Next |
-| 4 | End-to-end checks with the real frontend; deployment configuration | Not started |
+| 3A–3B | V2 Next.js frontend: design system, assessment flow, History, Model Performance | **Done** (see [frontend.md](frontend.md)) |
+| 4 | End-to-end verification in a browser; deployment configuration | Next |
 | 5 | Retire V1 (routes, assets, `assessments`) only after the V2 UI is validated | Planned |
 
 ## 9. Repository cleanup
@@ -146,15 +146,14 @@ Per `repository_cleanup_audit.md` and `repository_cleanup_final.md`: 317 tracked
 
 ## 11. Recommended next steps
 
-1. Phase 3: V2 frontend built from `/v2/features/{mode}` (no hard-coded field lists), showing probability, threshold decision and SHAP in model-output units (never "+X%"), plus history.
+1. Phase 4: browser end-to-end verification of all three views against the running backend; deployment configuration.
 2. Disclose the test-selection caveat and unweighted metrics in any paper; fix the report inconsistencies listed in the ML doc.
-3. Update the root `README.md` for V2 and setup steps (`pip install -r backend/requirements-dev.txt`, `npm install`).
-4. Decide on retiring V1 once the V2 UI is validated.
+3. Decide on retiring the V1 backend routes, assets and `assessments` table now that no UI uses them.
 
 ## Current project state
 
 - **Fully complete:** V2 ML research pipeline (frozen) and the V2 backend (registry, inference, live SHAP, persistence, `/v2/*`), verified by a 126-test suite including golden parity and V1 non-regression.
-- **Currently implemented:** V1 application (UI + API + `assessments`) and the V2 API.
+- **Currently implemented:** the V2 API and the V2 Next.js frontend (Assessment, History, Model Performance); the V1 API routes remain in the backend.
 - **Partially implemented:** Streamlit dashboard.
-- **Not started:** V2 frontend, authentication, deployment, V1 retirement.
-- **Next task:** Phase 3, the V2 Next.js frontend.
+- **Not started:** authentication, deployment, V1 retirement.
+- **Next task:** Phase 4, browser end-to-end verification.

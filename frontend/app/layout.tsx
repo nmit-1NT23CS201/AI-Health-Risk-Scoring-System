@@ -1,19 +1,27 @@
 import "./globals.css";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { DM_Sans, JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 
-const manrope = Manrope({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-manrope",
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-jakarta",
 });
 
-const spaceGrotesk = Space_Grotesk({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-space",
+  variable: "--font-dm-sans",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-jetbrains",
 });
 
 export const metadata = {
-  title: "AI Health Risk Dashboard",
-  description: "AI-powered preventive healthcare intelligence dashboard.",
+  title: "Preventive Risk Assessment",
+  description:
+    "Research prototype for preventive screening support: independent estimates for cardiovascular disease, diabetes and hypertension.",
 };
 
 export default function RootLayout({
@@ -23,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${manrope.variable} ${spaceGrotesk.variable}`}>
+      <body className={`${jakarta.variable} ${dmSans.variable} ${jetbrains.variable}`}>
         {children}
       </body>
     </html>

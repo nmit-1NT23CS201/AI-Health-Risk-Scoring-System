@@ -1,864 +1,294 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { SPRING } from "@/lib/motion";
+import { AlertCircle, CheckCircle2, ClipboardList, Info, TriangleAlert } from "lucide-react";
+import Navbar, { type TabId } from "@/components/Navbar";
+import AssessmentForm, { type SampleProfile } from "@/components/AssessmentForm";
+import DiseaseResultCard, { DisclaimerNote } from "@/components/DiseaseResultCard";
+import ResultsSkeleton from "@/components/ResultsSkeleton";
+import HistoryView from "@/components/HistoryView";
+import ModelPerformanceView from "@/components/ModelPerformanceView";
+import { ApiError, getFeatures, predict } from "@/lib/api";
+import { buildInputs, type FormValues } from "@/lib/form";
+import type { FeatureMeta, Inputs, Mode, PredictResponse } from "@/lib/types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
-
-type PredictionInput = {
-  age: number;
-  gender: string;
-  bmi: number;
-  systolic_bp: number;
-  diastolic_bp: number;
-  cholesterol_mg_dl: number;
-  smoking: string;
-  alcohol_consumption: string;
-  physical_activity: string;
-  family_history: string;
-  heart_rate_bpm: number;
-  sdnn_hrv: number;
-  rmssd_hrv: number;
-  spo2: number;
+/* Quick-fill demo profiles (sample data only; option strings are the backend's allowed values). */
+const PROFILES: Record<Mode, SampleProfile[]> = {
+  A: [
+    {
+      id: "a-lower",
+      label: "Lower-risk profile",
+      values: {
+        age: "34", gender: "female", bmi: "22.4", waist_circumference: "74",
+        mean_sbp: "108", mean_dbp: "68", mean_pulse: "66",
+        smoking_status: "never", alcohol_frequency: "current", physical_activity_level: "high",
+        sedentary_minutes: "240", education_level: "5", poverty_income_ratio: "4.1",
+      },
+    },
+    {
+      id: "a-higher",
+      label: "Higher-risk profile",
+      values: {
+        age: "61", gender: "male", bmi: "33.1", waist_circumference: "113",
+        mean_sbp: "146", mean_dbp: "92", mean_pulse: "82",
+        smoking_status: "former", alcohol_frequency: "current", physical_activity_level: "low",
+        sedentary_minutes: "540", education_level: "3", poverty_income_ratio: "1.6",
+      },
+    },
+  ],
+  B: [
+    {
+      id: "b-lower",
+      label: "Lower-risk profile",
+      values: {
+        age: "38", gender: "female", bmi: "23.1", waist_circumference: "76",
+        mean_sbp: "110", mean_dbp: "70", mean_pulse: "68",
+        smoking_status: "never", alcohol_frequency: "current", physical_activity_level: "high",
+        sedentary_minutes: "260", education_level: "5", poverty_income_ratio: "3.9",
+        hba1c: "5.2", fasting_glucose: "88", total_cholesterol: "176", hdl_cholesterol: "63",
+        triglycerides: "84", ldl_cholesterol: "98", serum_creatinine: "0.7", blood_urea_nitrogen: "12",
+        serum_uric_acid: "4.2", alt_enzyme: "16", ast_enzyme: "18", hemoglobin: "13.4",
+        wbc_count: "6.1", platelet_count: "240", rdw: "12.9", serum_albumin: "4.4",
+      },
+    },
+    {
+      id: "b-higher",
+      label: "Higher-risk profile",
+      values: {
+        age: "63", gender: "male", bmi: "32.6", waist_circumference: "112",
+        mean_sbp: "144", mean_dbp: "90", mean_pulse: "80",
+        smoking_status: "former", alcohol_frequency: "current", physical_activity_level: "low",
+        sedentary_minutes: "520", education_level: "3", poverty_income_ratio: "1.8",
+        hba1c: "6.4", fasting_glucose: "122", total_cholesterol: "228", hdl_cholesterol: "38",
+        triglycerides: "212", ldl_cholesterol: "148", serum_creatinine: "1.1", blood_urea_nitrogen: "19",
+        serum_uric_acid: "7.0", alt_enzyme: "34", ast_enzyme: "29", hemoglobin: "14.6",
+        wbc_count: "7.8", platelet_count: "262", rdw: "13.9", serum_albumin: "4.0",
+      },
+    },
+  ],
 };
-
-type Contributor = {
-  feature: string;
-  value: number;
-};
-
-type PredictionResponse = {
-  risk_score: number;
-  risk_level: string;
-  positive_contributors: Contributor[];
-  negative_contributors: Contributor[];
-  insights: string[];
-  recommendations: string[];
-  summary_plot: string;
-  bar_plot: string;
-  waterfall_plot: string;
-};
-type HistoryRecord = {
-  id: number;
-  age: number;
-  risk_score: number;
-  risk_level: string;
-  created_at: string;
-};
-
-type ModelMetrics = {
-  regression_metrics: {
-    MAE: number;
-    MSE: number;
-    RMSE: number;
-    R2: number;
-  };
-  classification_metrics: {
-    accuracy: number;
-    precision: number;
-    recall: number;
-    f1: number;
-  };
-  confusion_matrix: string;
-};
-
-const defaultValues: PredictionInput = {
-  age: 40,
-  gender: "Male",
-  bmi: 25,
-  systolic_bp: 125,
-  diastolic_bp: 80,
-  cholesterol_mg_dl: 190,
-  smoking: "No",
-  alcohol_consumption: "No",
-  physical_activity: "Medium",
-  family_history: "No",
-  heart_rate_bpm: 76,
-  sdnn_hrv: 55,
-  rmssd_hrv: 50,
-  spo2: 97,
-};
-
-const highRiskPreset: PredictionInput = {
-  age: 55,
-  gender: "Male",
-  bmi: 31,
-  systolic_bp: 145,
-  diastolic_bp: 92,
-  cholesterol_mg_dl: 250,
-  smoking: "Yes",
-  alcohol_consumption: "Yes",
-  physical_activity: "Low",
-  family_history: "Yes",
-  heart_rate_bpm: 92,
-  sdnn_hrv: 35,
-  rmssd_hrv: 28,
-  spo2: 94,
-};
-
-const lowRiskPreset: PredictionInput = {
-  age: 24,
-  gender: "Female",
-  bmi: 22,
-  systolic_bp: 112,
-  diastolic_bp: 72,
-  cholesterol_mg_dl: 160,
-  smoking: "No",
-  alcohol_consumption: "No",
-  physical_activity: "High",
-  family_history: "No",
-  heart_rate_bpm: 68,
-  sdnn_hrv: 78,
-  rmssd_hrv: 65,
-  spo2: 99,
-};
-
-function riskPillClass(riskLevel: string) {
-  if (riskLevel === "Low Risk") {
-    return "risk-pill pill-low";
-  }
-  if (riskLevel === "Medium Risk") {
-    return "risk-pill pill-medium";
-  }
-  return "risk-pill pill-high";
-}
 
 export default function Home() {
-  const [formValues, setFormValues] = useState<PredictionInput>(defaultValues);
-  const [prediction, setPrediction] = useState<PredictionResponse | null>(null);
-  const [history, setHistory] = useState<HistoryRecord[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [metrics, setMetrics] = useState<ModelMetrics | null>(null);
-  const [metricsLoading, setMetricsLoading] = useState(false);
-  const [metricsError, setMetricsError] = useState<string | null>(null);
+  const [tab, setTab] = useState<TabId>("assessment");
+  const [mode, setMode] = useState<Mode>("A");
+  const [featuresByMode, setFeaturesByMode] = useState<Partial<Record<Mode, FeatureMeta[]>>>({});
+  const [featuresLoading, setFeaturesLoading] = useState(false);
+  const [featuresError, setFeaturesError] = useState<string | null>(null);
+  const [values, setValues] = useState<FormValues>({});
+  const [saveToHistory, setSaveToHistory] = useState(true);
 
-  useEffect(() => {
-    loadHistory();
-    loadMetrics();
+  const [submitting, setSubmitting] = useState(false);
+  const [serverErrors, setServerErrors] = useState<string[]>([]);
+  const [error, setError] = useState<{ message: string; details: string[] } | null>(null);
+  const [result, setResult] = useState<{ response: PredictResponse; submitted: Inputs } | null>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  const loadFeatures = useCallback(async (m: Mode) => {
+    setFeaturesLoading(true);
+    setFeaturesError(null);
+    try {
+      const data = await getFeatures(m);
+      setFeaturesByMode((prev) => ({ ...prev, [m]: data.fields }));
+    } catch (e) {
+      setFeaturesError(e instanceof Error ? e.message : "Could not load the form.");
+    } finally {
+      setFeaturesLoading(false);
+    }
   }, []);
 
-  async function loadMetrics() {
-    setMetricsLoading(true);
-    setMetricsError(null);
-    try {
-      const response = await fetch(`${API_BASE}/model-metrics`);
-      if (!response.ok) {
-        throw new Error("Failed to load model performance metrics.");
+  useEffect(() => {
+    if (!featuresByMode[mode]) void loadFeatures(mode);
+  }, [mode, featuresByMode, loadFeatures]);
+
+  const features = featuresByMode[mode] ?? null;
+
+  const { labels, units } = useMemo(() => {
+    const l: Record<string, string> = {};
+    const u: Record<string, string | null> = {};
+    for (const list of Object.values(featuresByMode)) {
+      for (const f of list ?? []) {
+        l[f.name] = f.label;
+        u[f.name] = f.unit;
       }
-      const data = await response.json();
-      setMetrics(data);
-    } catch (err) {
-      setMetricsError(err instanceof Error ? err.message : "Failed to load metrics");
-    } finally {
-      setMetricsLoading(false);
     }
-  }
-  const riskPercent = useMemo(() => {
-    if (!prediction) return 0;
-    return Math.max(0, Math.min(100, prediction.risk_score));
-  }, [prediction]);
+    return { labels: l, units: u };
+  }, [featuresByMode]);
 
-  const predictionState = prediction ? "Prediction Complete" : "Awaiting Input";
-  async function loadHistory() {
-    try {
-      const response = await fetch(`${API_BASE}/history`);
-
-      if (!response.ok) return;
-
-      const data = await response.json();
-
-      setHistory(data);
-    } catch {
-      console.log("Failed to load history");
-    }
-  }
-
-  async function deleteAssessment(id: number) {
-    if (!window.confirm("Are you sure you want to delete this assessment?")) return;
-    try {
-      const res = await fetch(`${API_BASE}/history/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Delete failed");
-      await loadHistory();
-    } catch {
-      console.error("Failed to delete assessment");
-    }
-  }
-
-  async function clearAllHistory() {
-    if (!window.confirm("Are you sure you want to permanently delete all assessment history?")) return;
-    try {
-      const res = await fetch(`${API_BASE}/history`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Clear failed");
-      await loadHistory();
-    } catch {
-      console.error("Failed to clear history");
-    }
-  }
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    setLoading(true);
+  async function handleSubmit(formValues: FormValues) {
+    if (!features) return;
+    const { inputs } = buildInputs(features, formValues);
+    setSubmitting(true);
     setError(null);
+    setServerErrors([]);
     try {
-      const response = await fetch(`${API_BASE}/predict`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formValues),
-      });
-
-      if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || "Prediction failed.");
+      const response = await predict({ mode, inputs, include_explanation: true, save_to_history: saveToHistory });
+      setResult({ response, submitted: inputs });
+      requestAnimationFrame(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 422) {
+        setServerErrors(e.details);
+      } else if (e instanceof ApiError) {
+        setError({ message: e.message, details: e.details });
+      } else {
+        setError({ message: "Something went wrong.", details: [] });
       }
-
-      const payload = (await response.json()) as PredictionResponse;
-      setPrediction(payload);
-      await loadHistory();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Prediction failed.");
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
-  }
-
-  function updateField<K extends keyof PredictionInput>(
-    key: K,
-    value: PredictionInput[K]
-  ) {
-    setFormValues((prev) => ({ ...prev, [key]: value }));
-  }
-
-  function applyPreset(preset: PredictionInput) {
-    setFormValues(preset);
   }
 
   return (
-    <main>
-      <div className="navbar">
-        <div className="nav-block">
-          <small>AI Health Risk System</small>
-          <span>Preventive Intelligence Dashboard</span>
-        </div>
-        <div className="nav-block">
-          <small>AI Status</small>
-          <span>Online</span>
-        </div>
-        <div className="nav-block">
-          <small>Prediction State</small>
-          <span>{predictionState}</span>
-        </div>
-      </div>
-
-      <section className="hero">
-        <div className="section-label">AI-powered preventive healthcare intelligence</div>
-        <h1>Personalized Health Risk Scoring</h1>
-        <p>
-          Predict cardiovascular risk with explainable AI, visualize the top drivers, and
-          deliver personalized recommendations in seconds.
-        </p>
-      </section>
-
-      <div className="layout">
-        <aside className="sidebar">
-          <div className="glass-card">
-            <div className="card-title">Demo Presets</div>
-            <div className="demo-buttons">
-              <button type="button" onClick={() => applyPreset(defaultValues)}>
-                Custom
-              </button>
-              <button type="button" onClick={() => applyPreset(highRiskPreset)}>
-                High Risk
-              </button>
-              <button type="button" onClick={() => applyPreset(lowRiskPreset)}>
-                Low Risk
-              </button>
-            </div>
-          </div>
-
-          <form className="glass-card" onSubmit={handleSubmit}>
-            <div className="card-title">Patient Inputs</div>
-            <div className="section-label">Demographics</div>
-            <div className="input-section">
-              <div className="form-group">
-                <label htmlFor="age">Age</label>
-                <input
-                  id="age"
-                  type="range"
-                  min={18}
-                  max={80}
-                  value={formValues.age}
-                  onChange={(event) => updateField("age", Number(event.target.value))}
-                />
-                <input
-                  type="number"
-                  min={18}
-                  max={80}
-                  value={formValues.age}
-                  onChange={(event) => updateField("age", Number(event.target.value))}
-                />
-              </div>
-              <div className="input-divider" />
-              <div className="form-group">
-                <label htmlFor="gender">Gender</label>
-                <select
-                  id="gender"
-                  value={formValues.gender}
-                  onChange={(event) => updateField("gender", event.target.value)}
-                >
-                  <option>Male</option>
-                  <option>Female</option>
-                </select>
-              </div>
+    <div className="app-shell">
+      <Navbar tab={tab} onChange={setTab} />
+      <main className="container page">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={tab}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={SPRING}
+          >
+        {tab === "assessment" && (
+          <>
+            <div className="page-head">
+              <div className="eyebrow">Preventive screening support</div>
+              <h1>Estimate risk for three conditions, independently.</h1>
+              <p>
+                Enter what you know. Each condition is assessed by its own model and reported with an estimated
+                probability, the screening threshold it is compared against, and the factors that contributed most.
+              </p>
             </div>
 
-            <div className="section-label">Lifestyle</div>
-            <div className="input-section">
-              <div className="form-group">
-                <label htmlFor="smoking">Smoking</label>
-                <select
-                  id="smoking"
-                  value={formValues.smoking}
-                  onChange={(event) => updateField("smoking", event.target.value)}
-                >
-                  <option>Yes</option>
-                  <option>No</option>
-                </select>
-              </div>
-              <div className="input-divider" />
-              <div className="form-group">
-                <label htmlFor="alcohol">Alcohol Consumption</label>
-                <select
-                  id="alcohol"
-                  value={formValues.alcohol_consumption}
-                  onChange={(event) =>
-                    updateField("alcohol_consumption", event.target.value)
-                  }
-                >
-                  <option>Yes</option>
-                  <option>No</option>
-                </select>
-              </div>
-              <div className="input-divider" />
-              <div className="form-group">
-                <label htmlFor="activity">Physical Activity</label>
-                <select
-                  id="activity"
-                  value={formValues.physical_activity}
-                  onChange={(event) =>
-                    updateField("physical_activity", event.target.value)
-                  }
-                >
-                  <option>Low</option>
-                  <option>Medium</option>
-                  <option>High</option>
-                </select>
-              </div>
-              <div className="input-divider" />
-              <div className="form-group">
-                <label htmlFor="family">Family History</label>
-                <select
-                  id="family"
-                  value={formValues.family_history}
-                  onChange={(event) => updateField("family_history", event.target.value)}
-                >
-                  <option>Yes</option>
-                  <option>No</option>
-                </select>
-              </div>
-            </div>
+            <div className="workspace">
+              <AssessmentForm
+                mode={mode}
+                onModeChange={(m) => {
+                  setMode(m);
+                  setServerErrors([]);
+                }}
+                features={features}
+                featuresError={featuresError}
+                featuresLoading={featuresLoading}
+                onRetry={() => void loadFeatures(mode)}
+                values={values}
+                onValueChange={(name, v) => setValues((prev) => ({ ...prev, [name]: v }))}
+                onFill={(p) => {
+                  setValues(p.values);
+                  setServerErrors([]);
+                }}
+                onReset={() => {
+                  setValues({});
+                  setServerErrors([]);
+                }}
+                profiles={PROFILES[mode]}
+                saveToHistory={saveToHistory}
+                onSaveToHistoryChange={setSaveToHistory}
+                submitting={submitting}
+                onSubmit={handleSubmit}
+                serverErrors={serverErrors}
+              />
 
-            <div className="section-label">Clinical Indicators</div>
-            <div className="input-section">
-              <div className="form-group">
-                <label htmlFor="bmi">BMI</label>
-                <input
-                  id="bmi"
-                  type="number"
-                  min={15}
-                  max={45}
-                  step={0.1}
-                  value={formValues.bmi}
-                  onChange={(event) => updateField("bmi", Number(event.target.value))}
-                />
-              </div>
-              <div className="input-divider" />
-              <div className="form-group">
-                <label htmlFor="sys">Systolic BP</label>
-                <input
-                  id="sys"
-                  type="range"
-                  min={90}
-                  max={200}
-                  value={formValues.systolic_bp}
-                  onChange={(event) =>
-                    updateField("systolic_bp", Number(event.target.value))
-                  }
-                />
-                <input
-                  type="number"
-                  min={90}
-                  max={200}
-                  value={formValues.systolic_bp}
-                  onChange={(event) =>
-                    updateField("systolic_bp", Number(event.target.value))
-                  }
-                />
-              </div>
-              <div className="input-divider" />
-              <div className="form-group">
-                <label htmlFor="dia">Diastolic BP</label>
-                <input
-                  id="dia"
-                  type="range"
-                  min={60}
-                  max={130}
-                  value={formValues.diastolic_bp}
-                  onChange={(event) =>
-                    updateField("diastolic_bp", Number(event.target.value))
-                  }
-                />
-                <input
-                  type="number"
-                  min={60}
-                  max={130}
-                  value={formValues.diastolic_bp}
-                  onChange={(event) =>
-                    updateField("diastolic_bp", Number(event.target.value))
-                  }
-                />
-              </div>
-              <div className="input-divider" />
-              <div className="form-group">
-                <label htmlFor="cholesterol">Cholesterol (mg/dL)</label>
-                <input
-                  id="cholesterol"
-                  type="range"
-                  min={120}
-                  max={320}
-                  value={formValues.cholesterol_mg_dl}
-                  onChange={(event) =>
-                    updateField("cholesterol_mg_dl", Number(event.target.value))
-                  }
-                />
-                <input
-                  type="number"
-                  min={120}
-                  max={320}
-                  value={formValues.cholesterol_mg_dl}
-                  onChange={(event) =>
-                    updateField("cholesterol_mg_dl", Number(event.target.value))
-                  }
-                />
-              </div>
-            </div>
-
-            <div className="section-label">Physiological Metrics</div>
-            <div className="input-section">
-              <div className="form-group">
-                <label htmlFor="hr">Heart Rate (BPM)</label>
-                <input
-                  id="hr"
-                  type="range"
-                  min={50}
-                  max={130}
-                  value={formValues.heart_rate_bpm}
-                  onChange={(event) =>
-                    updateField("heart_rate_bpm", Number(event.target.value))
-                  }
-                />
-                <input
-                  type="number"
-                  min={50}
-                  max={130}
-                  value={formValues.heart_rate_bpm}
-                  onChange={(event) =>
-                    updateField("heart_rate_bpm", Number(event.target.value))
-                  }
-                />
-              </div>
-              <div className="input-divider" />
-              <div className="form-group">
-                <label htmlFor="sdnn">SDNN (HRV)</label>
-                <input
-                  id="sdnn"
-                  type="number"
-                  min={10}
-                  max={140}
-                  step={0.5}
-                  value={formValues.sdnn_hrv}
-                  onChange={(event) =>
-                    updateField("sdnn_hrv", Number(event.target.value))
-                  }
-                />
-              </div>
-              <div className="input-divider" />
-              <div className="form-group">
-                <label htmlFor="rmssd">RMSSD (HRV)</label>
-                <input
-                  id="rmssd"
-                  type="number"
-                  min={10}
-                  max={140}
-                  step={0.5}
-                  value={formValues.rmssd_hrv}
-                  onChange={(event) =>
-                    updateField("rmssd_hrv", Number(event.target.value))
-                  }
-                />
-              </div>
-              <div className="input-divider" />
-              <div className="form-group">
-                <label htmlFor="spo2">SpO2 (%)</label>
-                <input
-                  id="spo2"
-                  type="range"
-                  min={90}
-                  max={100}
-                  step={0.5}
-                  value={formValues.spo2}
-                  onChange={(event) => updateField("spo2", Number(event.target.value))}
-                />
-                <input
-                  type="number"
-                  min={90}
-                  max={100}
-                  step={0.5}
-                  value={formValues.spo2}
-                  onChange={(event) => updateField("spo2", Number(event.target.value))}
-                />
-              </div>
-            </div>
-
-            <button className="primary-button" type="submit" disabled={loading}>
-              {loading ? "Analyzing..." : "Predict Health Risk"}
-            </button>
-          </form>
-        </aside>
-
-        <section className="content">
-          <div className="results-grid">
-            <div className="metric-card results-card">
-              <div className="card-header">
-                <div>
-                  <div className="section-label">Risk Score</div>
-                  <div className="card-subtitle">Predicted health risk level</div>
-                </div>
-                <div className="card-subtitle">Score (0-100)</div>
-              </div>
-              <div className="metric-score">
-                {prediction ? prediction.risk_score.toFixed(2) : "--"}
-              </div>
-              {prediction ? (
-                <div className={riskPillClass(prediction.risk_level)}>
-                  {prediction.risk_level}
-                </div>
-              ) : (
-                <div className="empty-state">Awaiting prediction.</div>
-              )}
-              <div className="risk-bar">
-                <div className="risk-bar-fill" style={{ width: `${riskPercent}%` }} />
-              </div>
-            </div>
-
-            <div className="glass-card results-card">
-              <div className="card-header">
-                <div>
-                  <div className="card-title">Personalized Recommendations</div>
-                  <div className="card-subtitle">Actionable next steps</div>
-                </div>
-              </div>
-              <div className="recommendation-list">
-                {prediction?.recommendations.map((rec) => (
-                  <div key={rec} className="insight-card">
-                    {rec}
-                  </div>
-                ))}
-                {!prediction && (
-                  <div className="empty-state">
-                    Recommendations appear after prediction.
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="glass-card results-card results-span-2">
-              <div className="card-header">
-                <div>
-                  <div className="card-title">AI Explanation</div>
-                  <div className="card-subtitle">
-                    Key factors driving the score
-                  </div>
-                </div>
-              </div>
-
-              <div className="ai-explanation-grid">
-                <div>
-                  <div className="section-label">Top Contributors</div>
-                  <div className="chip-grid">
-                    {prediction?.positive_contributors.map((item) => (
-                      <div key={item.feature} className="chip positive">
-                        <span>+</span>
-                        {item.feature}
-                      </div>
-                    ))}
-
-                    {prediction?.negative_contributors.map((item) => (
-                      <div key={item.feature} className="chip negative">
-                        <span>-</span>
-                        {item.feature}
-                      </div>
-                    ))}
-
-                    {!prediction && (
-                      <div className="empty-state">
-                        Awaiting prediction.
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="section-label">Insights</div>
-                  <div className="insight-grid">
-                    {prediction?.insights.map((insight) => (
-                      <div key={insight} className="insight-card">
-                        {insight}
-                      </div>
-                    ))}
-
-                    {!prediction && (
-                      <div className="empty-state">
-                        No insights yet.
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-card results-card results-span-2">
-              <div className="card-header">
-                <div>
-                  <div className="card-title">SHAP Visualizations</div>
-                  <div className="card-subtitle">
-                    Explainability charts
-                  </div>
-                </div>
-              </div>
-
-              {error && (
-                <p style={{ color: "var(--danger)" }}>
-                  {error}
-                </p>
-              )}
-
-              {!prediction && (
-                <p style={{ color: "var(--muted)" }}>
-                  Run a prediction to load charts.
-                </p>
-              )}
-
-              {prediction && (
-                <div className="chart-grid">
-                  <div className="chart-card">
-                    <div className="section-label">
-                      Summary Plot
-                    </div>
-
-                    <img
-                      src={`data:image/png;base64,${prediction.summary_plot}`}
-                      alt="SHAP Summary"
-                    />
-                  </div>
-
-                  <div className="chart-card">
-                    <div className="section-label">
-                      Bar Plot
-                    </div>
-
-                    <img
-                      src={`data:image/png;base64,${prediction.bar_plot}`}
-                      alt="SHAP Bar"
-                    />
-                  </div>
-
-                  <div className="chart-card">
-                    <div className="section-label">
-                      Waterfall Plot
-                    </div>
-
-                    <img
-                      src={`data:image/png;base64,${prediction.waterfall_plot}`}
-                      alt="SHAP Waterfall"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Model Performance Card */}
-            <div className="glass-card results-card results-span-2">
-              <div className="card-header">
-                <div>
-                  <div className="card-title">Model Performance Evaluation</div>
-                  <div className="card-subtitle">
-                    RandomForestRegressor & Risk Classification metrics
-                  </div>
-                </div>
-              </div>
-
-              {metricsLoading && (
-                <div className="empty-state">Loading model performance metrics...</div>
-              )}
-
-              {metricsError && (
-                <div style={{ color: "var(--danger)", padding: "12px 14px" }}>
-                  {metricsError}
-                </div>
-              )}
-
-              {metrics && (
-                <div className="metrics-dashboard-grid">
-                  <div className="metrics-group">
-                    <div className="section-label">Regression Metrics</div>
-                    <div className="metrics-stats-grid">
-                      <div className="stat-box">
-                        <small>MAE</small>
-                        <span>{metrics.regression_metrics.MAE.toFixed(4)}</span>
-                      </div>
-                      <div className="stat-box">
-                        <small>MSE</small>
-                        <span>{metrics.regression_metrics.MSE.toFixed(4)}</span>
-                      </div>
-                      <div className="stat-box">
-                        <small>RMSE</small>
-                        <span>{metrics.regression_metrics.RMSE.toFixed(4)}</span>
-                      </div>
-                      <div className="stat-box">
-                        <small>R² Score</small>
-                        <span>{metrics.regression_metrics.R2.toFixed(4)}</span>
-                      </div>
+              <section ref={resultsRef} style={{ scrollMarginTop: 90 }} aria-label="Results">
+                {submitting ? (
+                  <ResultsSkeleton />
+                ) : error ? (
+                  <div className="banner banner-error" role="alert">
+                    <AlertCircle size={16} />
+                    <div>
+                      <strong>{error.message}</strong>
+                      {error.details.length > 0 && (
+                        <ul>
+                          {error.details.slice(0, 5).map((d) => (
+                            <li key={d}>{d}</li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                   </div>
-
-                  <div className="metrics-group">
-                    <div className="section-label">Classification Metrics</div>
-                    <div className="metrics-stats-grid">
-                      <div className="stat-box">
-                        <small>Accuracy</small>
-                        <span>{(metrics.classification_metrics.accuracy * 100).toFixed(2)}%</span>
-                      </div>
-                      <div className="stat-box">
-                        <small>Precision</small>
-                        <span>{(metrics.classification_metrics.precision * 100).toFixed(2)}%</span>
-                      </div>
-                      <div className="stat-box">
-                        <small>Recall</small>
-                        <span>{(metrics.classification_metrics.recall * 100).toFixed(2)}%</span>
-                      </div>
-                      <div className="stat-box">
-                        <small>F1 Score</small>
-                        <span>{(metrics.classification_metrics.f1 * 100).toFixed(2)}%</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="metrics-chart-container">
-                    <div className="section-label">Confusion Matrix Plot</div>
-                    <div className="confusion-matrix-wrapper">
-                      <img
-                        src={`data:image/png;base64,${metrics.confusion_matrix}`}
-                        alt="Confusion Matrix"
-                        className="confusion-matrix-img"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Assessment History */}
-            <div className="glass-card results-card results-span-2">
-              <div className="card-header">
-                <div>
-                  <div className="card-title">
-                    Assessment History
-                  </div>
-
-                  <div className="card-subtitle">
-                    Previously stored health assessments
-                  </div>
-                </div>
-
-                {history.length > 0 && (
-                  <button
-                    id="clear-all-history-btn"
-                    className="clear-all-btn"
-                    onClick={clearAllHistory}
-                    type="button"
+                ) : result ? (
+                  <motion.div
+                    key={result.response.submission_id}
+                    className="stack"
+                    initial="hidden"
+                    animate="show"
+                    variants={{ show: { transition: { staggerChildren: 0.12 } } }}
                   >
-                    🗑 Clear All History
-                  </button>
-                )}
-              </div>
+                    <div className="results-head">
+                      <h2>Assessment results</h2>
+                      <span className="mono" style={{ color: "var(--faint)" }}>
+                        Mode {result.response.mode} · {new Date(result.response.created_at).toLocaleString()}
+                      </span>
+                    </div>
 
-              {history.length === 0 ? (
-                <div className="empty-state">
-                  No assessment history available.
-                </div>
-              ) : (
-                <table className="history-table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Age</th>
-                      <th>Risk Score</th>
-                      <th>Risk Level</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
+                    {result.response.warnings.length > 0 && (
+                      <div className="banner banner-warn">
+                        <TriangleAlert size={16} />
+                        <div>
+                          {result.response.warnings.map((w) => (
+                            <div key={w}>{w}</div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {result.response.input_adjustments.length > 0 && (
+                      <div className="banner banner-info">
+                        <Info size={16} />
+                        <div>
+                          {result.response.input_adjustments.map((a) => (
+                            <div key={a}>{a}</div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-                  <tbody>
-                    {history.map((record) => (
-                      <tr key={record.id}>
-                        <td>
-                          {new Date(
-                            record.created_at
-                          ).toLocaleString("en-IN")}
-                        </td>
-
-                        <td>{record.age}</td>
-
-                        <td>
-                          {record.risk_score.toFixed(2)}
-                        </td>
-
-                        <td>{record.risk_level}</td>
-
-                        <td>
-                          <button
-                            id={`delete-assessment-${record.id}`}
-                            className="delete-row-btn"
-                            onClick={() => deleteAssessment(record.id)}
-                            type="button"
-                            title="Delete this assessment"
-                          >
-                            🗑
-                          </button>
-                        </td>
-                      </tr>
+                    {result.response.results.map((r) => (
+                      <DiseaseResultCard
+                        key={r.config_key}
+                        result={r}
+                        submitted={result.submitted}
+                        labels={labels}
+                        units={units}
+                      />
                     ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </div>
-        </section>
-      </div>
 
-      <footer className="footer">
-        <div className="section-label">AI Healthcare System</div>
-        <div>Sensor-Augmented Personalized Health Risk Scoring</div>
-      </footer>
-    </main>
+                    {result.response.history_saved && (
+                      <div className="disclaimer" style={{ color: "var(--neg-ink)" }}>
+                        <CheckCircle2 size={16} />
+                        <span>Saved to history.</span>
+                      </div>
+                    )}
+                    <DisclaimerNote text={result.response.disclaimer} />
+                  </motion.div>
+                ) : (
+                  <div className="glass empty">
+                    <div className="empty-icon" aria-hidden>
+                      <ClipboardList size={26} />
+                    </div>
+                    <h3>Your estimates will appear here</h3>
+                    <p>
+                      Age, sex and BMI are required. Everything else is optional; adding more information, such as
+                      blood pressure or laboratory results, gives the models more to work with.
+                    </p>
+                    <div className="preview-trio" aria-hidden>
+                      <div className="preview-chip">Cardiovascular</div>
+                      <div className="preview-chip">Diabetes</div>
+                      <div className="preview-chip">Hypertension</div>
+                    </div>
+                  </div>
+                )}
+              </section>
+            </div>
+          </>
+        )}
+
+        {tab === "history" && <HistoryView />}
+        {tab === "performance" && <ModelPerformanceView />}
+          </motion.div>
+        </AnimatePresence>
+      </main>
+    </div>
   );
 }

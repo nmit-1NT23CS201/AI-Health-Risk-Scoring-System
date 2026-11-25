@@ -41,3 +41,6 @@ Thumbs.db
 
 # Local SQLite databases (contain user-submitted health data)
 *.db
+
+# TypeScript incremental build cache
+*.tsbuildinfo
