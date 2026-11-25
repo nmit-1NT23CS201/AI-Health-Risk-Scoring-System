@@ -11,6 +11,7 @@
 | Styling | Plain global CSS design tokens in `app/globals.css` (no Tailwind / CSS modules) |
 | Fonts | Plus Jakarta Sans (headings, UI labels), DM Sans (body, controls), JetBrains Mono (thresholds, metadata); tabular numerals on all numbers |
 | API base URL | `NEXT_PUBLIC_API_BASE_URL`, default `http://127.0.0.1:8000` |
+| Per-user history | `lib/clientId.ts` keeps a random id in `localStorage` (`hra_client_id`); `lib/api.ts` sends it as `X-Client-ID` on every request |
 | Path alias | `@/*` → `frontend/*` (`tsconfig.json`) |
 
 ```
@@ -21,7 +22,9 @@ npm run build      # production build
 npx tsc --noEmit   # type check
 ```
 
-The backend must be running (`uvicorn backend.api.main:app`) and CORS only allows `localhost:3000` / `127.0.0.1:3000`.
+The backend must be running (`uvicorn backend.api.main:app`). Its CORS origins come from `CORS_ORIGINS` (default `localhost:3000` / `127.0.0.1:3000`); set it to the deployed frontend origin when hosting.
+
+**Per-browser history:** the first time the app runs in a browser it generates an id with `crypto.randomUUID()` (random-hex fallback) and stores it under `hra_client_id`. Every API call carries it as `X-Client-ID`, so each browser sees only its own saved assessments, with no login. It is not authentication, and clearing site data or using another browser starts a fresh, empty history.
 
 ## 2. Structure
 

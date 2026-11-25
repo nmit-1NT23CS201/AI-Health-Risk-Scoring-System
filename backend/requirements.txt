@@ -10,3 +10,5 @@ xgboost==3.4.1
 pyarrow==26.0.1
 pydantic==2.14.4
 tzdata==2026.6
+psycopg[binary]==3.3.9
+python-dotenv==1.2.4

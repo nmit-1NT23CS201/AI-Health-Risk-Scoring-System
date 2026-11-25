@@ -1,3 +1,4 @@
+import { getClientId } from "./clientId";
 import type {
   FeaturesResponse,
   HistoryDeleteResponse,
@@ -38,7 +39,10 @@ function describeValidation(items: ValidationItem[]): string[] {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${API_BASE}${path}`, init);
+    const headers = new Headers(init?.headers);
+    const clientId = getClientId();
+    if (clientId) headers.set("X-Client-ID", clientId);
+    response = await fetch(`${API_BASE}${path}`, { ...init, headers });
   } catch {
     throw new ApiError(0, "Cannot reach the assessment service. Check that the backend is running.");
   }

@@ -24,17 +24,28 @@ def _rows(sql="SELECT * FROM v2_assessments ORDER BY id"):
         conn.close()
 
 
-def _post(client, mode="A", inputs=A, **kw):
-    r = client.post("/v2/predict", json={"mode": mode, "inputs": inputs, "include_explanation": False, **kw})
+def _post(client, mode="A", inputs=A, headers=None, **kw):
+    r = client.post("/v2/predict", json={"mode": mode, "inputs": inputs, "include_explanation": False, **kw},
+                    headers=headers)
     assert r.status_code == 200, r.text
     return r.json()
 
 
+def _wipe():
+    """Remove every row regardless of client (test housekeeping, bypasses the scoped API)."""
+    conn = sqlite3.connect(db.DB_PATH)
+    try:
+        conn.execute("DELETE FROM v2_assessments")
+        conn.commit()
+    finally:
+        conn.close()
+
+
 @pytest.fixture(autouse=True)
 def clean_history(client):
-    db.delete_all_v2_history()
+    _wipe()
     yield
-    db.delete_all_v2_history()
+    _wipe()
 
 
 # ------------------------------------------------------------------ schema / lifecycle
@@ -48,7 +59,7 @@ def test_tables_created_by_lifespan_not_import(monkeypatch, tmp_path, preserve_v
     cols = {r["name"]: r for r in _rows("PRAGMA table_info(v2_assessments)")}
     assert list(cols) == ["id", "submission_id", "created_at", "disease", "mode", "config_key", "inputs_json",
                           "model_input_json", "probability", "threshold", "predicted_positive", "imputed_json",
-                          "model_version", "artifact_sha256", "schema_version", "patient_name"]
+                          "model_version", "artifact_sha256", "schema_version", "patient_name", "client_id"]
     idx = {r["name"] for r in _rows("SELECT name FROM sqlite_master WHERE type='index'")}
     assert {"idx_v2_assessments_submission", "idx_v2_assessments_created"} <= idx
 
@@ -67,7 +78,7 @@ def test_check_constraints_reject_bad_rows():
                 model_version="v", artifact_sha256="x", schema_version=1)
     for bad in ({"disease": "flu"}, {"mode": "C"}, {"predicted_positive": 2}):
         with pytest.raises(sqlite3.IntegrityError):
-            db.save_v2_submission([{**base, **bad}])
+            db.save_v2_submission("c", [{**base, **bad}])
 
 
 def test_submission_insert_is_atomic():
@@ -76,7 +87,7 @@ def test_submission_insert_is_atomic():
                 model_version="v", artifact_sha256="x", schema_version=1)
     rows = [base, {**base, "disease": "diabetes"}, {**base, "disease": "not-a-disease"}]
     with pytest.raises(sqlite3.IntegrityError):
-        db.save_v2_submission(rows)
+        db.save_v2_submission("c", rows)
     assert _rows() == []  # nothing stored
 
 
@@ -124,7 +135,7 @@ def test_failed_validation_stores_nothing(client):
 
 # ------------------------------------------------------------------ failure policy
 def test_db_failure_after_prediction_returns_200_with_warning(client, monkeypatch):
-    def boom(rows):
+    def boom(*a, **k):
         raise sqlite3.OperationalError("disk I/O error")
 
     monkeypatch.setattr(db, "save_v2_submission", boom)
@@ -262,10 +273,107 @@ def test_existing_database_is_upgraded_without_data_loss(monkeypatch, tmp_path):
     conn.close()
     db.create_v2_tables()
     db.create_v2_tables()  # idempotent
-    rows = db.get_v2_submission("old")
+    rows = db.get_v2_submission("anonymous", "old")  # pre-upgrade rows belong to "anonymous"
     assert len(rows) == 1 and rows[0]["patient_name"] is None and rows[0]["probability"] == 0.1
+    assert rows[0]["client_id"] == "anonymous"
     row = {**rows[0]}
     row.pop("id")
     row.update(submission_id="new", patient_name="Priya")
-    db.save_v2_submission([row])
-    assert db.get_v2_submission("new")[0]["patient_name"] == "Priya"
+    row.pop("client_id", None)
+    db.save_v2_submission("dev-1", [row])
+    assert db.get_v2_submission("dev-1", "new")[0]["patient_name"] == "Priya"
+    assert db.get_v2_submission("anonymous", "new") == []
+
+# ------------------------------------------------------------------ per-client isolation
+A_ID = {"X-Client-ID": "client-a"}
+B_ID = {"X-Client-ID": "client-b"}
+
+
+def test_clients_see_only_their_own_history(client):
+    sid_a = _post(client, headers=A_ID, patient_name="Alice")["submission_id"]
+    sid_b = _post(client, headers=B_ID, patient_name="Bob")["submission_id"]
+    sid_anon = _post(client)["submission_id"]  # no header -> "anonymous"
+    a = [i["submission_id"] for i in client.get("/v2/history", headers=A_ID).json()["items"]]
+    b = [i["submission_id"] for i in client.get("/v2/history", headers=B_ID).json()["items"]]
+    anon = [i["submission_id"] for i in client.get("/v2/history").json()["items"]]
+    assert a == [sid_a] and b == [sid_b] and anon == [sid_anon]
+    assert {r["client_id"] for r in _rows()} == {"client-a", "client-b", "anonymous"}
+
+
+def test_client_cannot_fetch_another_clients_submission(client):
+    sid_b = _post(client, headers=B_ID)["submission_id"]
+    assert client.get(f"/v2/history/{sid_b}", headers=A_ID).status_code == 404
+    assert client.get(f"/v2/history/{sid_b}").status_code == 404  # anonymous is just another client
+    assert client.get(f"/v2/history/{sid_b}", headers=B_ID).status_code == 200
+
+
+def test_client_cannot_delete_another_clients_submission(client):
+    sid_b = _post(client, headers=B_ID)["submission_id"]
+    assert client.delete(f"/v2/history/{sid_b}", headers=A_ID).status_code == 404
+    assert len(_rows()) == 3  # untouched
+    assert db.delete_v2_submission("client-a", sid_b) == 0  # DB layer: 0 rows
+    assert len(_rows()) == 3
+    assert client.delete(f"/v2/history/{sid_b}", headers=B_ID).json()["deleted_rows"] == 3
+
+
+def test_delete_all_only_clears_the_callers_rows(client):
+    _post(client, headers=A_ID)
+    _post(client, headers=A_ID)
+    sid_b = _post(client, headers=B_ID)["submission_id"]
+    assert client.delete("/v2/history?confirm=true", headers=A_ID).json()["deleted_rows"] == 6
+    assert client.get("/v2/history", headers=A_ID).json()["items"] == []
+    assert [i["submission_id"] for i in client.get("/v2/history", headers=B_ID).json()["items"]] == [sid_b]
+    assert {r["client_id"] for r in _rows()} == {"client-b"}
+
+
+def test_pagination_is_scoped_per_client(client):
+    a_ids = [_post(client, headers=A_ID)["submission_id"] for _ in range(3)]
+    _post(client, headers=B_ID)
+    p1 = client.get("/v2/history?limit=2", headers=A_ID).json()
+    assert [i["submission_id"] for i in p1["items"]] == a_ids[::-1][:2] and p1["next_before_id"] is not None
+    p2 = client.get(f"/v2/history?limit=2&before_id={p1['next_before_id']}", headers=A_ID).json()
+    assert [i["submission_id"] for i in p2["items"]] == a_ids[::-1][2:]
+
+
+def test_client_id_trimmed_blank_means_anonymous_and_length_limit(client):
+    _post(client, headers={"X-Client-ID": "  padded-id  "})
+    _post(client, headers={"X-Client-ID": "   "})
+    assert {r["client_id"] for r in _rows()} == {"padded-id", "anonymous"}
+    assert client.get("/v2/history", headers={"X-Client-ID": "x" * 128}).status_code == 200
+    assert client.get("/v2/history", headers={"X-Client-ID": "x" * 129}).status_code == 422
+
+
+def test_client_id_never_leaks_into_responses(client):
+    body = _post(client, headers=A_ID)
+    assert "client-a" not in json.dumps(body)
+    item = client.get("/v2/history", headers=A_ID).json()
+    assert "client-a" not in json.dumps(item)
+
+
+def test_health_reports_sqlite_backend_without_connection_details(client):
+    h = client.get("/v2/health").json()
+    assert h["database_backend"] == "sqlite" and "DATABASE_URL" not in json.dumps(h)
+
+
+def test_backend_selection_and_placeholder_translation(monkeypatch):
+    for url, expected in (("", "sqlite"), ("sqlite:///x", "sqlite"), ("postgres://u:p@h/db", "postgresql"),
+                          ("postgresql://u:p@h/db", "postgresql")):
+        monkeypatch.setenv("DATABASE_URL", url)
+        assert db.backend_name() == expected
+    monkeypatch.setenv("DATABASE_URL", "postgresql://u:p@h/db")
+    assert db._q("SELECT * FROM t WHERE a = ? AND b = ?") == "SELECT * FROM t WHERE a = %s AND b = %s"
+    monkeypatch.delenv("DATABASE_URL")
+    assert db._q("a = ?") == "a = ?"
+
+
+def test_cors_allows_client_id_header_and_env_origins(monkeypatch):
+    from backend.api import main
+
+    r = TestClient(main.app).options("/v2/history", headers={
+        "Origin": "http://localhost:3000", "Access-Control-Request-Method": "GET",
+        "Access-Control-Request-Headers": "x-client-id"})
+    assert r.status_code == 200 and "x-client-id" in r.headers["access-control-allow-headers"].lower()
+    monkeypatch.setenv("CORS_ORIGINS", " https://app.example.com , https://b.example.com ")
+    assert main.cors_origins() == ["https://app.example.com", "https://b.example.com"]
+    monkeypatch.delenv("CORS_ORIGINS")
+    assert main.cors_origins() == ["http://localhost:3000", "http://127.0.0.1:3000"]

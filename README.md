@@ -58,7 +58,18 @@ cd frontend
 npm run dev
 ```
 
-Open <http://localhost:3000>. The API listens on <http://127.0.0.1:8000> (interactive docs at `/docs`). The frontend reads `NEXT_PUBLIC_API_BASE_URL` (default `http://127.0.0.1:8000`); the backend allows CORS only from `localhost:3000` / `127.0.0.1:3000`.
+Open <http://localhost:3000>. The API listens on <http://127.0.0.1:8000> (interactive docs at `/docs`). The frontend reads `NEXT_PUBLIC_API_BASE_URL` (default `http://127.0.0.1:8000`).
+
+### Configuration (optional)
+
+Copy `.env.example` to `.env` (git-ignored; never commit it):
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `DATABASE_URL` | Neon / PostgreSQL connection string for saved history | unset → local SQLite file `backend/database/healthrisk.db` |
+| `CORS_ORIGINS` | Comma-separated browser origins allowed to call the API | `http://localhost:3000,http://127.0.0.1:3000` |
+
+History is kept per browser: the frontend sends a random `X-Client-ID` (stored in `localStorage`), and the API only ever returns or deletes the caller's own entries. This separates browsers; it is not authentication. `GET /v2/health` reports which database backend is active (`postgresql` or `sqlite`). Tests always run offline against a temporary SQLite database.
 
 ## Test and build
 
@@ -88,7 +99,7 @@ The tests never touch `backend/database/healthrisk.db` (they use a temporary dat
 - The CVD target is a **self-reported prior diagnosis**, not incident risk.
 - Mode B improves ranking (ROC-AUC / PR-AUC) but Mode A keeps higher sensitivity at the locked thresholds; neither mode is universally better.
 - Some training-data encodings are imperfect (for example the physical-activity category ignores the survey's unit fields); details in [`docs/api-and-database.md`](docs/api-and-database.md).
-- Submitted health inputs are stored in a local, unencrypted SQLite file when "Save to history" is on; there is no authentication.
+- Submitted health inputs (and the optional patient name) are stored in the configured database (local SQLite or your Postgres) when "Save to history" is on. History is separated per browser by an anonymous id, but there is no authentication or encryption layer of our own.
 
 ## Documentation
 

@@ -2,18 +2,18 @@
 from __future__ import annotations
 
 import logging
-import sqlite3
 import uuid
 from typing import Literal
 
 import annotated_types
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 
 from backend.api.v2 import config, history, service
 from backend.api.v2.errors import HistoryUnavailableError, RegistryUnavailableError
 from backend.api.v2.preprocessing import FEATURE_SPECS, REQUIRED_FIELDS, input_field_names
 from backend.api.v2.registry import DISEASES, MODES, ModelRegistry
+from backend.database import database
 from backend.api.v2.schemas import (
     HistoryDeleteResponse,
     HistoryDetail,
@@ -28,6 +28,19 @@ log = logging.getLogger("backend.api.v2")
 router = APIRouter(prefix="/v2", tags=["v2"])
 
 
+MAX_CLIENT_ID_LENGTH = 128
+
+
+def get_client_id(x_client_id: str | None = Header(default=None, alias="X-Client-ID")) -> str:
+    """Per-browser history scope. Missing/blank falls back to "anonymous" (curl / Swagger keep working)."""
+    value = (x_client_id or "").strip()
+    if not value:
+        return database.DEFAULT_CLIENT_ID
+    if len(value) > MAX_CLIENT_ID_LENGTH:
+        raise HTTPException(status_code=422, detail=f"X-Client-ID must be at most {MAX_CLIENT_ID_LENGTH} characters.")
+    return value
+
+
 def get_registry(request: Request) -> ModelRegistry:
     registry = getattr(request.app.state, "v2_registry", None)
     if registry is None:
@@ -38,9 +51,13 @@ def get_registry(request: Request) -> ModelRegistry:
 
 
 @router.post("/predict", response_model=PredictResponse)
-def predict(body: PredictRequest, registry: ModelRegistry = Depends(get_registry)):
+def predict(
+    body: PredictRequest,
+    registry: ModelRegistry = Depends(get_registry),
+    client_id: str = Depends(get_client_id),
+):
     try:
-        return service.predict(registry, body)
+        return service.predict(registry, body, client_id)
     except Exception:
         request_id = str(uuid.uuid4())
         log.exception("v2_predict_failed request_id=%s", request_id)
@@ -53,7 +70,11 @@ def health(request: Request):
     if registry is None:
         return JSONResponse(
             status_code=503,
-            content={"status": "unavailable", "errors": getattr(request.app.state, "v2_startup_errors", [])},
+            content={
+                "status": "unavailable",
+                "database_backend": database.backend_name(),
+                "errors": getattr(request.app.state, "v2_startup_errors", []),
+            },
         )
     configs = {
         b.config_key: {
@@ -70,6 +91,7 @@ def health(request: Request):
     degraded = any(not c["explanations_available"] for c in configs.values())
     return {
         "status": "degraded" if degraded else "ok",
+        "database_backend": database.backend_name(),
         "results_sha256": registry.results_sha256,
         "sklearn_expected": registry.sklearn_expected,
         "versions_runtime": registry.versions_runtime,
@@ -143,34 +165,38 @@ def features(mode: Literal["A", "B", "a", "b"], registry: ModelRegistry = Depend
 def _db(fn, *args):
     try:
         return fn(*args)
-    except sqlite3.Error:
-        log.exception("v2_history_db_error")
+    except database.DB_ERRORS as exc:
+        log.error("v2_history_db_error error=%s", type(exc).__name__)  # never log driver messages (may hold hosts)
         raise HistoryUnavailableError("V2 history storage is unavailable.") from None
 
 
 @router.get("/history", response_model=HistoryList)
-def list_history(limit: int = Query(20, ge=1, le=100), before_id: int | None = Query(None, ge=1)):
-    return _db(history.list_history, limit, before_id)
+def list_history(
+    limit: int = Query(20, ge=1, le=100),
+    before_id: int | None = Query(None, ge=1),
+    client_id: str = Depends(get_client_id),
+):
+    return _db(history.list_history, client_id, limit, before_id)
 
 
 @router.get("/history/{submission_id}", response_model=HistoryDetail)
-def get_history(submission_id: str):
-    detail = _db(history.get_submission, submission_id)
+def get_history(submission_id: str, client_id: str = Depends(get_client_id)):
+    detail = _db(history.get_submission, client_id, submission_id)
     if detail is None:
         raise HTTPException(status_code=404, detail=f"Submission {submission_id} not found.")
     return detail
 
 
 @router.delete("/history/{submission_id}", response_model=HistoryDeleteResponse)
-def delete_history_item(submission_id: str):
-    n = _db(history.delete_submission, submission_id)
+def delete_history_item(submission_id: str, client_id: str = Depends(get_client_id)):
+    n = _db(history.delete_submission, client_id, submission_id)
     if n == 0:
         raise HTTPException(status_code=404, detail=f"Submission {submission_id} not found.")
     return HistoryDeleteResponse(deleted_rows=n, submission_id=submission_id)
 
 
 @router.delete("/history", response_model=HistoryDeleteResponse)
-def delete_all_history(confirm: bool = Query(False)):
+def delete_all_history(confirm: bool = Query(False), client_id: str = Depends(get_client_id)):
     if not confirm:
         raise HTTPException(status_code=422, detail="Deleting all V2 history requires ?confirm=true.")
-    return HistoryDeleteResponse(deleted_rows=_db(history.delete_all))
+    return HistoryDeleteResponse(deleted_rows=_db(history.delete_all, client_id))

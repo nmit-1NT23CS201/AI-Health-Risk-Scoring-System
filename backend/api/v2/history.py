@@ -33,7 +33,10 @@ def _vector(frame: pd.DataFrame) -> dict[str, float | None]:
 
 
 def save_submission(
-    request: PredictRequestA | PredictRequestB, response: PredictResponse, frames: list[pd.DataFrame]
+    request: PredictRequestA | PredictRequestB,
+    response: PredictResponse,
+    frames: list[pd.DataFrame],
+    client_id: str = database.DEFAULT_CLIENT_ID,
 ) -> int:
     """Store every disease row of one submission atomically. Raises on failure (caller degrades)."""
     inputs_json = json.dumps(request.inputs.model_dump(mode="json", exclude_none=True))
@@ -58,7 +61,7 @@ def save_submission(
         }
         for r, frame in zip(response.results, frames)
     ]
-    return database.save_v2_submission(rows)
+    return database.save_v2_submission(client_id, rows)
 
 
 def _result(row: dict) -> HistoryResult:
@@ -69,8 +72,8 @@ def _result(row: dict) -> HistoryResult:
     )
 
 
-def list_history(limit: int, before_id: int | None) -> HistoryList:
-    groups = database.list_v2_history(limit=limit, before_id=before_id)
+def list_history(client_id: str, limit: int, before_id: int | None) -> HistoryList:
+    groups = database.list_v2_history(client_id, limit=limit, before_id=before_id)
     items = [
         HistorySubmission(
             submission_id=g["submission_id"], patient_name=g["rows"][0].get("patient_name"),
@@ -83,8 +86,8 @@ def list_history(limit: int, before_id: int | None) -> HistoryList:
     return HistoryList(items=items, next_before_id=nxt)
 
 
-def get_submission(submission_id: str) -> HistoryDetail | None:
-    rows = database.get_v2_submission(submission_id)
+def get_submission(client_id: str, submission_id: str) -> HistoryDetail | None:
+    rows = database.get_v2_submission(client_id, submission_id)
     if not rows:
         return None
     first = rows[0]
@@ -102,9 +105,9 @@ def get_submission(submission_id: str) -> HistoryDetail | None:
     )
 
 
-def delete_submission(submission_id: str) -> int:
-    return database.delete_v2_submission(submission_id)
+def delete_submission(client_id: str, submission_id: str) -> int:
+    return database.delete_v2_submission(client_id, submission_id)
 
 
-def delete_all() -> int:
-    return database.delete_all_v2_history()
+def delete_all(client_id: str) -> int:
+    return database.delete_all_v2_history(client_id)

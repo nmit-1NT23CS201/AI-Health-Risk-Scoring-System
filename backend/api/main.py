@@ -9,8 +9,11 @@ endpoints (database only) keep working.
 from __future__ import annotations
 
 import logging
+import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -19,14 +22,24 @@ from backend.api.v2.registry import load_registry, log_event
 from backend.api.v2.router import router as v2_router
 from backend.database.database import create_v2_tables
 
+# Load the git-ignored .env (DATABASE_URL, CORS_ORIGINS). Variables already set in the environment win.
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
 API_VERSION = "2.0"
+DEFAULT_CORS_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000"
+
+
+def cors_origins() -> list[str]:
+    raw = os.getenv("CORS_ORIGINS", "").strip() or DEFAULT_CORS_ORIGINS
+    return [o.strip() for o in raw.split(",") if o.strip()]
 
 
 def _load_v2(app_: FastAPI) -> None:
     try:  # history storage is independent of the model registry
         create_v2_tables()
     except Exception as exc:
-        log_event("v2_history_init_failed", logging.ERROR, reason=f"{type(exc).__name__}: {exc}")
+        # type only: driver messages can include connection details
+        log_event("v2_history_init_failed", logging.ERROR, reason=type(exc).__name__)
     app_.state.v2_registry = None
     app_.state.v2_startup_errors = []
     try:
@@ -50,10 +63,10 @@ app = FastAPI(title="Preventive Health Risk Assessment API", version=API_VERSION
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["Content-Type", "Accept", "X-Client-ID"],
 )
 app.add_exception_handler(V2Error, v2_error_handler)
 app.include_router(v2_router)  # router defines the /v2 prefix

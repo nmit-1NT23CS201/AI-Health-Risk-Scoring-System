@@ -7,6 +7,8 @@ __pycache__/
 .venv/
 venv/
 ENV/
+.env
+*/.env
 
 # Jupyter
 .ipynb_checkpoints/
@@ -44,3 +46,8 @@ Thumbs.db
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+
+# Environment files (secrets): ignore all except the committed template
+.env
+.env.*
+!.env.example

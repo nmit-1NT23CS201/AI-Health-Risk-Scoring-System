@@ -8,9 +8,9 @@
 |---|---|---|
 | Application | `.\.venv\Scripts\python.exe -m uvicorn backend.api.main:app --reload` | `GET /`, `GET /health`, `/v2/*` |
 
-Environment: project `.venv` (Python 3.13). Pinned in `backend/requirements.txt` (+ `backend/requirements-dev.txt` for `pytest`, `httpx`): scikit-learn 1.9.0 (matches the version recorded in `stage_1f_results.json`), xgboost 3.4.1, shap 0.54.1, fastapi 0.165.0, pydantic 2.14.4, pandas 3.1.1, numpy 2.5.5, uvicorn 0.54.0, joblib 1.6.0, pyarrow 26.0.1, tzdata 2026.6, matplotlib 3.11.2 (research scripts only). Run tests from the repo root: `.venv\Scripts\python -m pytest backend/tests -v`.
+Environment: project `.venv` (Python 3.13). Pinned in `backend/requirements.txt` (+ `backend/requirements-dev.txt` for `pytest`, `httpx`): scikit-learn 1.9.0 (matches the version recorded in `stage_1f_results.json`), xgboost 3.4.1, shap 0.54.1, fastapi 0.165.0, pydantic 2.14.4, pandas 3.1.1, numpy 2.5.5, uvicorn 0.54.0, joblib 1.6.0, pyarrow 26.0.1, tzdata 2026.6, matplotlib 3.11.2 (research scripts only). `psycopg[binary]==3.3.9` and `python-dotenv==1.2.4` support Postgres and `.env` loading. Run tests from the repo root: `.venv\Scripts\python -m pytest backend/tests -v`.
 
-`backend/api/main.py` creates the FastAPI app (`title="Preventive Health Risk Assessment API"`, `version="2.0"`) with the `v2_lifespan` startup, CORS (`http://localhost:3000`, `http://127.0.0.1:3000`), the `V2Error` handler and the `/v2` router, plus lightweight `GET /` and `GET /health` returning `{"status": "ok", "version": "2.0"}`. **A failed model-registry load never takes the process down**: errors are logged as structured JSON, `/v2/health`, `/v2/predict`, `/v2/model-metrics` and `/v2/features/*` return 503, and `/`, `/health` and the history endpoints (database only) keep working.
+`backend/api/main.py` creates the FastAPI app (`title="Preventive Health Risk Assessment API"`, `version="2.0"`) with the `v2_lifespan` startup, CORS (origins from `CORS_ORIGINS`, default `http://localhost:3000,http://127.0.0.1:3000`; headers `Content-Type`, `Accept`, `X-Client-ID`), the `V2Error` handler and the `/v2` router, plus lightweight `GET /` and `GET /health` returning `{"status": "ok", "version": "2.0"}`. **A failed model-registry load never takes the process down**: errors are logged as structured JSON, `/v2/health`, `/v2/predict`, `/v2/model-metrics` and `/v2/features/*` return 503, and `/`, `/health` and the history endpoints (database only) keep working.
 
 ## 2. V2 package layout (`backend/api/v2/`)
 
@@ -43,7 +43,7 @@ Soft failures (predictions still served, `/v2/health` returns 200 with `"degrade
 | Method | Path | Purpose | Status codes |
 |---|---|---|---|
 | POST | `/v2/predict` | Disease-specific probabilities, locked-threshold decisions, optional live SHAP; optionally persists | 200; 422 validation; 503 registry unavailable; 500 generic `{"error":"internal_error","request_id"}` |
-| GET | `/v2/health` | Registry state, per-config load/explainer status, SHA-256s, runtime vs expected versions | 200 (`ok` or `degraded`); 503 (`unavailable`) |
+| GET | `/v2/health` | Registry state, per-config load/explainer status, SHA-256s, runtime vs expected versions | 200 (`ok` or `degraded`); 503 (`unavailable`). Also reports `database_backend`: `"postgresql"` or `"sqlite"` (never the connection string) |
 | GET | `/v2/model-metrics` | **Offline research evaluation only**, from `stage_1f_results.json`, with caveats; no per-user data | 200; 503 |
 | GET | `/v2/features/{mode}` | Field metadata (labels, units, enums, hard bounds, training range, required flag, which diseases use each field) | 200; 422; 503 |
 | GET | `/v2/history?limit&before_id` | Newest-first submissions grouped by `submission_id` (`limit` 1-100, default 20) with `next_before_id` cursor | 200; 422; 503 (DB error) |
@@ -94,7 +94,22 @@ Leftovers to be aware of:
 - Historical research reports under `backend/ml/data/` and `backend/ml/evaluation/` still mention the V1 dataset; they are frozen records.
 ## 5. Database (`backend/database/database.py`)
 
-Raw `sqlite3`, per-call connections, file `backend/database/healthrisk.db`. No ORM, no migration tool. **The `.db` file is no longer tracked by git** (`*.db` is in `.gitignore`) because it holds user-submitted health data; it is created on first run. Tests redirect `DB_PATH` to a temp file and assert the real file is never modified.
+### 5.0 Backends and configuration
+
+`backend/database/database.py` picks a backend per call from `DATABASE_URL`:
+
+| `DATABASE_URL` | Backend | Notes |
+|---|---|---|
+| starts with `postgres://` or `postgresql://` | **PostgreSQL** (e.g. Neon) via `psycopg` | `%s` placeholders, `BIGSERIAL` key, `DOUBLE PRECISION` for probabilities, `dict_row` results |
+| unset or empty | **SQLite** `backend/database/healthrisk.db` | `?` placeholders, `INTEGER PRIMARY KEY AUTOINCREMENT`; automatic fallback |
+
+Configuration lives in a git-ignored `.env` at the repository root, loaded at startup by `backend/api/main.py` (`python-dotenv`; real environment variables take precedence). `.env.example` documents it: `DATABASE_URL` (optional) and `CORS_ORIGINS` (optional, comma-separated, default `http://localhost:3000,http://127.0.0.1:3000`). `.gitignore` ignores `.env` and `.env.*` except `.env.example`. The connection string is never logged, returned or committed; error logs record only the exception type. No ORM, no migration tool. The local `.db` file is git-ignored too (`*.db`) because it holds user-submitted health data.
+
+Tests always run offline against a temporary SQLite file: `conftest.py` sets `DATABASE_URL` to an empty value before importing the app (so `.env` cannot inject the Neon URL), removes it for every test, redirects `DB_PATH` to a temp file and asserts the local file is never modified.
+
+### 5.0.1 Per-user history (`X-Client-ID`)
+
+History is scoped per browser. Every request may carry an `X-Client-ID` header (the frontend sends a UUID kept in `localStorage`). The API trims it; missing or blank falls back to `"anonymous"` (so `curl` and Swagger keep working); more than 128 characters is a 422. All history reads and deletes are filtered with `WHERE client_id = ...` in the database layer, so one client cannot list, fetch or delete another client's submissions (they get `404` / `0` rows), and `DELETE /v2/history?confirm=true` clears only the caller's rows. The id is a separation key, **not authentication**: anyone who knows another client's id could use it, and `"anonymous"` is shared by all header-less callers. It is never included in responses.
 
 ### 5.1 Table `v2_assessments`
 
@@ -117,9 +132,10 @@ Created by `create_v2_tables()` (`CREATE TABLE IF NOT EXISTS`, idempotent) from 
 | `model_version` | TEXT NOT NULL | `stage1f/<config_key>` |
 | `artifact_sha256` | TEXT NOT NULL | SHA-256 of the model file used |
 | `schema_version` | INTEGER NOT NULL DEFAULT 1 | for future migrations |
+| `client_id` | TEXT NOT NULL DEFAULT `'anonymous'` | per-browser owner (see §5.0.1); indexed with `id DESC` (`idx_v2_assessments_client_created`) |
 | `patient_name` | TEXT (nullable) | optional label from the request; returned by `GET /v2/history` and `GET /v2/history/{id}` as `patient_name` (`null` when omitted) |
 
-**Automatic upgrade:** `create_v2_tables()` checks `PRAGMA table_info(v2_assessments)` and runs `ALTER TABLE ... ADD COLUMN patient_name TEXT` when the column is missing, so existing local databases are upgraded in place on the next startup without losing rows (idempotent; covered by a test).
+**Automatic upgrade:** `create_v2_tables()` inspects the existing columns (`PRAGMA table_info` on SQLite, `information_schema.columns` on PostgreSQL) and runs `ALTER TABLE ... ADD COLUMN` for `patient_name` and `client_id TEXT NOT NULL DEFAULT 'anonymous'` when missing, so existing databases are upgraded in place on the next startup without losing rows (idempotent; covered by a test). Pre-existing rows belong to `"anonymous"`.
 
 Functions: `create_v2_tables`, `save_v2_submission` (single transaction; all rows or none), `list_v2_history(limit, before_id)` (groups by submission, positioned by each submission's highest row id), `get_v2_submission`, `delete_v2_submission`, `delete_all_v2_history`. SHAP explanations are **not** stored (recomputable). There are no users or foreign keys. The old V1 `assessments` table is no longer created or used (see §4).
 
@@ -127,10 +143,10 @@ Functions: `create_v2_tables`, `save_v2_submission` (single transaction; all row
 
 | File | Covers |
 |---|---|
-| `conftest.py` | Temp-DB redirect before app import, local-DB integrity guard, shared fixtures |
+| `conftest.py` | Offline SQLite only (`DATABASE_URL` neutralised), temp-DB redirect before app import, local-DB integrity guard, shared fixtures |
 | `test_v2_schemas.py`, `test_v2_preprocessing.py` | Validation, encoding table, leakage exclusions, training-range table equals processed data |
 | `test_v2_registry.py` | Six configs/thresholds, tampered JSON, missing/corrupt artifacts, app stays up with V2 503 |
 | `test_v2_predict_parity.py` | Golden parity vs independent offline load (max diff 7.8e-16), full-test-split aggregate metrics vs `stage_1f_results.json` within 5e-5, threshold boundary, no double sigmoid |
 | `test_v2_shap.py` | Additivity, payload semantics, HTN-A background hygiene and premise check, concurrency, no pyplot, latency |
-| `test_v2_api.py`, `test_v2_history.py` | Endpoints, persistence, atomicity, failure policy, history CRUD, `v2_assessments` created by the lifespan (not at import) |
+| `test_v2_api.py`, `test_v2_history.py` | Endpoints, persistence, atomicity, failure policy, history CRUD, `v2_assessments` created by the lifespan (not at import), per-client isolation (list / fetch / delete / delete-all / pagination), backend selection, CORS `X-Client-ID` and `CORS_ORIGINS` |
 | `test_v2_api.py` (also) | `GET /`, `GET /health`, OpenAPI contains only the V2 route set, CORS allows only the frontend origins |

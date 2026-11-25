@@ -113,7 +113,9 @@ def _evaluate(bundle: ModelBundle, enc: EncodedInputs, include_explanation: bool
     return result, frame
 
 
-def predict(registry: ModelRegistry, request: PredictRequestA | PredictRequestB) -> PredictResponse:
+def predict(
+    registry: ModelRegistry, request: PredictRequestA | PredictRequestB, client_id: str = "anonymous"
+) -> PredictResponse:
     enc = encode_inputs(request.inputs)
     evaluated = [
         _evaluate(registry.get(d.value, request.mode), enc, request.include_explanation)
@@ -132,10 +134,11 @@ def predict(registry: ModelRegistry, request: PredictRequestA | PredictRequestB)
         # Persist only after every prediction succeeded, in one transaction. A persistence failure
         # must never turn a successful prediction into an error: degrade to a warning instead.
         try:
-            history.save_submission(request, response, [f for _, f in evaluated])
+            history.save_submission(request, response, [f for _, f in evaluated], client_id)
             response.history_saved = True
-        except Exception:
-            log.exception("v2_history_save_failed submission_id=%s", response.submission_id)
+        except Exception as exc:
+            # Log only the error type: driver messages can contain connection details.
+            log.error("v2_history_save_failed submission_id=%s error=%s", response.submission_id, type(exc).__name__)
             response.warnings.append(
                 "The prediction succeeded but could not be saved to history; this result is not stored."
             )

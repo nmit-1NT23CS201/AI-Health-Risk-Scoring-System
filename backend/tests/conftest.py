@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -10,6 +11,10 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+# Tests always use the temporary SQLite DB and never touch Neon: an EMPTY value is "set", so
+# load_dotenv() in backend/api/main.py (which never overrides existing variables) cannot inject the .env URL.
+os.environ["DATABASE_URL"] = ""
 
 import backend.database.database as _db  # noqa: E402  (must precede any app import)
 
@@ -33,6 +38,13 @@ def _sha(path: Path) -> str | None:
 
 def pytest_configure(config):  # noqa: F811  (pytest requires this exact parameter name)
     config.addinivalue_line("markers", "artifacts: needs the frozen Stage 1F artifacts / processed NHANES data")
+
+
+@pytest.fixture(autouse=True)
+def _offline_sqlite_only(monkeypatch):
+    """No test may reach a network database: DATABASE_URL is removed for every test."""
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    assert _db.backend_name() == "sqlite"
 
 
 @pytest.fixture(scope="session", autouse=True)
