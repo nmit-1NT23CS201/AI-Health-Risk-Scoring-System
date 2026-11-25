@@ -53,13 +53,12 @@ def test_tables_created_by_lifespan_not_import(monkeypatch, tmp_path, preserve_v
     assert {"idx_v2_assessments_submission", "idx_v2_assessments_created"} <= idx
 
 
-def test_create_v2_tables_is_idempotent_and_leaves_v1_table_alone(monkeypatch, tmp_path):
-    monkeypatch.setattr(db, "DB_PATH", tmp_path / "v1.db")
-    db.create_tables()
-    before = _rows("SELECT sql FROM sqlite_master WHERE name='assessments'")
+def test_create_v2_tables_is_idempotent(monkeypatch, tmp_path):
+    monkeypatch.setattr(db, "DB_PATH", tmp_path / "fresh2.db")
     db.create_v2_tables()
     db.create_v2_tables()
-    assert _rows("SELECT sql FROM sqlite_master WHERE name='assessments'") == before
+    tables = {r["name"] for r in _rows("SELECT name FROM sqlite_master WHERE type='table'")}
+    assert "v2_assessments" in tables and "assessments" not in tables  # V1 table is no longer created
 
 
 def test_check_constraints_reject_bad_rows():
@@ -121,18 +120,6 @@ def test_subset_of_diseases_and_mode_b(client):
 def test_failed_validation_stores_nothing(client):
     r = client.post("/v2/predict", json={"mode": "A", "inputs": {"age": 52}})
     assert r.status_code == 422 and _rows() == []
-
-
-def test_v1_assessments_table_untouched_by_v2_activity(client):
-    before = _rows("SELECT * FROM assessments")
-    sql_before = _rows("SELECT sql FROM sqlite_master WHERE name='assessments'")
-    sid = _post(client)["submission_id"]
-    client.get("/v2/history")
-    client.delete(f"/v2/history/{sid}")
-    _post(client)
-    client.delete("/v2/history?confirm=true")
-    assert _rows("SELECT * FROM assessments") == before
-    assert _rows("SELECT sql FROM sqlite_master WHERE name='assessments'") == sql_before
 
 
 # ------------------------------------------------------------------ failure policy

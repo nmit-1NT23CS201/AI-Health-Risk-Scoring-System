@@ -1,6 +1,6 @@
 # Frontend
 
-> Next.js V2 frontend, implemented in Phases 3A–3B. It talks only to the `/v2/*` API (see [api-and-database.md](api-and-database.md)); the V1 `/predict` UI it replaced no longer exists in the frontend (the V1 backend routes still do). Status: light redesign applied in Phase 3C; **type-checks and builds cleanly** (`npx tsc --noEmit`, `npm run build`); data shapes were checked against the live backend. A visual/browser pass and end-to-end verification are still outstanding (Phase 4).
+> Next.js frontend, implemented in Phases 3A–3C. It talks only to the `/v2/*` API (see [api-and-database.md](api-and-database.md)); the V1 prototype it replaced has been retired from the whole repository. Status: light redesign applied in Phase 3C; **type-checks and builds cleanly** (`npx tsc --noEmit`, `npm run build`); data shapes were checked against the live backend. A visual/browser pass and end-to-end verification are still outstanding (Phase 4).
 
 ## 1. Stack and setup
 
@@ -127,4 +127,4 @@ Display-only; values sent to the API are unchanged. `education_level` is shown a
 - Single route; tabs are not deep-linkable. No authentication (none exists in the backend).
 - Quick-fill profiles are illustrative demo values, not clinical examples.
 - Letter-case and wording of option labels other than education is derived by capitalising the backend's strings; the backend supplies no display labels.
-- The V1 Streamlit dashboard (`backend/api/app.py`) is separate and unaffected.
+- The V1 Streamlit dashboard no longer exists (retired in Phase 5).

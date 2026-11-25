@@ -1,4 +1,4 @@
-"""Shared fixtures. The V1 SQLite DB is redirected to a temp file BEFORE any app import so that
+"""Shared fixtures. The SQLite DB is redirected to a temp file BEFORE any app import so that
 ``backend/database/healthrisk.db`` (tracked in git) is never touched by the test suite."""
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-import backend.database.database as _db  # noqa: E402  (must precede any api_server import)
+import backend.database.database as _db  # noqa: E402  (must precede any app import)
 
 _REAL_DB = Path(_db.DB_PATH)
 _TMP_DIR = Path(tempfile.mkdtemp(prefix="hrs_test_db_"))

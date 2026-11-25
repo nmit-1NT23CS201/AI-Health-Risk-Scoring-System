@@ -84,7 +84,7 @@ Reports in `backend/ml/evaluation/stage_1g/`.
 | 1G-3 SHAP | `STAGE_1G_SHAP_ANALYSIS.md` | **PASS / LOCKED** | Explainer choice, base-model extraction, global/local explanations | Missing IEEE SHAP figures, resolved (regenerated); limitations noted |
 | 1G-4 Research Readiness | `STAGE_1G-4_FINAL_RESEARCH_READINESS_AUDIT.md` | **CONDITIONAL PASS** (line 8): zero methodological blockers; pipeline frozen & verified | Provenance, targets, leakage, splits, artifacts, calibration, thresholds, metric reproduction, Mode A/B, SHAP fidelity, paper claims, reproducibility | 4 non-blocking |
 
-1G-4 non-blocking issues: ISSUE-1 requirements missing xgboost/pyarrow — **resolved**; ISSUE-2 stale V1 docs — largely resolved via `docs/legacy_v1/` (root `README.md` still V1-only); ISSUE-3 UI mockup shows SHAP as "+14.2%" — **open** (must not carry into V2 UI); ISSUE-4 Figures 1, 2, 5 only ASCII — **open** (publication only).
+1G-4 non-blocking issues: ISSUE-1 requirements missing xgboost/pyarrow — **resolved**; ISSUE-2 stale V1 docs — **resolved** (V1 documents and code were removed in Phase 5; the root `README.md` now describes V2); ISSUE-3 UI mockup shows SHAP as "+14.2%" — **open** (must not carry into V2 UI); ISSUE-4 Figures 1, 2, 5 only ASCII — **open** (publication only).
 
 A conditional pass applies to the **research pipeline**. It is not clinical validation: no external validation, no prospective study, no regulatory review, US-based cohort.
 

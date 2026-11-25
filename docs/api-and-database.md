@@ -1,17 +1,16 @@
 # Backend API and Database
 
-> Two APIs share one FastAPI app. **V1** (`backend/api/api_server.py`, unchanged) still serves the current frontend. **V2** (`backend/api/v2/`, attached by `backend/api/main.py`) is the disease-specific inference API. Status: V2 backend **implemented and verified by the automated suite** (`backend/tests/`, 126 tests passing at Phase 2C). No frontend consumes V2 yet.
+> The backend is a single V2 FastAPI application (`backend/api/main.py`, engine in `backend/api/v2/`). It is **implemented and verified by the automated suite** (`backend/tests/`, 123 tests passing) and is consumed by the Next.js frontend. The earlier V1 prototype has been retired (see §4).
 
 ## 1. Running
 
 | Entry point | Command | Serves |
 |---|---|---|
-| Composition root (V1 + V2) | `uvicorn backend.api.main:app` | V1 routes + `/v2/*` |
-| V1 only | `uvicorn backend.api.api_server:app` | V1 routes |
+| Application | `.\.venv\Scripts\python.exe -m uvicorn backend.api.main:app --reload` | `GET /`, `GET /health`, `/v2/*` |
 
-Environment: project `.venv` (Python 3.13). Pinned in `backend/requirements.txt` (+ `backend/requirements-dev.txt` for `pytest`, `httpx`): scikit-learn 1.9.0 (matches the version recorded in `stage_1f_results.json`), xgboost 3.4.1, shap 0.54.1, fastapi 0.165.0, pydantic 2.14.4, pandas 3.1.1, numpy 2.5.5, uvicorn 0.54.0, joblib 1.6.0, pyarrow 26.0.1, tzdata 2026.6, matplotlib 3.11.2, streamlit 1.67.0. Run tests from the repo root: `.venv\Scripts\python -m pytest backend/tests -v`.
+Environment: project `.venv` (Python 3.13). Pinned in `backend/requirements.txt` (+ `backend/requirements-dev.txt` for `pytest`, `httpx`): scikit-learn 1.9.0 (matches the version recorded in `stage_1f_results.json`), xgboost 3.4.1, shap 0.54.1, fastapi 0.165.0, pydantic 2.14.4, pandas 3.1.1, numpy 2.5.5, uvicorn 0.54.0, joblib 1.6.0, pyarrow 26.0.1, tzdata 2026.6, matplotlib 3.11.2 (research scripts only). Run tests from the repo root: `.venv\Scripts\python -m pytest backend/tests -v`.
 
-`backend/api/main.py` imports the V1 `app`, attaches `app.router.lifespan_context` (V2 startup, wrapping V1's), registers the `V2Error` handler and includes the `/v2` router. **V2 startup never blocks V1**: if the model registry fails to load, errors are logged as structured JSON, `/v2/health`, `/v2/predict`, `/v2/model-metrics` and `/v2/features/*` return 503, and every V1 route (and V2 history) keeps working.
+`backend/api/main.py` creates the FastAPI app (`title="Preventive Health Risk Assessment API"`, `version="2.0"`) with the `v2_lifespan` startup, CORS (`http://localhost:3000`, `http://127.0.0.1:3000`), the `V2Error` handler and the `/v2` router, plus lightweight `GET /` and `GET /health` returning `{"status": "ok", "version": "2.0"}`. **A failed model-registry load never takes the process down**: errors are logged as structured JSON, `/v2/health`, `/v2/predict`, `/v2/model-metrics` and `/v2/features/*` return 503, and `/`, `/health` and the history endpoints (database only) keep working.
 
 ## 2. V2 package layout (`backend/api/v2/`)
 
@@ -50,7 +49,7 @@ Soft failures (predictions still served, `/v2/health` returns 200 with `"degrade
 | GET | `/v2/history?limit&before_id` | Newest-first submissions grouped by `submission_id` (`limit` 1-100, default 20) with `next_before_id` cursor | 200; 422; 503 (DB error) |
 | GET | `/v2/history/{submission_id}` | One submission with stored inputs, encoded vector, imputed features | 200; 404 |
 | DELETE | `/v2/history/{submission_id}` | Delete one submission | 200; 404 |
-| DELETE | `/v2/history?confirm=true` | Delete all V2 history (V1 table untouched) | 200; 422 unless `confirm=true` |
+| DELETE | `/v2/history?confirm=true` | Delete all V2 history | 200; 422 unless `confirm=true` |
 
 History routes need only the database, so they keep working while the model registry is unavailable.
 
@@ -84,35 +83,20 @@ Known encoding limitations (properties of the frozen training data; fixing them 
 5. **`bmi` is required by policy but is missing in ~23.5% of NHANES rows**, so such rows cannot be sent through the API (they are covered by encoded-level parity tests).
 6. CVD means "self-reported prior diagnosis", not incident risk; training cohort is US NHANES 2021-2023.
 
-## 4. V1 API (unchanged)
+## 4. Retired V1 (removed in Phase 5)
 
-Entry point `backend/api/api_server.py`, `app = FastAPI(title="AI Health Risk API", version="1.0")`. The Streamlit dashboard `backend/api/app.py` imports it (known bug: line 512 omits the `payload` argument to `generate_insights`).
+The original prototype (a single RandomForestRegressor 0–100 score on a small synthetic dataset, with SHAP plots, rule-based insights, a Streamlit dashboard and an `assessments` table) has been **removed**: `backend/api/api_server.py`, `backend/api/app.py`, `dataset/`, `backend/models/`, `backend/outputs/metrics.json` and `confusion_matrix.png`, the V1 helper modules in `backend/ml/` (`feature_engineering`, `risk_interpreter`, `shap_explainer`, `data_loader`, `train_model`, `preprocessing`, `predict`, `model_evaluation`, `visualization`, `utils`), the V1 database functions and the V1 non-regression tests. The code remains available in git history. `streamlit` was dropped from `backend/requirements.txt`; `matplotlib` is kept because retained research scripts (`backend/ml/scripts/benchmark_*.py`, `backend/ml/evaluation/stage_1g/shap_plot_figure3.py`) import it (the API does not).
 
-| Method | Path | Behaviour |
-|---|---|---|
-| GET | `/`, `/health` | `{"status":"ok"}` |
-| POST | `/predict` | V1 RandomForestRegressor 0-100 score, SHAP plots, insights, recommendations; saves to `assessments` |
-| GET | `/history` | Latest 20: `{id, age, risk_score, risk_level, created_at}` (UTC → Asia/Kolkata) |
-| DELETE | `/history/{assessment_id}`, `/history` | Delete one / all (404 for unknown id) |
-| GET | `/model-metrics` | V1 `metrics.json` + base64 `confusion_matrix.png` |
+Leftovers to be aware of:
 
-V1 `PredictionInput` has 14 fields (`gender` is accepted and stored but unused by the model; the model uses the 13 columns of `FEATURE_COLUMNS`). `PredictionResponse`: `risk_score`, `risk_level`, `positive_contributors`, `negative_contributors`, `insights`, `recommendations`, `summary_plot`, `bar_plot`, `waterfall_plot`.
-
-Configuration: CORS allows `http://localhost:3000` and `http://127.0.0.1:3000` (applies to V2 routes too); no environment variables in V1; `create_tables()` runs at import; errors in `/predict` return 500 with `str(exc)`.
-
-Known V1 defects (not fixed; V1 is frozen until the V2 frontend replaces it): deprecated `payload.dict()`; the row is saved before SHAP runs; debug `print`s; server-side `pyplot` is not thread-safe; score not clamped and non-integer values between bands classify as `"Unknown"`; `tzdata` was not in requirements (now pinned); the pickled V1 model was trained with scikit-learn 1.8.0 and loads under 1.9.0 with a version warning (V1 contract tests pass).
-
-V1 legacy assets that must stay while V1 is live: `dataset/indian_health_risk_dataset.csv`, `backend/models/random_forest_model.pkl`, `backend/outputs/metrics.json`, `backend/outputs/confusion_matrix.png`, and the `backend/ml` helpers `feature_engineering`, `risk_interpreter`, `shap_explainer`.
-
+- `backend/ml/scripts/main.py` is a V1 end-to-end runner that imports the deleted helpers and reads the deleted dataset and model. It sits in the protected research-scripts directory and was deliberately left untouched; it no longer runs and can be deleted with explicit approval.
+- An existing local `backend/database/healthrisk.db` may still contain the old V1 `assessments` table and rows. The code no longer creates or reads it and nothing was dropped; delete the file (it is git-ignored) if the old data is not wanted.
+- Historical research reports under `backend/ml/data/` and `backend/ml/evaluation/` still mention the V1 dataset; they are frozen records.
 ## 5. Database (`backend/database/database.py`)
 
 Raw `sqlite3`, per-call connections, file `backend/database/healthrisk.db`. No ORM, no migration tool. **The `.db` file is no longer tracked by git** (`*.db` is in `.gitignore`) because it holds user-submitted health data; it is created on first run. Tests redirect `DB_PATH` to a temp file and assert the real file is never modified.
 
-### 5.1 V1 table `assessments` (unchanged)
-
-`id`, `age`, `gender`, `bmi`, `systolic_bp`, `diastolic_bp`, `cholesterol_mg_dl`, `smoking`, `alcohol_consumption`, `physical_activity`, `family_history`, `heart_rate_bpm`, `sdnn_hrv`, `rmssd_hrv`, `spo2`, `risk_score`, `risk_level`, `model_version` (always `"RF_v1"`), `created_at`. Created by `create_tables()` at import.
-
-### 5.2 V2 table `v2_assessments`
+### 5.1 Table `v2_assessments`
 
 Created by `create_v2_tables()` (`CREATE TABLE IF NOT EXISTS`, idempotent) from the V2 **lifespan** in `backend/api/main.py`, never at import time. One row per disease result; all rows of a submission share `submission_id`.
 
@@ -134,16 +118,16 @@ Created by `create_v2_tables()` (`CREATE TABLE IF NOT EXISTS`, idempotent) from 
 | `artifact_sha256` | TEXT NOT NULL | SHA-256 of the model file used |
 | `schema_version` | INTEGER NOT NULL DEFAULT 1 | for future migrations |
 
-Functions: `create_v2_tables`, `save_v2_submission` (single transaction; all rows or none), `list_v2_history(limit, before_id)` (groups by submission, positioned by each submission's highest row id), `get_v2_submission`, `delete_v2_submission`, `delete_all_v2_history`. SHAP explanations are **not** stored (recomputable). V1 functions and table are unchanged; the V2 functions are appended to the same file. There are no users or foreign keys.
+Functions: `create_v2_tables`, `save_v2_submission` (single transaction; all rows or none), `list_v2_history(limit, before_id)` (groups by submission, positioned by each submission's highest row id), `get_v2_submission`, `delete_v2_submission`, `delete_all_v2_history`. SHAP explanations are **not** stored (recomputable). There are no users or foreign keys. The old V1 `assessments` table is no longer created or used (see §4).
 
 ## 6. Tests (`backend/tests/`)
 
 | File | Covers |
 |---|---|
-| `conftest.py` | Temp-DB redirect before app import, real-DB integrity guard, shared fixtures |
+| `conftest.py` | Temp-DB redirect before app import, local-DB integrity guard, shared fixtures |
 | `test_v2_schemas.py`, `test_v2_preprocessing.py` | Validation, encoding table, leakage exclusions, training-range table equals processed data |
 | `test_v2_registry.py` | Six configs/thresholds, tampered JSON, missing/corrupt artifacts, app stays up with V2 503 |
 | `test_v2_predict_parity.py` | Golden parity vs independent offline load (max diff 7.8e-16), full-test-split aggregate metrics vs `stage_1f_results.json` within 5e-5, threshold boundary, no double sigmoid |
 | `test_v2_shap.py` | Additivity, payload semantics, HTN-A background hygiene and premise check, concurrency, no pyplot, latency |
-| `test_v2_api.py`, `test_v2_history.py` | Endpoints, persistence, atomicity, failure policy, history CRUD |
-| `test_v1_nonregression.py` | V1 contract (also with V2 broken), V1 routes/schemas, frozen files unchanged, `database.py` only extended |
+| `test_v2_api.py`, `test_v2_history.py` | Endpoints, persistence, atomicity, failure policy, history CRUD, `v2_assessments` created by the lifespan (not at import) |
+| `test_v2_api.py` (also) | `GET /`, `GET /health`, OpenAPI contains only the V2 route set, CORS allows only the frontend origins |

@@ -89,7 +89,7 @@ CVD is a **self-reported prior diagnosis**: the model estimates probability of h
 
 **Authoritative feature order:** no separate manifest exists. The ordered list per configuration is the `features` key of each record in `backend/ml/evaluation/stage_1f/stage_1f_results.json` (written at `calibrate_and_optimize_thresholds.py:563`).
 
-V2 features differ entirely from V1's (no HRV, SpO₂ or family history); V1 form data cannot be fed to V2 models.
+The retired V1 prototype used a different feature set (HRV, SpO₂, family history, cholesterol); none of it applies to V2.
 
 ## 9. Splits
 

@@ -1,4 +1,4 @@
-# Preventive Risk Assessment (V2)
+# Preventive Risk Assessment
 
 A research prototype for **preventive screening support**. It estimates, independently, the probability of **cardiovascular disease (CVD)**, **diabetes** and **hypertension** from routinely available information, and shows which inputs contributed most. It is **not** a clinically validated diagnostic product and does not provide medical advice.
 
@@ -6,25 +6,23 @@ A research prototype for **preventive screening support**. It estimates, indepen
 - Each probability is sigmoid-calibrated and compared with a **locked screening threshold**. There is no combined or 0–100 score.
 - Explanations (SHAP) are computed live for the submitted input and shown as relative magnitude, never as probability changes.
 
-Full documentation is in [`docs/`](docs/README.md).
+The repository contains only this V2 system; the earlier V1 prototype (single synthetic-data risk score) has been retired. Full documentation is in [`docs/`](docs/README.md).
 
 ## Repository layout
 
 ```text
 backend/
 ├── api/
-│   ├── main.py            V1 + V2 composition root (run this)
-│   ├── api_server.py      V1 API (legacy, unchanged)
-│   ├── app.py             V1 Streamlit dashboard (legacy)
-│   └── v2/                V2 inference engine (registry, preprocessing, SHAP, history, routes)
+│   ├── main.py            FastAPI application (run this)
+│   └── v2/                Inference engine: registry, preprocessing, SHAP, history, routes
 ├── database/              SQLite access (healthrisk.db is created locally; git-ignored)
-├── ml/                    Frozen V2 research pipeline: data, scripts, models, evaluation reports
-├── models/, outputs/      Legacy V1 artifacts (still used by the V1 API)
+├── ml/                    Frozen research pipeline: data, scripts, models, evaluation reports,
+│                          Stage 1G SHAP scripts and figures
+├── outputs/               Stage 1D / 1E-1 baseline model outputs
 ├── tests/                 pytest suite
 ├── requirements.txt       Pinned runtime dependencies
 └── requirements-dev.txt   Test dependencies
-frontend/                  Next.js V2 interface
-dataset/                   Legacy V1 dataset (kept for the V1 API)
+frontend/                  Next.js interface
 docs/                      Maintained documentation
 ```
 
@@ -47,7 +45,7 @@ cd ..
 
 ## Run
 
-Backend (V1 + V2 routes, from the repository root):
+Backend (from the repository root):
 
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn backend.api.main:app --reload
@@ -62,12 +60,10 @@ npm run dev
 
 Open <http://localhost:3000>. The API listens on <http://127.0.0.1:8000> (interactive docs at `/docs`). The frontend reads `NEXT_PUBLIC_API_BASE_URL` (default `http://127.0.0.1:8000`); the backend allows CORS only from `localhost:3000` / `127.0.0.1:3000`.
 
-The legacy V1 API alone can still be started with `.\.venv\Scripts\python.exe -m uvicorn backend.api.api_server:app`, but the current frontend uses only the V2 API.
-
 ## Test and build
 
 ```powershell
-# Backend: 126 tests (V2 parity, SHAP, history, V1 non-regression)
+# Backend: V2 parity, SHAP, history and API tests
 .\.venv\Scripts\python.exe -m pytest backend/tests -v
 
 # Frontend

@@ -42,7 +42,10 @@ except ImportError:
     sys.exit("Missing dependency: pip install shap")
 
 # Base project paths
-BASE_DIR = Path(__file__).resolve().parent
+# This script lives in backend/ml/evaluation/stage_1g/. Inputs resolve from the repository root;
+# outputs (shap_global_values.csv/.json) are written next to the script.
+OUT_DIR = Path(__file__).resolve().parent
+BASE_DIR = OUT_DIR.parents[3]
 PROCESSED_DIR = BASE_DIR / "backend" / "ml" / "data" / "processed" / "nhanes_2021_2023"
 SPLITS_DIR = PROCESSED_DIR / "splits"
 MODELS_DIR = BASE_DIR / "backend" / "ml" / "evaluation" / "stage_1f" / "models"
@@ -317,8 +320,8 @@ def main():
         sys.exit("Error: No pipelines produced output. Check file paths.")
 
     df = pd.DataFrame(all_rows)
-    csv_out = BASE_DIR / "shap_global_values.csv"
-    json_out = BASE_DIR / "shap_global_values.json"
+    csv_out = OUT_DIR / "shap_global_values.csv"
+    json_out = OUT_DIR / "shap_global_values.json"
 
     df.to_csv(csv_out, index=False)
     with open(json_out, "w") as f:

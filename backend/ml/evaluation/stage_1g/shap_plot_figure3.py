@@ -42,7 +42,10 @@ SUBINK = "#5B6B7B"
 INK = "#22303F"
 SPINE_COLOR = "#B9C6D3"
 
-CSV_PATH = "shap_global_values.csv"
+# Lives in backend/ml/evaluation/stage_1g/: reads the CSV beside it, writes figures to ./figures/.
+_HERE = Path(__file__).resolve().parent
+CSV_PATH = str(_HERE / "shap_global_values.csv")
+FIG_DIR = _HERE / "figures"
 
 PANEL_ORDER = [
     ("a", "CVD", "A"),
@@ -129,9 +132,9 @@ def main():
     plt.tight_layout()
     fig.subplots_adjust(hspace=0.48, wspace=0.55)
 
-    png_out = "fig3_global_shap_feature_importance.png"
-    pdf_out = "fig3_global_shap_feature_importance.pdf"
-    svg_out = "fig3_global_shap_feature_importance.svg"
+    png_out = FIG_DIR / "fig3_global_shap_feature_importance.png"
+    pdf_out = FIG_DIR / "fig3_global_shap_feature_importance.pdf"
+    svg_out = FIG_DIR / "fig3_global_shap_feature_importance.svg"
 
     fig.savefig(png_out, dpi=300, bbox_inches="tight")
     fig.savefig(pdf_out, bbox_inches="tight")

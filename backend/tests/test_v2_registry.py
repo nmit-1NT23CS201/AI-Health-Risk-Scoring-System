@@ -112,7 +112,7 @@ def test_app_stays_up_with_v2_503_when_registry_broken(monkeypatch, tmp_path, pr
         r = c.post("/v2/predict", json=body)
         assert r.status_code == 503 and r.json()["error"] == "v2_unavailable"
         assert c.get("/v2/model-metrics").status_code == 503
-        assert c.get("/health").json() == {"status": "ok"}  # V1 unaffected
+        assert c.get("/health").json() == {"status": "ok", "version": "2.0"}  # process stays up
     # registry recovers on the next normal startup
     monkeypatch.delenv("V2_RESULTS_JSON")
     with TestClient(app) as c:

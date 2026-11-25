@@ -80,3 +80,24 @@ def test_features_endpoint(client):
     assert bm["gender"]["allowed_values"] == ["male", "female"]
     assert bm["bmi"]["hard_bounds"] == {"min": 10, "max": 80}
     assert client.get("/v2/features/C").status_code == 422
+
+
+def test_root_and_health_report_v2(client):
+    for path in ("/", "/health"):
+        r = client.get(path)
+        assert r.status_code == 200 and r.json() == {"status": "ok", "version": "2.0"}
+
+
+def test_openapi_contains_only_v2_routes(client):
+    spec = client.get("/openapi.json").json()
+    assert spec["info"]["title"] == "Preventive Health Risk Assessment API" and spec["info"]["version"] == "2.0"
+    paths = set(spec["paths"])
+    assert paths == {"/", "/health", "/v2/predict", "/v2/health", "/v2/model-metrics", "/v2/features/{mode}",
+                     "/v2/history", "/v2/history/{submission_id}"}
+
+
+def test_cors_allows_frontend_origin_only(client):
+    ok = client.options("/v2/predict", headers={"Origin": "http://localhost:3000", "Access-Control-Request-Method": "POST"})
+    assert ok.headers.get("access-control-allow-origin") == "http://localhost:3000"
+    bad = client.options("/v2/predict", headers={"Origin": "http://evil.example", "Access-Control-Request-Method": "POST"})
+    assert "access-control-allow-origin" not in bad.headers

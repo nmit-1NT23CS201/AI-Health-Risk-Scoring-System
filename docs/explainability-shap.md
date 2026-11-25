@@ -2,14 +2,14 @@
 
 ## 1. Research methodology (Stage 1G-3, implemented & verified)
 
-Scripts live at the **repo root**: `shap_compute.py`, `shap_plot_figure3.py`.
+Scripts live in `backend/ml/evaluation/stage_1g/`: `shap_compute.py` and `shap_plot_figure3.py` (moved there from the repository root in Phase 5; only their path constants were updated, so they still read inputs from the repo root and write beside themselves).
 
 | Aspect | Implementation |
 |---|---|
 | Model explained | The **base estimator** extracted from `calibrated_classifiers_[0]` and unwrapped from `FrozenEstimator` (`shap_compute.py:149-187`). For Pipeline models, `est[:-1]` transforms X and `est[-1]` is explained (`:226-247`). |
 | Explainers | `shap.TreeExplainer` for RF, HGB, XGB (`:267-274`); `shap.LinearExplainer` for Hypertension A (LR) with a 200-row background sampled from the test set, `random_state=42` (`:275-279`). |
 | Data | Held-out **test split** only (`:190-223`). No retraining. |
-| Artifacts (root) | `shap_global_values.csv/.json`, `fig3_global_shap_feature_importance.{png,pdf,svg}`, `shap_summary_plot.png`, `shap_waterfall_plot.png` |
+| Artifacts | `backend/ml/evaluation/stage_1g/shap_global_values.csv/.json`; figures in `backend/ml/evaluation/stage_1g/figures/`: `fig3_global_shap_feature_importance.{png,pdf,svg}`, `shap_summary_plot.png`, `shap_waterfall_plot.png` |
 | Artifacts (`backend/ml/evaluation/stage_1g/`) | `figures/`, `stage_1g_shap_analysis.json`, `STAGE_1G_SHAP_ANALYSIS.md` |
 | Examples (per report) | Waterfall: SEQN 130670 (Diabetes B, P = 0.539); beeswarm: 300 test participants |
 
@@ -21,13 +21,9 @@ Audit verdict: Stage 1G-3 **PASS / LOCKED**. The missing IEEE figures were regen
 - SHAP describes **model behaviour, not causal medical effects**. Correlated features (e.g. BMI and waist) share attribution arbitrarily.
 - Precomputed SHAP files describe **NHANES test participants**. They must never be presented as explanations of an application user.
 
-## 3. V1 application SHAP
+## 3. Live per-request SHAP (implemented & verified, `backend/api/v2/explain.py`)
 
-`/predict` (V1) uses `shap.TreeExplainer` on the V1 RandomForestRegressor's `model` step (`backend/ml/shap_explainer.py`), returns the top 6 contributors, and renders summary/bar plots from a cached 200-row sample of the V1 CSV plus a per-request waterfall (server-side `pyplot`). This is unrelated to the V2 models and remains until V1 is retired.
-
-## 4. V2 live per-request SHAP (implemented & verified, `backend/api/v2/explain.py`)
-
-Explanations are computed for the **submitted input only**; the service never reads `shap_global_values.*` or any precomputed NHANES explanation, never uses `matplotlib`/`pyplot` (a test enforces both), and returns numbers rather than images.
+Explanations are computed for the **submitted input only**; the service never reads the research outputs `shap_global_values.*` or any precomputed NHANES explanation, never uses `matplotlib`/`pyplot` (a test enforces both), and returns numbers rather than images.
 
 **Unwrapping** (mirrors `shap_compute.py`): `CalibratedClassifierCV → calibrated_classifiers_[0] → .estimator → FrozenEstimator → .estimator` gives either a `Pipeline` (CVD A/B, Hypertension A/B: `est[:-1]` transforms the row, `est[-1]` is explained) or a bare estimator (Diabetes A HistGradientBoosting, Diabetes B XGBoost: the raw frame is explained). Probabilities always come from the full calibrated artifact, never the unwrapped base.
 

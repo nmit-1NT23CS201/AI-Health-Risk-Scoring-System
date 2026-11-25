@@ -15,6 +15,5 @@
 
 ## Frozen V2 ML pipeline
 
-- **Never modify the frozen V2 ML research pipeline without explicit instruction**: `backend/ml/scripts/`, `backend/ml/data/`, `backend/ml/evaluation/`, split files, calibrated models and thresholds, and the root SHAP scripts and artifacts.
-- Keep V1 runtime assets (`backend/models/random_forest_model.pkl`, `backend/outputs/metrics.json`, `backend/outputs/confusion_matrix.png`, `dataset/indian_health_risk_dataset.csv`) until V2 is validated.
-- `docs/legacy_v1/` is archived; do not edit it.
+- **Never modify the frozen V2 ML research pipeline without explicit instruction**: `backend/ml/scripts/`, `backend/ml/data/`, `backend/ml/evaluation/`, split files, calibrated models and thresholds, and the Stage 1G SHAP scripts and artifacts in `backend/ml/evaluation/stage_1g/`.
+- The repository is V2-only; the V1 prototype was retired in Phase 5. Do not reintroduce a combined or 0–100 risk score.
