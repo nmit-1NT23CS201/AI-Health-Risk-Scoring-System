@@ -38,3 +38,6 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Local SQLite databases (contain user-submitted health data)
+*.db

@@ -1,3 +1,5 @@
+> **Note:** The maintained, sharded documentation now lives in [`docs/README.md`](docs/README.md). This file is retained as the original blueprint and may be out of date (its UI mockup in §18 is not the current UI).
+
 # AI Health Risk Scoring System: Architectural Blueprint and Technical System Description
 
 ---
